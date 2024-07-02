@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/StoryManagement
+/StoryManagement.Model/bin/Debug/net8.0
+/StoryManagement.Model/obj
+/Admin/bin/Debug/net8.0
+/Admin/obj
+/Admin/Properties
