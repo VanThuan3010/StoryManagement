@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Id <= 0 ? "Thêm mới chương truyện" : "Sửa nội dung chương";
+}
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="breadcrumb-title pe-3">Tác giả</div>
+    <div class="ps-1">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 p-0">
+                <li class="breadcrumb-item">
+                    <a href="/"><i class="bx bx-home-alt"></i></a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Danh sách tác giả</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="ms-auto">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" id="btnCreate">Thêm mới</button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                @* <div class="row mb-3">
+                <div class="col-lg-3">
+                <input type="text" class="form-control" id="txtSearch" placeholder="Tìm kiếm tên truyện" />
+                </div>*@
+                <form id="frmChapter">
+                    <input type="text" hidden id="txtIdStory" value="@ViewBag.Id" name="Id" />
+                    <div class="form-group col-lg-12 mb-3">
+                        <label class="form-label required">Tiêu đề</label>
+                        <input type="text" class="form-control" id="txtTitle" name="Title" />
+                    </div>
+                    <div class="form-group col-lg-12 mb-3">
+                        <label class="form-label">Thuộc</label>
+                        <input type="text" class="form-control" name="NumberChapter" id="txtPseudonym" />
+                    </div>
+                    <div class="form-group col-lg-12 mb-3">
+                        <label class="form-label">Nội dung chương</label>
+                        <textarea class="" id="txtContent" name="Content">
+                        </textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        CKEDITOR.replace('txtContent');
+    </script>
+}
+

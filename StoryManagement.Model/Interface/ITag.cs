@@ -1,0 +1,17 @@
+﻿using BaseRepo.Interfaces;
+using StoryManagement.Model.Entity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace StoryManagement.Model.Interface
+{
+    public interface ITag : IRepository<Tags>
+    {
+        List<Tags> GetAll(int pageIndex, int pageSize, string search, ref int Total);
+        int CreateOrUpdate(Tags tags);
+        List<Tags> GetStoryTag(int id);
+    }
+}

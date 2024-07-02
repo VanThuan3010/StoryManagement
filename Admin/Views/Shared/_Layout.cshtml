@@ -1,0 +1,85 @@
+﻿
+@{
+    var controller = this.Context.GetRouteData().Values["controller"].ToString().ToLower();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Admin.styles.css" asp-append-version="true" />
+    @* Bootstrap-table *@
+    <link href="~/lib/bootstrap_table/bootstrap-table.css" rel="stylesheet" />
+    @* AminLTE *@
+    <link href="~/lib/adminlte/css/adminlte.min.css" rel="stylesheet" />
+    <link href="~/lib/adminlte/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    @* Select 2 *@
+    <link href="~/asset/select2/select2.min.css" rel="stylesheet" />
+    @* Notification *@
+    <link href="~/asset/notifications/css/lobibox.min.css" rel="stylesheet" />
+    @* Jquery-confirm *@
+    <link href="~/asset/jquery-confirm/css/jquery-confirm.css" rel="stylesheet" />
+
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        @Html.Partial("_header");
+        @Html.Partial("_nav");
+
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            @* <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Blank Page</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">Blank Page</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section> *@
+
+            <!-- Main content -->
+            <section class="content">
+                @RenderBody()
+            </section>
+            <!-- /.content -->
+        </div>
+        
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 3.2.0
+            </div>
+        </footer>
+        <!-- end main content-->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+
+    </div>
+
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/lib/bootstrap_table/bootstrap-table.js"></script>
+    <script src="~/asset/select2/select2.min.js"></script>
+    <script src="~/asset/ckeditor/ckeditor.js"></script>
+    <script src="~/asset/notifications/js/lobibox.js"></script>
+    <script src="~/asset/notifications/js/lobibox.min.js"></script>
+    <script src="~/asset/jquery-confirm/js/jquery-confirm.js"></script>
+
+    <script src="~/lib/adminlte/js/adminlte.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/controller/@(controller).js?v=@DateTime.UtcNow.ToString()"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
