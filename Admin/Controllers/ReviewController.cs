@@ -13,7 +13,7 @@ namespace Admin.Controllers
         }
         public IActionResult Index(int idStory)
         {
-            var data = _ibase.reviewRespository.Get(x=> x.IdStory == idStory).FirstOrDefault();
+            var data = _ibase.reviewRespository.GetStoryReview(idStory);
             return View(data);
         }
 

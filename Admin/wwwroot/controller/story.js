@@ -132,7 +132,7 @@
                             var action = "<div style='width: 200px;'>";
                             action += '<a href="javascript:void(0)" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
                             action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
-                            action += '<a href="/Review/Index?idStory=' + row.storyId + '" class="btn btn-success btn-sm btnReview ms-1"><i class="fa fa-book-open"></i></a>';
+                            action += '<a href="/Review/Index?idStory=' + row.id + '" class="btn btn-success btn-sm btnReview ms-1"><i class="fa fa-book-open"></i></a>';
                             action += '</div>';
                             return action;
                         },

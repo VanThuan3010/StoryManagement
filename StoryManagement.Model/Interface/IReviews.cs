@@ -11,5 +11,6 @@ namespace StoryManagement.Model.Interface
     public interface IReviews : IRepository<Reviews>
     {
         int CreateOrUpdate(Reviews reviews);
+        Reviews GetStoryReview(int id);
     }
 }

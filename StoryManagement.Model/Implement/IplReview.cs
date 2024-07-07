@@ -45,5 +45,25 @@ namespace StoryManagement.Model.Implement
             }
 
         }
+        public Reviews GetStoryReview(int id)
+        {
+            Reviews List = new Reviews();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@idStory", id);
+                    List = u.GetIEnumerable<Reviews>("Get_Review", p).SingleOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
     }
 }
