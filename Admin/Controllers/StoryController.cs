@@ -86,11 +86,7 @@ namespace Admin.Controllers
             }
 
         }
-        public IActionResult Detail(int id)
-        {
-            return View();
-        }
-        public IActionResult Chapter(int idStory, int idChapter)
+        public IActionResult Chapter(int idStory)
         {
             return View();
         }
