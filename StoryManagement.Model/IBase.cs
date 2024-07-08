@@ -18,7 +18,7 @@ namespace StoryManagement.Model
         ISeries seriesRespository { get; }
         ITag tagRespository { get; }
 
-
+        IPart_Chapter part_ChapterRespository { get; }
         void Commit();
     }
 }

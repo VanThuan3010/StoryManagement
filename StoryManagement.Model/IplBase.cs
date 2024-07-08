@@ -21,6 +21,7 @@ namespace StoryManagement.Model
         private IReviews _reviewRespository ;
         private ISeries _seriesRespository ;
         private ITag _tagRespository ;
+        private IPart_Chapter _partRespository ;
 
         public IConfiguration _Configuration ;
 
@@ -71,6 +72,13 @@ namespace StoryManagement.Model
             get
             {
                 return _tagRespository ?? (_tagRespository = new IplTag(_dbContext, _Configuration));
+            }
+        }
+        public IPart_Chapter part_ChapterRespository
+        {
+            get
+            {
+                return _partRespository ?? (_partRespository = new IplPart_Chapter(_dbContext, _Configuration));
             }
         }
         public void Commit()
