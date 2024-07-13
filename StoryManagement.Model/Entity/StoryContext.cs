@@ -88,7 +88,7 @@ namespace MFTech.Model.Entity
             {
                 entity.ToTable("Part_Chapter");
 
-                entity.Property(e => e.Name).HasMaxLength(250);
+                entity.Property(e => e.Name).HasMaxLength(500);
 
                 entity.Property(e => e.IdStory);
             });

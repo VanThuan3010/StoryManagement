@@ -10,5 +10,6 @@ namespace StoryManagement.Model.Interface
 {
     public interface IPart_Chapter : IRepository<Part_Chapter>
     {
+        List<Part_Chapter> GetAll(int idStory);
     }
 }

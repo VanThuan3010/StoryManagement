@@ -46,6 +46,26 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public Story GetDetail(int id)
+        {
+            Story List = new Story();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@idStory", id);
+                    List = u.GetIEnumerable<Story>("Get_StoryDetail", p).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
         public int CreateOrUpdate(Story storyModel)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
