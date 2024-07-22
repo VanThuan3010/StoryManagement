@@ -9,6 +9,31 @@
         },
 
         action: function () {
+            $('#savePosition').click(function () {
+                const chapterIdsString = $('#tblChapter').bootstrapTable('getData').map(function (row) {
+                    return row.chapterId;
+                }).join(',');
+                /*alert(chapterIdsString);*/
+                $.ajax({
+                    url: '/Chapter/UpdatePosition',
+                    type: 'post',
+                    data: { ids: chapterIdsString },
+                    beforeSend: function () {
+                        $('#savePosition').prop('disabled', true);
+                        $('#savePosition').html(base.loadButton("Lưu"));
+                    },
+                    success: function (res) {
+                        $('#savePosition').prop('disabled', false);
+                        $('#savePosition').html("Lưu vị trí");
+                        $("#tblChapter").bootstrapTable('refresh');
+                        if (res.status) {
+                            base.notification('success', res.message);
+                        } else {
+                            base.notification('error', res.message);
+                        }
+                    }
+                })
+            })
         },
         tblChapter: function () {
             var objTable = $("#tblChapter");
@@ -37,6 +62,7 @@
                 search: false,
                 pageSize: 50,
                 pageList: [50, 100],
+                reorderableRows: true,
 
                 columns: [
                     {

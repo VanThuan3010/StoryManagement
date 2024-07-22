@@ -94,5 +94,26 @@ namespace StoryManagement.Model.Implement
             }
 
         }
+        public int UpdatePosition(string listId)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@Ids", listId);
+
+                    list = u.ProcedureExecute("UpdatePositions", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
     }
 }

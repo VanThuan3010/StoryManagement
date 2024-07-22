@@ -81,5 +81,36 @@ namespace Admin.Controllers
             }
 
         }
+        [HttpPost]
+        public JsonResult UpdatePosition(string ids)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(ids))
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
+                }
+                _ibase.chapterRespository.UpdatePosition(ids);
+                _ibase.Commit();
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Cập nhật thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = ex.Message,
+                });
+            }
+
+        }
     }
 }

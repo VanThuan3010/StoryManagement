@@ -5,7 +5,12 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoryManagement.Model", "StoryManagement.Model\StoryManagement.Model.csproj", "{436FA9E6-70F2-45E0-BDCC-D420C10958F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin", "Admin\Admin.csproj", "{499CCDB2-93BA-424A-B79B-ADE47BF05D06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "Admin\Admin.csproj", "{499CCDB2-93BA-424A-B79B-ADE47BF05D06}"
+	ProjectSection(ProjectDependencies) = postProject
+		{436FA9E6-70F2-45E0-BDCC-D420C10958F0} = {436FA9E6-70F2-45E0-BDCC-D420C10958F0}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Website", "Website\Website.csproj", "{4F71B6A3-D9BF-4A88-AB20-8B9590C0D36E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{436FA9E6-70F2-45E0-BDCC-D420C10958F0} = {436FA9E6-70F2-45E0-BDCC-D420C10958F0}
 	EndProjectSection
@@ -24,6 +29,10 @@ Global
 		{499CCDB2-93BA-424A-B79B-ADE47BF05D06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{499CCDB2-93BA-424A-B79B-ADE47BF05D06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{499CCDB2-93BA-424A-B79B-ADE47BF05D06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F71B6A3-D9BF-4A88-AB20-8B9590C0D36E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F71B6A3-D9BF-4A88-AB20-8B9590C0D36E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F71B6A3-D9BF-4A88-AB20-8B9590C0D36E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F71B6A3-D9BF-4A88-AB20-8B9590C0D36E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
