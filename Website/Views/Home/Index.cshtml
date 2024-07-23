@@ -1,4 +1,5 @@
-﻿@{
+﻿@using StoryManagement.Model.Entity
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -18,20 +19,26 @@
                     Được nhiều Like &gt;
                 </div>
                 <div class="row book-grid">
-                    <a class="col-lg-2 col-md-3 col-sm-3 col-4 cap"
-                       href="/Story/Details">
-                        <div class="bookthumb">
-                            <img loading="lazy"
-                                 referrerpolicy="no-referrer"
-                                 src="https://bookcover.yuewen.com/qdbimg/349573/1040874138/300" />
-                        </div>
-                        <div class="nameSto" title="Ngộ tính nghịch thiên: Từ Đấu La bắt đầu thứ nguyên hành trình">
-                            <b style="line-height: 1.5; display: block; margin: 8px 0" id="nameSto">
-                                Ngộ tính nghịch thiên: Từ Đấu La bắt đầu thứ nguyên hành
-                                trình
-                            </b>
-                        </div>
-                    </a>
+                    @if (ViewBag.listStory != null && ViewBag.listStory.Count > 0)
+                    {
+                        foreach (Story str in ViewBag.listStory)
+                        {
+                            <a class="col-lg-2 col-md-3 col-sm-3 col-4 cap"
+                               href="/Story/Details?idStory=@str.Id">
+                                <div class="bookthumb">
+                                    <img loading="lazy"
+                                         referrerpolicy="no-referrer"
+                                         src="https://bookcover.yuewen.com/qdbimg/349573/1040874138/300" />
+                                </div>
+                                <div class="nameSto" title="@str.Name">
+                                    <b style="line-height: 1.5; display: block; margin: 8px 0" id="nameSto">
+                                        @str.Name
+                                    </b>
+                                </div>
+                            </a>
+                        }
+                    }
+                    
                 </div>
             </div>
         </div>

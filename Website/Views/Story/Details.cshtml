@@ -1,4 +1,12 @@
-﻿<div class="inner">
+﻿@using StoryManagement.Model.Entity
+@model Story
+
+@{
+    ViewData["Title"] = "Thông tin truyện";
+    List<Tags> tags = (List<Tags>)ViewBag.listTags;
+    List<Authors> authors = (List<Authors>)ViewBag.listAuthors;
+}
+<div class="inner">
     <div class="container">
         <div class="row">
             <div class="col-3 col-md-3 col-lg-3">
@@ -14,19 +22,24 @@
             <div class="col-6 col-md-6 col-lg-6">
                 <div class="col-inner">
                     <div class="product-title-container">
-                        <h3 class="product-title product_title entry-title">Ngộ tính nghịch thiên: Từ Đấu La bắt đầu thứ nguyên hành trình</h3>
+                        <h3 class="product-title product_title entry-title">@Model.Name<</h3>
                         <div class="is-divider small"></div>
+                        <a href="/Story/Chapter?idSory=@Model.Id" class="btn btn-primary">Đọc truyện</a>
                     </div>
                 </div>
             </div>
             <div class="col-1 col-md-1 col-lg-1"></div>
         </div>
         <div class="row mt-5">
-            <div class="col-7 col-md-7 col-lg-7 col-inner">
+            <div class="col-12 col-md-12 col-lg-12 col-inner">
                 <ul class="tags">
-                    <li><a href="#" class="tag">HTML</a></li>
-                    <li><a href="#" class="tag">CSS</a></li>
-                    <li><a href="#" class="tag">JavaScript</a></li>
+                    @if(tags != null && tags.Count > 0)
+                    {
+                        foreach(Tags tg in tags)
+                        {
+                            <li><a href="#" class="tag">@tg.Name</a></li>                            
+                        }
+                    }
                 </ul>
             </div>
         </div>
@@ -37,7 +50,7 @@
                     <div class="navtab active border border-1" data-target="review">Giới thiệu</div>
                     <div class="navtab border border-1" data-target="listChapter">Chương</div>
                     <div class="navtab border border-1" data-target="rating">Đánh giá</div>
-                    <div class="navtab border border-1" data-target="page4">Page4</div>
+                    <div class="navtab border border-1" data-target="series">Series</div>
                     <div class="navtab border border-1" data-target="page5">Page5</div>
                     <div class="navtab border border-1" data-target="page6">Page6</div>
                     <div class="navtab border border-1" data-target="page7">Page7</div>
@@ -55,7 +68,7 @@
                         <h1>Contact Us</h1>
                         <p>This is the contact section.</p>
                     </div>
-                    <div id="page4" class="content">
+                    <div id="series" class="content">
                         <h1>Page 4</h1>
                         <p>This is the page 4 section.</p>
                     </div>

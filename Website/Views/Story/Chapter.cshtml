@@ -1,4 +1,7 @@
-﻿<div id="inner" class="mt-5">
+﻿@using StoryManagement.Model.Entity
+@model Chapters
+
+<div id="inner" class="mt-5">
     <a href="/truyen/qidian/1/1040649722/" id="booknameholder" style="font-size: 24px;font-weight: 700;color: gray;display: block;text-align: center;"> Người tại sa ẩn, cố gắng liền có thể trở nên mạnh mẽ </a>
     <div id="bookchapnameholder" style="color: gray; text-align: center;">Thứ 1 chương Làng Cát</div>
     <br>
@@ -10,19 +13,7 @@
         </div>
     </div>
     <div id="content-container" class="container" style="min-height: 300px;padding: 0px; margin-top: 30px; margin-bottom: 30px;">
-        <div>
-            Truyện được đăng tại https://sangtacviet.vip/truyen/qidian/1/1040649722/796676690/
-            Mộc diệp 47 năm, sa ẩn 46 năm.
-            Học viện Ninja, một gian trong đó lớp học trong phòng học, trung nhẫn lão sư đang ôm lấy sách vở máy móc đọc lấy.
-            “Cái gọi là chakra, chính là từ ninja thể nội tế bào năng lượng cùng năng lượng tinh thần dung hợp lẫn nhau tinh luyện mà ra, là ninja sức mạnh căn nguyên.”
-            “Hết thảy nhẫn thuật, huyễn thuật, thể thuật, đều là đối với chakra năng lượng khác biệt lợi dụng.”
-            “Phân Thân Thuật kết ấn chính là không - Tị - Dần 3 cái ấn.”
-            Bành!
-            Kèm theo một đám khói trắng tán đi, một đạo cùng trung nhẫn lão sư giống nhau như đúc phân thân xuất hiện ở bên người.
-            Trong phòng học, tọa lạc mấy chục cái Làng Cát học sinh, phần lớn cũng là 10 tuổi khoảng chừng tuổi tác.
-            Nhưng đối với những thứ này xuất thân từ bình dân gia đình bọn nhỏ tới nói, Học viện Ninja chương trình học là bọn hắn duy nhất có thể lấy thu hoạch ninja tri thức cùng dạy dỗ đường tắt.
-            Cổ Xuyên Tú cùng nhau dạng cũng là như thế.
-        </div>
+        @Html.Raw(Model.Content)
     </div>
     <div class="tm-reader-top-nav" style="background: #eeeeee;font-size: 16px;padding: 6px 0;font-weight: 500">
         <div class="container" style="text-align: center;">
