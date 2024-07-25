@@ -1,0 +1,46 @@
+﻿@using StoryManagement.Model.Entity
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="inner">
+    <div class="container">
+        <div class="row">
+            <div class="tmc-home-section"
+                 style="
+                color: black;
+                font-size: 14px;
+                padding: 0 15px;
+                width: 100%;
+                border-top-left-radius: 16px;
+                border-top-right-radius: 16px;
+              ">
+                <div style="font-size: 20px; margin: 20px 0; border-top: 5px solid #394589;">
+                    Được nhiều Like &gt;
+                </div>
+                <div class="row book-grid">
+                    @if (ViewBag.listStory != null && ViewBag.listStory.Count > 0)
+                    {
+                        foreach (Story str in ViewBag.listStory)
+                        {
+                            <a class="col-lg-2 col-md-3 col-sm-3 col-4 cap"
+                               href="/Story/Details?idStory=@str.Id">
+                                <div class="bookthumb">
+                                    <img loading="lazy"
+                                         referrerpolicy="no-referrer"
+                                         src="https://bookcover.yuewen.com/qdbimg/349573/1040874138/300" />
+                                </div>
+                                <div class="nameSto" title="@str.Name">
+                                    <b style="line-height: 1.5; display: block; margin: 8px 0" id="nameSto">
+                                        @str.Name
+                                    </b>
+                                </div>
+                            </a>
+                        }
+                    }
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

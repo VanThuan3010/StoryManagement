@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace StoryManagement.Model.Entity
 {
-    public class Story_Author
+    public class Part_Chapter
     {
-        public long Id { get; set; }
-        public int StoryId { get; set; }
-        public int AuthorId { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int IdStory {  get; set; } 
     }
 }

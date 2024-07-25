@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace StoryManagement.Model.Interface
 {
-    public interface IStory_Author : IRepository<Story_Author>
+    public interface IPart_Chapter : IRepository<Part_Chapter>
     {
+        List<Part_Chapter> GetAll(int idStory);
     }
 }

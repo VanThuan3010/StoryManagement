@@ -16,11 +16,9 @@ namespace StoryManagement.Model
         IChapters chapterRespository { get; }
         IReviews reviewRespository { get; }
         ISeries seriesRespository { get; }
-        IStory_Author storyAuthorRespository { get; }
-        IStory_Tag storyTagRespository { get; }
         ITag tagRespository { get; }
 
-
+        IPart_Chapter part_ChapterRespository { get; }
         void Commit();
     }
 }

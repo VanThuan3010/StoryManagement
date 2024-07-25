@@ -9,3 +9,7 @@
 /Admin/obj
 /Admin/Properties
 /.vs/ProjectEvaluation
+/Website/obj
+/Admin/wwwroot/lib
+/Website/bin/Debug/net8.0
+/Website/wwwroot/lib

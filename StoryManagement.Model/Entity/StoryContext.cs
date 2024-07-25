@@ -22,9 +22,8 @@ namespace MFTech.Model.Entity
         public virtual DbSet<Chapters> Chapters { get; set; } = null!;
         public virtual DbSet<Reviews> Reviews { get; set; } = null!;
         public virtual DbSet<Series> Series { get; set; } = null!;
-        public virtual DbSet<Story_Author> Story_Authors { get; set; } = null!;
-        public virtual DbSet<Story_Tag> Story_Tags { get; set; } = null!;
         public virtual DbSet<Tags> Tags { get; set; } = null!;
+        public virtual DbSet<Part_Chapter> Part_Chapters { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,22 +76,6 @@ namespace MFTech.Model.Entity
 
                 entity.Property(e => e.Position);
             });
-            modelBuilder.Entity<Story_Author>(entity =>
-            {
-                entity.ToTable("Story_Author");
-
-                entity.Property(e => e.StoryId);
-
-                entity.Property(e => e.AuthorId);
-            });
-            modelBuilder.Entity<Story_Tag>(entity =>
-            {
-                entity.ToTable("Story_Tag");
-
-                entity.Property(e => e.StoryId);
-
-                entity.Property(e => e.TagId);
-            });
             modelBuilder.Entity<Tags>(entity =>
             {
                 entity.ToTable("Tags");
@@ -100,6 +83,14 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.Name).HasMaxLength(200);
 
                 entity.Property(e => e.Definition).HasMaxLength(4000);
+            });
+            modelBuilder.Entity<Part_Chapter>(entity =>
+            {
+                entity.ToTable("Part_Chapter");
+
+                entity.Property(e => e.Name).HasMaxLength(500);
+
+                entity.Property(e => e.IdStory);
             });
 
             OnModelCreatingPartial(modelBuilder);

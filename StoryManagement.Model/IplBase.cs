@@ -20,9 +20,8 @@ namespace StoryManagement.Model
         private IChapters _chapterRespository;
         private IReviews _reviewRespository ;
         private ISeries _seriesRespository ;
-        private IStory_Author _storyAuthorRespository ;
-        private IStory_Tag _storyTagRespository ;
         private ITag _tagRespository ;
+        private IPart_Chapter _partRespository ;
 
         public IConfiguration _Configuration ;
 
@@ -68,25 +67,18 @@ namespace StoryManagement.Model
                 return _seriesRespository ?? (_seriesRespository = new IplSeries(_dbContext, _Configuration));
             }
         }
-        public IStory_Author storyAuthorRespository
-        {
-            get
-            {
-                return _storyAuthorRespository ?? (_storyAuthorRespository = new IplStory_Author(_dbContext, _Configuration));
-            }
-        }
-        public IStory_Tag storyTagRespository
-        {
-            get
-            {
-                return _storyTagRespository ?? (_storyTagRespository = new IplStory_Tag(_dbContext, _Configuration));
-            }
-        }
         public ITag tagRespository
         {
             get
             {
                 return _tagRespository ?? (_tagRespository = new IplTag(_dbContext, _Configuration));
+            }
+        }
+        public IPart_Chapter part_ChapterRespository
+        {
+            get
+            {
+                return _partRespository ?? (_partRespository = new IplPart_Chapter(_dbContext, _Configuration));
             }
         }
         public void Commit()

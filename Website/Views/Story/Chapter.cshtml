@@ -1,0 +1,28 @@
+﻿@using StoryManagement.Model.Entity
+@model Chapters
+
+<div id="inner" class="mt-5">
+    <a href="/truyen/qidian/1/1040649722/" id="booknameholder" style="font-size: 24px;font-weight: 700;color: gray;display: block;text-align: center;"> Người tại sa ẩn, cố gắng liền có thể trở nên mạnh mẽ </a>
+    <div id="bookchapnameholder" style="color: gray; text-align: center;">Thứ 1 chương Làng Cát</div>
+    <br>
+    <div class="tm-reader-top-nav" style="background: #eeeeee;font-size: 16px;padding: 6px 0;font-weight: 500">
+        <div class="container" style="text-align: center;">
+            <a onclick="blinkloadnextchap(true)" id="navprevtop" href="/truyen/qidian/1/1040649722/0/" style="display: inline-block;float: left;"><i class="fas fa-chevron-left"></i> Chương trước</a>
+            <a id="navcentertop" href="/truyen/qidian/1/1040649722/"> Mục lục </a>
+            <a onclick="blinkloadnextchap()" id="navnexttop" href="/truyen/qidian/1/1040649722/796676993/" style="display: inline-block;float: right;">Chương sau <i class="fas fa-chevron-right"></i></a>
+        </div>
+    </div>
+    <div id="content-container" class="container" style="min-height: 300px;padding: 0px; margin-top: 30px; margin-bottom: 30px;">
+        @Html.Raw(Model.Content)
+    </div>
+    <div class="tm-reader-top-nav" style="background: #eeeeee;font-size: 16px;padding: 6px 0;font-weight: 500">
+        <div class="container" style="text-align: center;">
+            <a onclick="blinkloadnextchap(true)" id="navprevtop" href="/truyen/qidian/1/1040649722/0/" style="display: inline-block;float: left;"><i class="fas fa-chevron-left"></i> Chương trước</a>
+            <a id="navcentertop" href="/truyen/qidian/1/1040649722/"> Mục lục </a>
+            <a onclick="blinkloadnextchap()" id="navnexttop" href="/truyen/qidian/1/1040649722/796676993/" style="display: inline-block;float: right;">Chương sau <i class="fas fa-chevron-right"></i></a>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/chapt.js"></script>
+}
