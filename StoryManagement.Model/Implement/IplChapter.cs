@@ -115,5 +115,36 @@ namespace StoryManagement.Model.Implement
             }
 
         }
+        public Chapters GetChapterToRead(long ChapterId, int StoryId, ref long CurrentChaterId, ref long PrevChaterId, ref string PrevChaterTitle, ref long NextChaterId, ref string NextChaterTitle)
+        {
+            Chapters List = new Chapters();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@idChapter", ChapterId);
+                    p.Add("@idstory", StoryId);
+                    p.Add("@currentChapterId", CurrentChaterId, DbType.Int64, ParameterDirection.Output);
+                    p.Add("@prevChapterId", PrevChaterId, DbType.Int64, ParameterDirection.Output);
+                    p.Add("@prevChapterTitle", PrevChaterTitle, DbType.String, ParameterDirection.Output);
+                    p.Add("@nextChapterId", NextChaterId, DbType.Int64, ParameterDirection.Output);
+                    p.Add("@nextChapterTitle", NextChaterTitle, DbType.String, ParameterDirection.Output);
+                    List = u.GetIEnumerable<Chapters>("Get_ChapterToRead", p).FirstOrDefault();
+                    CurrentChaterId = p.Get<long>("@currentChapterId");
+                    PrevChaterId = p.Get<long>("@prevChapterId");
+                    PrevChaterTitle = p.Get<string>("@prevChapterTitle");
+                    NextChaterId = p.Get<long>("@nextChapterId");
+                    NextChaterTitle = p.Get<string>("@nextChapterTitle");
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
     }
 }
