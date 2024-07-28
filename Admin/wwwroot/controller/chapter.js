@@ -10,10 +10,10 @@
 
         action: function () {
             $('#savePosition').click(function () {
-                const chapterIdsString = $('#tblChapter').bootstrapTable('getData').map(function (row) {
+                let chapterIdsString = $('#tblChapter').bootstrapTable('getData').map(function (row) {
                     return row.chapterId;
                 }).join(',');
-                /*alert(chapterIdsString);*/
+                alert(chapterIdsString);
                 $.ajax({
                     url: '/Chapter/UpdatePosition',
                     type: 'post',
@@ -63,6 +63,7 @@
                 pageSize: 50,
                 pageList: [50, 100],
                 reorderableRows: true,
+                useRowAttrFunc: true,
 
                 columns: [
                     {

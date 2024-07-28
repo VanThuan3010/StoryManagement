@@ -15,5 +15,8 @@ namespace StoryManagement.Model.Interface
         int CreateOrUpdate(Story storyModel);
         int DeleteStory(int id);
         Story GetDetail(int id);
+        List<Story> GetStoryCanRead();
+        List<Story> GetStoryNewest();
+        List<Story> GetStoryLastUpdate();
     }
 }
