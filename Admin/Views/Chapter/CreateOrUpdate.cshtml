@@ -19,15 +19,18 @@
                     </div>
                     <div class="form-group col-lg-12 mb-3">
                         <label class="form-label">Phần truyện</label>
-                        <select class="form-select" asp-for="@Model.Belong">
-                            @if (part_Chapters.Count > 0)
-                            {
-                                foreach(Part_Chapter item in part_Chapters)
+                        <div class="d-flex gap-3">
+                            <select class="form-select" asp-for="@Model.Belong">
+                                @if (part_Chapters.Count > 0)
                                 {
-                                    <option value="@item.Id">@item.Name</option>
+                                    foreach (Part_Chapter item in part_Chapters)
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
                                 }
-                            }
-                        </select>
+                            </select>
+                            <a id="addPart" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary">+</a>
+                        </div>                        
                     </div>
                     <div class="form-group col-lg-12 mb-3">
                         <label class="form-label">Nội dung chương</label>
@@ -38,6 +41,24 @@
                         <a href="/Home" class="btn w-md btn-outline-info waves-effect waves-light">Quay lại</a>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" value="@ViewBag.idStory" id="idStoryAddPartChapt" />
+                <label class="form-label">Tên</label>
+                <input type="text" id="partChapterName" class="form-control"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savePart">Lưu</button>
             </div>
         </div>
     </div>

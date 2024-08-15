@@ -34,6 +34,35 @@
                     }
                 })
             })
+            $('#savePart').click(function () {
+                if ($('#partChapterName').val() == '') {
+                    base.notification('error', 'Chua nhập tên');
+                    $('#partChapterName').focus();
+                    return;
+                }
+                $.ajax({
+                    url: '/Chapter/AddPartChapter',
+                    type: 'post',
+                    data: {
+                        idStory: $('#idStoryAddPartChapt').val(),
+                        name: $('#partChapterName').val()
+                    },
+                    beforeSend: function () {
+                        $('#savePart').prop('disabled', true);
+                        $('#savePart').html(base.loadButton("Lưu"));
+                    },
+                    success: function (res) {
+                        $('#savePart').prop('disabled', false);
+                        $('#savePart').html("Lưu");
+                        $("#exampleModal").modal('hide');
+                        if (res.status) {
+                            base.notification('success', res.message);
+                        } else {
+                            base.notification('error', res.message);
+                        }
+                    }
+                })
+            })
         },
         tblChapter: function () {
             var objTable = $("#tblChapter");

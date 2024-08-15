@@ -112,5 +112,35 @@ namespace Admin.Controllers
             }
 
         }
+        [HttpPost]
+        public JsonResult AddPartChapter(int idStory, string name)
+        {
+            try
+            {
+                if (idStory <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
+                }
+                _ibase.part_ChapterRespository.CreatePart(idStory, name);
+                _ibase.Commit();
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Thêm thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = ex.Message,
+                });
+            }
+        }
     }
 }

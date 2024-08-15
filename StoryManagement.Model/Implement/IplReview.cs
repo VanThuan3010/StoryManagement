@@ -34,6 +34,7 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
                     p.Add("@idStory", reviews.IdStory);
                     p.Add("@review", reviews.Review);
+                    p.Add("@opening", reviews.Opening);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Review", p);
                 }

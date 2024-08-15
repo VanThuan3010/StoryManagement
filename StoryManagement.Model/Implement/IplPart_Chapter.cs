@@ -44,5 +44,27 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public int CreatePart(int idStory, string name)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@idStory", idStory);
+                    p.Add("@name", name);
+
+                    list = u.ProcedureExecute("Add_PartChapter", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
     }
 }
