@@ -18,8 +18,9 @@ namespace Website.Controllers
 
         public IActionResult Index()
         {
-            int total = 0;
-            ViewBag.listStory = _ibase.storyRespository.GetAll(0, int.MaxValue, null , null, null, ref total);
+            ViewBag.listStory = _ibase.storyRespository.GetStoryCanRead();
+            ViewBag.listNewest = _ibase.storyRespository.GetStoryNewest();
+            ViewBag.listLastUpdate = _ibase.storyRespository.GetStoryLastUpdate();
             return View();
         }
 

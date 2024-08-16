@@ -63,6 +63,7 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.IdStory);
 
                 entity.Property(e => e.Review);
+                entity.Property(e => e.Opening);
             });
             modelBuilder.Entity<Series>(entity =>
             {

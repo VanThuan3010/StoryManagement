@@ -5,11 +5,19 @@
 <div class="container">
     <form asp-action="CreateOrUpdate" enctype="multipart/form-data" id="form" method="post">
         <input asp-for="@Model.IdStory" hidden />
-        <div class="row"></div>
         <div class="col">
+            <label>Review</label>
             <div class="form-group">
                 <div class="col-md-12">
                     @Html.TextAreaFor(m => m.Review, new { @class = "form-control", id = "txtReview" })
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <label>Giới thiệu</label>
+            <div class="form-group">
+                <div class="col-md-12">
+                    @Html.TextAreaFor(m => m.Opening, new { @class = "form-control", id = "txtOpening" })
                 </div>
             </div>
         </div>
@@ -22,6 +30,6 @@
 @section Scripts {
     <script type="text/javascript">
         CKEDITOR.replace('txtReview');
-
+        CKEDITOR.replace('txtOpening');
     </script>
 }

@@ -113,5 +113,62 @@ namespace StoryManagement.Model.Implement
             }
 
         }
+        public List<Story> GetStoryCanRead()
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    List = u.GetIEnumerable<Story>("Get_StoryCanRead", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Story> GetStoryNewest()
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    List = u.GetIEnumerable<Story>("Get_StoryNewest", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Story> GetStoryLastUpdate()
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    List = u.GetIEnumerable<Story>("Get_StoryLastUpdate", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace StoryManagement.Model.Entity
         public int Id { get; set; }
         public int IdStory { get; set; }
         public string Review { get; set; }
+        public string Opening { get; set; }
     }
 }

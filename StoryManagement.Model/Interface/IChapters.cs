@@ -14,5 +14,6 @@ namespace StoryManagement.Model.Interface
         int CreateOrUpdate(Chapters chapters);
         Chapters GetDetail(long idChapter);
         int UpdatePosition(string listId);
+        Chapters GetChapterToRead(long ChapterId, int StoryId, ref long CurrentChaterId, ref long PrevChaterId, ref string PrevChaterTitle, ref long NextChaterId, ref string NextChaterTitle);
     }
 }

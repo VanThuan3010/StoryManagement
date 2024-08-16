@@ -1,0 +1,46 @@
+﻿
+
+<style>
+    .list-group {
+        min-height: 100px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        list-style-type: none;
+    }
+
+    .list-group-item {
+        margin: 5px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+        cursor: move;
+    }
+
+    .list-item-raw {
+        margin: 5px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+        cursor: move;
+    }
+
+    .search-box {
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-6 p-5">
+        <h3>Danh sách truyện</h3>
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Tìm kiếm truyện...">
+        <ul id="storiesList" class="list-group">
+            <!-- Danh sách tất cả các truyện, không bao gồm truyện có trong series bên phải -->
+        </ul>
+    </div>
+
+    <div class="col-6 p-5">
+        <h3>Series</h3>
+        <a href="#" class="btn btn-primary mb-3">Update</a>
+        <ul id="seriesList" class="list-group">
+            <!-- Truyện kéo thả sẽ xuất hiện ở đây -->
+        </ul>
+    </div>
+</div>

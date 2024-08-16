@@ -21,6 +21,7 @@ namespace Website.Controllers
             Story str = _ibase.storyRespository.GetDetail(idStory);
             ViewBag.listTags = _ibase.tagRespository.GetStoryTag(idStory);
             ViewBag.listAuthors = _ibase.authorRespository.GetStoryAuthor(idStory);
+            ViewBag.review = _ibase.reviewRespository.GetStoryReview(idStory);
             //int id = GetStoryIdBySlug(slug);
             //if (id == 0)
             //{
@@ -31,10 +32,17 @@ namespace Website.Controllers
             //return View("Details", story);
             return View(str);
         }
-        public IActionResult Chapter(int idSory)
+        public IActionResult Chapter(int idStory, long idChapter)
         {
-            int total = 0;
-            Chapters chapters = _ibase.chapterRespository.GetAll(0, 1, idSory, ref total).FirstOrDefault();
+            long CurrentChaterId = 0;
+            long PrevChaterId = 0;
+            long NextChaterId = 0;
+            string PrevChaterTitle = "";
+            string NextChaterTitle = "";
+            Chapters chapters = _ibase.chapterRespository.GetChapterToRead(idChapter, idStory, ref CurrentChaterId, ref PrevChaterId, ref PrevChaterTitle, ref NextChaterId, ref NextChaterTitle);
+            ViewBag.story = _ibase.storyRespository.GetDetail(idStory);
+            ViewBag.PrevChapterId = PrevChaterId;
+            ViewBag.NextChapterId = NextChaterId;
             return View(chapters);
         }
     }
