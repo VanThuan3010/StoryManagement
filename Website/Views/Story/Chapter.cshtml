@@ -8,6 +8,11 @@
     <input type="hidden" id="savePrevChapId" value="@ViewBag.PrevChaterId" />
     <input type="hidden" id="saveNextChapId" value="@ViewBag.NextChapterId" />
     <a href="/Story/Details?idStory=@story.Id" style="font-size: 24px;font-weight: 700;color: gray;display: block;text-align: center;"> @story.Name </a>
+    @if (Model.Part_Name != "Cốt truyện chính")
+    {
+        <div id="bookchapnameholder" style="color: gray; text-align: center;font-size: 20px;">@Model.Part_Name</div>
+    }
+    
     <div id="bookchapnameholder" style="color: gray; text-align: center;">@Model.Title</div>
     <br>
     <div class="tm-reader-top-nav" style="background: #eeeeee;font-size: 16px;padding: 6px 0;font-weight: 500">

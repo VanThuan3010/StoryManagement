@@ -45,5 +45,11 @@ namespace Website.Controllers
             ViewBag.NextChapterId = NextChaterId;
             return View(chapters);
         }
+        public JsonResult GetChapterStory(int offset, int limit, int idStory)
+        {
+            int total = 0;
+            var data = _ibase.chapterRespository.GetAll(offset, limit, idStory, ref total);
+            return Json(new { rows = data, total = total });
+        }
     }
 }

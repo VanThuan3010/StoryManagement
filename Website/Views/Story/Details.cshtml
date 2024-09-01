@@ -58,8 +58,8 @@
                         @Html.Raw(reviews.Opening)
                     </div>
                     <div id="listChapter" class="content">
-                        <h1>About Us</h1>
-                        <p>This is the about section.</p>
+                        <input type="hidden" id="txtIdStory" value="@Model.Id"/>
+                        <table id="tblStoryListChapter"></table>
                     </div>
                     <div id="rating" class="content">
                         @Html.Raw(reviews.Review)
