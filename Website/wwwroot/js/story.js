@@ -99,7 +99,7 @@ $(function () {
                     if (data.length <= halfLimit) {
                         datas.forEach(function (item, index) {
                             displayData.push({
-                                TitleLeft: item.title,
+                                TitleLeft: item ? item.title : '',
                                 TitleRight: ''
                             });
                         });
@@ -118,8 +118,6 @@ $(function () {
                     var displayDatas = {};
                     displayDatas.total = data.total;
                     displayDatas.rows = displayData;
-                    console.log(displayDatas);
-                    console.log(data);
                     $('#tblStoryListChapter').bootstrapTable('load', displayDatas);
                 },
             })
