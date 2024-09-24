@@ -17,7 +17,7 @@ namespace Admin.Controllers
         {
             var total = 0;
             ViewBag.lstTag = _ibase.tagRespository.GetAll(0,1000, null, ref total);
-            ViewBag.lstAuthor = _ibase.authorRespository.GetAll(0, 1000, null, ref total);
+            //ViewBag.lstAuthor = _ibase.authorRespository.GetAll(0, 1000, null, ref total);
             return View();
         }
         public JsonResult GetStory(string search, int offset, int limit, string tags = "", string authors = "")

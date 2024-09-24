@@ -91,8 +91,9 @@
                 pagination: true,
                 paginationVAlign: 'bottom',
                 search: false,
-                pageSize: 10,
-                pageList: [10, 50, 100],
+                height: 500,
+                pageSize: 100,
+                pageList: [100, 150],
 
                 columns: [
                     {

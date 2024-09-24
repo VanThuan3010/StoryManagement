@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Danh sách truyện";
     var lstTags = (List<Tags>)ViewBag.lstTag;
-    var lstAuthors = (List<Authors>)ViewBag.lstAuthor;
+    // var lstAuthors = (List<Authors>)ViewBag.lstAuthor;
     // var listType = Enum.GetValues(typeof(StatusStory)).Cast<StatusStory>().Select(v => new SelectListItem
     //         {
     //             Text = v.ToString(),
@@ -52,13 +52,13 @@
                     <div class="col-lg-3">
                         <select class="form-select" id="sltAuthor" multiple>
                             <option value="0">--Tất cả tác giả--</option>
-                            @if (lstAuthors != null && lstAuthors.Count > 0)
+                            @* @if (lstAuthors != null && lstAuthors.Count > 0)
                             {
                                 foreach (var item in lstAuthors)
                                 {
                                     <option value="@item.Id">@item.Pseudonym</option>
                                 }
-                            }
+                            } *@
                         </select>
                     </div>
                     <div class="col-lg-3">
@@ -124,13 +124,13 @@
                     <div class="form-group mb-3">
                         <label class="form-label">Tác giả</label>
                         <select class="form-select" id="sltFormAuthor" multiple name="ListAuthor">
-                            @if (lstAuthors != null && lstAuthors.Count > 0)
+                            @* @if (lstAuthors != null && lstAuthors.Count > 0)
                             {
                                 foreach (var item in lstAuthors)
                                 {
                                     <option value="@item.Id">@item.Pseudonym</option>
                                 }
-                            }
+                            } *@
                         </select>
                     </div>
                 </form>

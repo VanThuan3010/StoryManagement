@@ -118,8 +118,6 @@ $(function () {
                     var displayDatas = {};
                     displayDatas.total = data.total;
                     displayDatas.rows = displayData;
-                    console.log(displayDatas);
-                    console.log(data);
                     $('#tblStoryListChapter').bootstrapTable('load', displayDatas);
                 },
             })
