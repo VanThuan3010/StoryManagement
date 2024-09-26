@@ -31,7 +31,8 @@
                 datas.append('NumberChapter', $('#txtNumberChapter').val());
                 datas.append('Status', $('#idStatus').val());
                 datas.append('IsRead', $('#ckRead').is(':checked'));
-                datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
+                /*datas.append('AuthorId', $('#sltFormAuthor').val().join(','));*/
+                datas.append('AuthorId', "");
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
@@ -197,8 +198,8 @@
                                 $('#txtIdModal').val(row.id);
                                 $('#txtName').val(row.name);
                                 $('#txtNumberChapter').val(row.numberChapter);
-                                $('#sltFormTag').select2().val(row.tagId == null ? null : row.tagId.split(",")).trigger('change');
-                                $('#sltFormAuthor').select2().val(row.authorId == null ? null : row.authorId.split(",")).trigger('change');
+                                $('#sltFormTag').select2().val(row.tagId ? row.tagId.split(",") : null).trigger('change');
+                                /*$('#sltFormAuthor').select2().val(row.authorId == null ? null : row.authorId.split(",")).trigger('change');*/
                                 $('#labelAction').text('Sửa truyện');
 
                                 $('#modalCreateOrEdit').modal('show');
