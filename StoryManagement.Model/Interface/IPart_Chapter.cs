@@ -11,6 +11,6 @@ namespace StoryManagement.Model.Interface
     public interface IPart_Chapter : IRepository<Part_Chapter>
     {
         List<Part_Chapter> GetAll(int idStory);
-        int CreatePart(int idStory, string name);
+        int CreatePart(int idStory, string name, ref int  NewId, ref string  NewPartName);
     }
 }

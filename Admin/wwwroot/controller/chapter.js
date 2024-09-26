@@ -56,6 +56,7 @@
                         $('#savePart').html("Lưu");
                         $("#exampleModal").modal('hide');
                         if (res.status) {
+                            $("#Belong").append(new Option(res.newName, res.newId));
                             base.notification('success', res.message);
                         } else {
                             base.notification('error', res.message);

@@ -125,12 +125,15 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.part_ChapterRespository.CreatePart(idStory, name);
-                _ibase.Commit();
+                int newId = 0;
+                string newName = "";
+                _ibase.part_ChapterRespository.CreatePart(idStory, name, ref newId, ref newName);
                 return new JsonResult(new
                 {
                     status = true,
-                    message = "Thêm thành công"
+                    message = "Thêm thành công",
+                    newId = newId,
+                    newName = newName
                 });
             }
             catch (Exception ex)

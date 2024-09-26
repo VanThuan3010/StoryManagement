@@ -44,7 +44,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreatePart(int idStory, string name)
+        public int CreatePart(int idStory, string name, ref int NewId, ref string NewPartName)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -55,8 +55,12 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
                     p.Add("@idStory", idStory);
                     p.Add("@name", name);
+                    p.Add("@NewId", NewId, DbType.Int32, ParameterDirection.Output);
+                    p.Add("@NewPartName", NewPartName, DbType.String, ParameterDirection.Output);
 
-                    list = u.ProcedureExecute("Add_PartChapter", p);
+                    list = u.ProcedureExecute("Insert_PartChapter", p);
+                    NewId = p.Get<int>("@NewId");
+                    NewPartName = p.Get<string>("@NewPartName");
                 }
                 return list;
             }
@@ -64,7 +68,6 @@ namespace StoryManagement.Model.Implement
             {
                 return list;
             }
-
         }
     }
 }
