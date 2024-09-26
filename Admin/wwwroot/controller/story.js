@@ -91,7 +91,6 @@
                 pagination: true,
                 paginationVAlign: 'bottom',
                 search: false,
-                height: 500,
                 pageSize: 100,
                 pageList: [100, 150],
 
@@ -111,18 +110,38 @@
                     {
                         field: "isRead",
                         title: "Đọc",
-                        align: 'left',
-                        valign: 'left',
+                        align: 'center',
+                        valign: 'center',
                         formatter: function (value, row, index) {
                             var html = '';
                             if (row.isRead == true) {
-                                html += '<input type="checkbox" disabled checked/>';
+                                html = '<input class="form-check-input btnRead" type="checkbox" checked title="Đánh dấu là chưa đọc" />';
                             } else {
-                                html += '<input type="checkbox" disabled/>';
+                                html = '<input class="form-check-input btnRead" type="checkbox" title="Đánh dấu là đã đọc" />';
                             }
                             return html;
 
                         },
+                        events: {
+                            'click .btnRead': function (e, value, row, index) {
+                                $.ajax({
+                                    url: '/Story/CheckRead',
+                                    type: 'post',
+                                    data: {
+                                        id: row.id
+                                    },
+                                    success: function (res) {
+                                        if (res.status) {
+                                            base.notification('success', res.message);
+                                            $("#tblStory").bootstrapTable('refresh', { silent: true });
+                                        }
+                                        else {
+                                            base.notification('error', res.message);
+                                        }
+                                    }
+                                });
+                            },
+                        }
                     },
                     {
                         title: "Chức năng",

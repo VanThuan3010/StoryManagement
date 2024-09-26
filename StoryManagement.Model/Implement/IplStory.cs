@@ -170,5 +170,26 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public int ReadChangeStory(int id)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@id", id);
+
+                    list = u.ProcedureExecute("Read_Change", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
     }
 }

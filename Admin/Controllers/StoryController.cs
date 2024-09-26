@@ -86,6 +86,36 @@ namespace Admin.Controllers
             }
 
         }
+        [HttpPost]
+        public JsonResult CheckRead(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
+                }
+                _ibase.storyRespository.ReadChangeStory(id);
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Thao tác thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = ex.Message,
+                });
+            }
+
+        }
         public IActionResult Chapter(int idStory)
         {
             return View();

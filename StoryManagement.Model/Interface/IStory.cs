@@ -18,5 +18,6 @@ namespace StoryManagement.Model.Interface
         List<Story> GetStoryCanRead();
         List<Story> GetStoryNewest();
         List<Story> GetStoryLastUpdate();
+        int ReadChangeStory(int id);
     }
 }
