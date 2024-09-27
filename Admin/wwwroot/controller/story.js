@@ -32,8 +32,8 @@
                 datas.append('NumberChapter', $('#txtNumberChapter').val());
                 datas.append('Status', $('#idStatus').val());
                 datas.append('IsRead', $('#ckRead').is(':checked'));
-                datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
-                /*datas.append('AuthorId', "");*/
+                /*datas.append('AuthorId', $('#sltFormAuthor').val().join(','));*/
+                datas.append('AuthorId', "");
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
