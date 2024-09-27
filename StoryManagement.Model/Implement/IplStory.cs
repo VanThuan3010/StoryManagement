@@ -191,5 +191,25 @@ namespace StoryManagement.Model.Implement
             }
 
         }
+        public List<Authors> GetAuthorByStory(int id)
+        {
+            List<Authors> List = new List<Authors>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@id", id);
+                    p.Add("@typeId", "Story");
+                    List = u.GetIEnumerable<Authors>("StoryAuthor_GetByOther", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
     }
 }

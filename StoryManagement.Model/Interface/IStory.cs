@@ -19,5 +19,6 @@ namespace StoryManagement.Model.Interface
         List<Story> GetStoryNewest();
         List<Story> GetStoryLastUpdate();
         int ReadChangeStory(int id);
+        List<Authors> GetAuthorByStory(int id);
     }
 }

@@ -116,6 +116,11 @@ namespace Admin.Controllers
             }
 
         }
+        public JsonResult GetAuthorByStory(int id)
+        {
+            var data = _ibase.storyRespository.GetAuthorByStory(id);
+            return Json(new { rows = data });
+        }
         public IActionResult Chapter(int idStory)
         {
             return View();

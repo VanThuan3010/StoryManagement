@@ -13,7 +13,8 @@
                 $('#txtName').val('');
                 $('#txtNumberChapter').val('');
                 $('#sltFormTag').select2();
-                $('#sltFormAuthor').select2();
+                story.initSelect2_Authors();
+                /*$('#sltFormAuthor').select2();*/
                 $('#labelAction').text('Thêm mới truyện');
 
                 $('#modalCreateOrEdit').modal('show');
@@ -31,8 +32,8 @@
                 datas.append('NumberChapter', $('#txtNumberChapter').val());
                 datas.append('Status', $('#idStatus').val());
                 datas.append('IsRead', $('#ckRead').is(':checked'));
-                /*datas.append('AuthorId', $('#sltFormAuthor').val().join(','));*/
-                datas.append('AuthorId', "");
+                datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
+                /*datas.append('AuthorId', "");*/
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
@@ -64,6 +65,51 @@
                     }
                 })
             });
+        },
+        initSelect2_Authors: function (existingAuthors = []) {
+            existingAuthors = existingAuthors || [];
+
+            $('#sltFormAuthor').select2({
+                placeholder: 'Tìm kiếm tác giả...',
+                minimumInputLength: 2, // Chỉ tìm kiếm khi người dùng nhập ít nhất 2 ký tự
+                allowClear: true, // Cho phép xóa tác giả đã chọn
+                ajax: {
+                    url: '/Author/GetAuthor', // URL tới API tìm kiếm tác giả
+                    dataType: 'json',
+                    delay: 250, // Thời gian chờ giữa các lần tìm kiếm
+                    data: function (params) {
+                        return {
+                            search: params.term, // Từ khóa tìm kiếm
+                            offset: 0, // Phân trang nếu cần
+                            limit: 10
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data.items, function (item) {
+                                return {
+                                    id: item.id,
+                                    text: item.pseudonym
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            if (existingAuthors.length > 0) {
+                existingAuthors.forEach(function (author) {
+                    let existingData = $('#sltFormAuthor').select2('data');
+                    existingAuthors.forEach(function (author) {
+                        if (!existingData.some(e => e.id == author.id)) {
+                            var option = new Option(author.pseudonym, author.id, true, true);
+                            $('#sltFormAuthor').append(option);
+                        }
+                    });
+                    $('#sltFormAuthor').trigger('change');
+                });
+            }
         },
         tblStory: function () {
             var objTable = $("#tblStory");
@@ -199,6 +245,22 @@
                                 $('#txtName').val(row.name);
                                 $('#txtNumberChapter').val(row.numberChapter);
                                 $('#sltFormTag').select2().val(row.tagId ? row.tagId.split(",") : null).trigger('change');
+                                if (row.authorId == null) {
+                                    story.initSelect2_Authors();
+                                } else {
+                                    $.ajax({
+                                        url: '/Story/GetAuthorByStory',
+                                        type: 'get',
+                                        processData: false,
+                                        contentType: false,
+                                        data: {
+                                            id: row.id
+                                        },
+                                        success: function (res) {
+                                            story.initSelect2_Authors(res.data);
+                                        }
+                                    })
+                                }
                                 /*$('#sltFormAuthor').select2().val(row.authorId == null ? null : row.authorId.split(",")).trigger('change');*/
                                 $('#labelAction').text('Sửa truyện');
 
