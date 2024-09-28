@@ -32,8 +32,8 @@
                 datas.append('NumberChapter', $('#txtNumberChapter').val());
                 datas.append('Status', $('#idStatus').val());
                 datas.append('IsRead', $('#ckRead').is(':checked'));
-                /*datas.append('AuthorId', $('#sltFormAuthor').val().join(','));*/
-                datas.append('AuthorId', "");
+                datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
+                /*datas.append('AuthorId', "");*/
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
@@ -99,8 +99,8 @@
             });
 
             if (existingAuthors.length > 0) {
+                let existingData = $('#sltFormAuthor').select2('data');
                 existingAuthors.forEach(function (author) {
-                    let existingData = $('#sltFormAuthor').select2('data');
                     existingAuthors.forEach(function (author) {
                         if (!existingData.some(e => e.id == author.id)) {
                             var option = new Option(author.pseudonym, author.id, true, true);
@@ -248,16 +248,14 @@
                                 if (row.authorId == null) {
                                     story.initSelect2_Authors();
                                 } else {
+                                    $("#sltFormAuthor").select2().val(null).trigger("change");
                                     $.ajax({
                                         url: '/Story/GetAuthorByStory',
-                                        type: 'get',
-                                        processData: false,
-                                        contentType: false,
                                         data: {
                                             id: row.id
                                         },
                                         success: function (res) {
-                                            story.initSelect2_Authors(res.data);
+                                            story.initSelect2_Authors(res.rows);
                                         }
                                     })
                                 }
