@@ -84,9 +84,9 @@
                             limit: 10
                         };
                     },
-                    processResults: function (data) {
+                    processResults: function (res) {
                         return {
-                            results: $.map(data.items, function (item) {
+                            results: $.map(res.rows, function (item) {
                                 return {
                                     id: item.id,
                                     text: item.pseudonym
