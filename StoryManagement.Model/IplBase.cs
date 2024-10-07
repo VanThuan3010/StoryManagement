@@ -22,6 +22,7 @@ namespace StoryManagement.Model
         private ISeries _seriesRespository ;
         private ITag _tagRespository ;
         private IPart_Chapter _partRespository ;
+        private IScene _sceneRespository ;
 
         public IConfiguration _Configuration ;
 
@@ -79,6 +80,13 @@ namespace StoryManagement.Model
             get
             {
                 return _partRespository ?? (_partRespository = new IplPart_Chapter(_dbContext, _Configuration));
+            }
+        }
+        public IScene sceneRespository
+        {
+            get
+            {
+                return _sceneRespository ?? (_sceneRespository = new IplScene(_dbContext, _Configuration));
             }
         }
         public void Commit()
