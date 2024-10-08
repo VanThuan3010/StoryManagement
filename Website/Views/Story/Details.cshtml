@@ -55,14 +55,14 @@
                 </div>
                 <div class="tabcontent border border-1">
                     <div id="review" class="content active">
-                        @Html.Raw(reviews.Opening)
+                        @if (reviews != null) { Html.Raw(reviews.Opening); }
                     </div>
                     <div id="listChapter" class="content">
                         <input type="hidden" id="txtIdStory" value="@Model.Id"/>
                         <table id="tblStoryListChapter"></table>
                     </div>
                     <div id="rating" class="content">
-                        @Html.Raw(reviews.Review)
+                        @if (reviews != null) { Html.Raw(reviews.Review); }
                     </div>
                     <div id="series" class="content">
                         <h1>Page 4</h1>

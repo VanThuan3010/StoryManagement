@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 
 namespace StoryManagement.Model.Interface
 {
-    public interface IScene : IRepository<Scene>
+    public interface IScene : IRepository<Scenes>
     {}
 }

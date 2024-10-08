@@ -24,7 +24,7 @@ namespace MFTech.Model.Entity
         public virtual DbSet<Series> Series { get; set; } = null!;
         public virtual DbSet<Tags> Tags { get; set; } = null!;
         public virtual DbSet<Part_Chapter> Part_Chapters { get; set; } = null!;
-        public virtual DbSet<Scene> Scenes { get; set; } = null!;
+        public virtual DbSet<Scenes> Scenes { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -94,7 +94,7 @@ namespace MFTech.Model.Entity
 
                 entity.Property(e => e.IdStory);
             });
-            modelBuilder.Entity<Scene>(entity =>
+            modelBuilder.Entity<Scenes>(entity =>
             {
                 entity.ToTable("Scene");
 

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace StoryManagement.Model.Implement
 {
-    public class IplScene : Repository<Scene>, IScene
+    public class IplScene : Repository<Scenes>, IScene
     {
         public IConfiguration _configuration { get; }
         internal string _cnnString;

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StoryManagement.Model.Entity
 {
-    public class Scene
+    public class Scenes
     {
         public int Id { get; set; }
         public string FromStory { get; set; }
