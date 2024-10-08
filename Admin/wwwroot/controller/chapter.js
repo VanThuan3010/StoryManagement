@@ -64,6 +64,28 @@
                     }
                 })
             })
+            // $('#frmChapter').submit(function(e){
+            //     e.preventDefault();
+            //     var formData = new FormData();
+            //     formData.append("Id", $('#Id').val());
+            //     formData.append("StoryId", $('#StoryId').val());
+            //     formData.append("Title", $('#Title').val());
+            //     formData.append("Belong", $('#Belong').val());
+            //     formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
+            //     $.ajax({
+            //         url: '/Chapter/CreateOrUpdate',
+            //         type: 'POST',
+            //         data: formData,
+            //         success: function () {
+            //         },
+            //         error:function(xhr, status, error){
+            //             console.error('Error:', status, error);
+            //         },
+            //         cache: false,
+            //         contentType: false,
+            //         processData: false
+            //     });
+            // })
         },
         tblChapter: function () {
             var objTable = $("#tblChapter");
