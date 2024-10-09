@@ -29,21 +29,29 @@ namespace Admin.Controllers
             ViewBag.idStory = idStory;
             ViewBag.idChapter = idChapter;
             ViewBag.PartChapter = _ibase.part_ChapterRespository.GetAll(idStory);
-            Chapters chapters = _ibase.chapterRespository.GetDetail(idChapter);
-            return View(chapters);
+            ViewBag.chapters = _ibase.chapterRespository.GetDetail(idChapter);
+            return View();
         }
 
         [HttpPost]
-        public IActionResult CreateOrUpdate(Chapters chapters)
+        public JsonResult CreateOrUpdate(Chapters chapters)
         {
             try
             {
                 if (chapters == null)
                 {
-                    return Redirect("/Story/Index");
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
                 }
                 _ibase.chapterRespository.CreateOrUpdate(chapters);
-                return Redirect("/Chapter/Index?idStory=" + chapters.StoryId);
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "/Chapter/Index?idStory=" + chapters.StoryId
+                });
             }
             catch (Exception ex)
             {

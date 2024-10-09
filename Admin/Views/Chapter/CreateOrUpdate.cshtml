@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = ViewBag.id <= 0 ? "Thêm mới chương truyện" : "Sửa nội dung chương";
     List<Part_Chapter> part_Chapters = (List<Part_Chapter>)ViewBag.PartChapter;
+    Chapters chapter = (Chapters)ViewBag.chapters
 }
 
 <div class="row">
@@ -11,16 +12,16 @@
         <div class="card">
             <div class="card-body">
                 <form id="frmChapter" asp-action="CreateOrUpdate" enctype="multipart/form-data" method="post">
-                    <input type="text" hidden value="@ViewBag.idChapter" asp-for="@Model.Id" />
-                    <input type="text" hidden value="@ViewBag.idStory" asp-for="@Model.StoryId" />
+                    <input type="text" hidden value="@ViewBag.idChapter" id="Id" name="Id" />
+                    <input type="text" hidden value="@ViewBag.idStory" id="StoryId" name="StoryId" />
                     <div class="form-group col-lg-12 mb-3">
                         <label class="form-label required">Tiêu đề</label>
-                        <textarea asp-for="@Model.Title" class="form-control" id="txtTitle"></textarea>
+                        <textarea class="form-control" id="txtTitle">@chapter != null ? chapter.Title : null</textarea>
                     </div>
                     <div class="form-group col-lg-12 mb-3">
                         <label class="form-label">Phần truyện</label>
                         <div class="d-flex gap-3">
-                            <select class="form-select" asp-for="@Model.Belong">
+                            <select class="form-select" id="Belong" name="Belong">
                                 @if (part_Chapters.Count > 0)
                                 {
                                     foreach (Part_Chapter item in part_Chapters)
@@ -35,7 +36,7 @@
                     <div class="form-group col-lg-12 mb-3">
                         <label class="form-label">Nội dung chương</label>
                         @Html.TextAreaFor(m => m.Content, new { @class = "form-control", id = "txtContent" })
-                        <!-- <textarea class="form-control" id="txtContent" name="txtContent"></textarea> -->
+                        <!-- <textarea class="form-control" id="txtContent" name="txtContent">@chapter != null ? chapter.Content : null</textarea> -->
                     </div>
                     <div class="mt-4">
                         <button class="btn btn-success" style="width:100px;" type="submit" id="Save">Lưu</button>
@@ -67,7 +68,7 @@
 @section Scripts {
     <script type="text/javascript">
         CKEDITOR.replace('txtContent', {
-            height: '1000px'
+            height: '700px'
         });
     </script>
 }
