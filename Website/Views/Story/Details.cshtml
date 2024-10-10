@@ -7,6 +7,22 @@
     List<Authors> authors = (List<Authors>)ViewBag.listAuthors;
     Reviews reviews = (Reviews)ViewBag.review;
 }
+<style>
+.belong-cell {
+text-align: center;
+font-weight: bold;
+}
+
+.pagination {
+margin-top: 10px;
+text-align: center;
+}
+
+.pagination button {
+margin: 0 5px;
+padding: 5px 10px;
+}
+</style>
 <div class="inner">
     <div class="container">
         <div class="row">
@@ -14,9 +30,9 @@
                 <div class="col-inner">
                     <div class="product-gallery-default has-hover position-relative">
                         <img style="max-width: 100%;"
-                             loading="lazy"
-                             referrerpolicy="no-referrer"
-                             src="https://bookcover.yuewen.com/qdbimg/349573/1040874138/300" />
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                            src="https://bookcover.yuewen.com/qdbimg/349573/1040874138/300" />
                     </div>
                 </div>
             </div>
@@ -61,17 +77,36 @@
                         <input type="hidden" id="txtIdStory" value="@Model.Id"/>
                         <!-- <table id="tblStoryListChapter"></table> -->
                         <div id="storyListChapter"></div>
-                        <div class="pagination"></div>
+                        <!-- <div class="pagination"></div> -->
                     </div>
                     <div id="rating" class="content">
                         @if (reviews != null) { Html.Raw(reviews.Review); }
                     </div>
                     <div id="series" class="content">
-                        <h1>Page 4</h1>
-                        <p>This is the page 4 section.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<button id="backToTop" class="btn btn-primary" style="position: fixed; bottom: 20px; right: 20px; display: none;">
+    <i class="fas fa-arrow-up"></i>
+</button>
+@section Scripts {
+    <script>
+        // Hiển thị/ẩn nút dựa trên vị trí cuộn
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 100) {
+                $('#backToTop').fadeIn();
+            } else {
+                $('#backToTop').fadeOut();
+            }
+        });
+
+        // Cuộn về đầu trang khi nhấn vào nút
+        $('#backToTop').click(function () {
+            $('html, body').animate({ scrollTop: 0 }, 'slow');
+            return false;
+        });
+    </script>
+}

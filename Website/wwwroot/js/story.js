@@ -2,7 +2,6 @@
 $(function () {
     window.story = {
         init: function () {
-            let groupedChapters = {};
             story.tblListChapter();
             const tabs = document.querySelectorAll('.navtab');
             const contents = document.querySelectorAll('.content');
@@ -36,19 +35,20 @@ $(function () {
 
         action: function () {
         },
-        listChapter: function (offs = 0, limit = 102){
+        listChapter: function (){
             $.ajax({
                 url: '/Chapter/GetChapter',
                 type: 'get',
                 data: {
-                    limit: 102,
-                    offset: offs,
+                    limit: 10000,
+                    offset: 0,
                     idStory: $('#txtIdStory').val()
                 },
                 success: function (res) {
                     if(res.total == 0){                        
                         $('#storyListChapter').html('<h3 style="color: red;">Không tìm thấy chương</h3>')
                     } else{
+                        let groupedChapters = {};
                         res.data.forEach(chapter => {
                             let belongValue = chapter.belong;
                             if (!groupedChapters[belongValue]) {
@@ -56,7 +56,6 @@ $(function () {
                             }
                             groupedChapters[belongValue].push(chapter);
                             story.renderTable(res.data);
-                            story.renderPagination(res.total);
                         });
                     }
                 },
@@ -68,31 +67,34 @@ $(function () {
                 processData: false
             });
         },
-        renderTable: function (chapters){
-            const $table = $('<table></table>');
+        renderTable: function(chapters) {
+            const $container = $('<div></div>').addClass('container');
             let currentBelong = null;
+            let $row = null;
+        
             chapters.forEach((item, index) => {
                 if (currentBelong !== item.belong && item.position == 1) {
                     currentBelong = item.belong;
-                    if(item.belong != 1){
-                        const $belongRow = $('<tr></tr>');
-                        const $belongCell = $('<td colspan="3"></td>').addClass('belong-cell').text(`Belong: ${item.belong}`);
-                        $belongRow.append($belongCell);
-                        $table.append($belongRow);
+                    if (item.belong != 1) {
+                        const $belongRow = $('<div></div>').addClass('row mb-3');
+                        const $belongCol = $('<div></div>').addClass('col-12 belong-cell').text(item.part_Name);
+                        $belongRow.append($belongCol);
+                        $container.append($belongRow);
                     }
                 }
 
-                // Tạo hàng chứa title chia thành 3 cột
                 if (index % 3 === 0) {
-                    $table.append('<tr></tr>');
+                    $row = $('<div></div>').addClass('row mb-3');
+                    $container.append($row);
                 }
-                const $titleCell = $('<td></td>');
-                const $link = $('<a></a>').attr('href', '#').text(item.title);
-                $titleCell.append($link);
-                $table.find('tr').last().append($titleCell);
-            });
 
-            $('#storyListChapter').html($table);
+                const $col = $('<div></div>').attr('title', item.title).addClass('col-md-4').css({'display': '-webkit-box','-webkit-line-clamp': 1,'-webkit-box-orient': 'vertical','overflow': 'hidden'});
+                const $link = $('<a></a>').attr('href', '/Story/Chapter?idStory=' + item.idStory + '&idChapter=' + item.id).css({'text-decoration': 'none', 'color': 'black'}).text(item.title);
+                $col.append($link);
+                $row.append($col);
+            });
+        
+            $('#storyListChapter').html($container);
         },
         renderPagination: function(total) {
             const totalPages = Math.ceil(total / 102);
