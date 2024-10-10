@@ -2,7 +2,7 @@
 $(function () {
     window.story = {
         init: function () {
-            story.tblListChapter();
+            story.listChapter();
             const tabs = document.querySelectorAll('.navtab');
             const contents = document.querySelectorAll('.content');
             const underline = document.querySelector('.underline');
@@ -37,7 +37,7 @@ $(function () {
         },
         listChapter: function (){
             $.ajax({
-                url: '/Chapter/GetChapter',
+                url: '/Story/GetChapterStory',
                 type: 'get',
                 data: {
                     limit: 10000,
@@ -49,22 +49,19 @@ $(function () {
                         $('#storyListChapter').html('<h3 style="color: red;">Không tìm thấy chương</h3>')
                     } else{
                         let groupedChapters = {};
-                        res.data.forEach(chapter => {
+                        res.rows.forEach(chapter => {
                             let belongValue = chapter.belong;
                             if (!groupedChapters[belongValue]) {
                                 groupedChapters[belongValue] = [];
                             }
                             groupedChapters[belongValue].push(chapter);
-                            story.renderTable(res.data);
+                            story.renderTable(res.rows);
                         });
                     }
                 },
                 error:function(xhr, status, error){
                     console.error('Error:', status, error);
-                },
-                cache: false,
-                contentType: false,
-                processData: false
+                }
             });
         },
         renderTable: function(chapters) {
@@ -89,7 +86,7 @@ $(function () {
                 }
 
                 const $col = $('<div></div>').attr('title', item.title).addClass('col-md-4').css({'display': '-webkit-box','-webkit-line-clamp': 1,'-webkit-box-orient': 'vertical','overflow': 'hidden'});
-                const $link = $('<a></a>').attr('href', '/Story/Chapter?idStory=' + item.idStory + '&idChapter=' + item.id).css({'text-decoration': 'none', 'color': 'black'}).text(item.title);
+                const $link = $('<a></a>').attr('href', '/Story/Chapter?idStory=' + item.storyId + '&idChapter=' + item.chapterId).css({'text-decoration': 'none', 'color': 'black'}).text(item.title);
                 $col.append($link);
                 $row.append($col);
             });

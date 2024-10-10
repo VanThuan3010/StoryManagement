@@ -69,7 +69,7 @@
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
                 formData.append("StoryId", $('#StoryId').val());
-                formData.append("txtTitle", $('#Title').val());
+                formData.append("Title", $('#txtTitle').val());
                 formData.append("Belong", $('#Belong').val());
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
                 $.ajax({

@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace Admin.Code

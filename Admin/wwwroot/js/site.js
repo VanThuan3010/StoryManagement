@@ -103,7 +103,7 @@ convertToHTML: function (content) {
     const invertedChars = Object.fromEntries(
         Object.entries(specialChars).map(([key, value]) => [value, key])
     );
-    return input.replace(/&agrave;|&aacute;|&atilde;|&acirc;|&egrave;|&eacute;|&ecirc;|&igrave;|&iacute;|&ograve;|&oacute;|&otilde;|&ocirc;|&ugrave;|&uacute;|&Agrave;|&Aacute;|&Atilde;|&Acirc;|&Egrave;|&Eacute;|&Ecirc;|&Igrave;|&Iacute;|&Ograve;|&Oacute;|&Otilde;|&Ocirc;|&Ugrave;|&Uacute;|&yacute;|&Yacute;/g, (match) => {
+    return content.replace(/&agrave;|&aacute;|&atilde;|&acirc;|&egrave;|&eacute;|&ecirc;|&igrave;|&iacute;|&ograve;|&oacute;|&otilde;|&ocirc;|&ugrave;|&uacute;|&Agrave;|&Aacute;|&Atilde;|&Acirc;|&Egrave;|&Eacute;|&Ecirc;|&Igrave;|&Iacute;|&Ograve;|&Oacute;|&Otilde;|&Ocirc;|&Ugrave;|&Uacute;|&yacute;|&Yacute;/g, (match) => {
         return invertedChars[match] || match;
     });
 },
