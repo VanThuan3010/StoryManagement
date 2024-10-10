@@ -59,7 +59,9 @@
                     </div>
                     <div id="listChapter" class="content">
                         <input type="hidden" id="txtIdStory" value="@Model.Id"/>
-                        <table id="tblStoryListChapter"></table>
+                        <!-- <table id="tblStoryListChapter"></table> -->
+                        <div id="storyListChapter"></div>
+                        <div class="pagination"></div>
                     </div>
                     <div id="rating" class="content">
                         @if (reviews != null) { Html.Raw(reviews.Review); }
