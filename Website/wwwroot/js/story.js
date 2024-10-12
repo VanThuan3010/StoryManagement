@@ -85,8 +85,8 @@ $(function () {
                     $container.append($row);
                 }
 
-                const $col = $('<div></div>').attr('title', item.title).addClass('col-md-4').css({'display': '-webkit-box','-webkit-line-clamp': 1,'-webkit-box-orient': 'vertical','overflow': 'hidden'});
-                const $link = $('<a></a>').attr('href', '/Story/Chapter?idStory=' + item.storyId + '&idChapter=' + item.chapterId).css({'text-decoration': 'none', 'color': 'black'}).text(item.title);
+                const $col = $('<div></div>').attr('title', item.title).addClass('col-md-4');
+                const $link = $('<a></a>').attr('href', '/Story/Chapter?idStory=' + item.storyId + '&idChapter=' + item.chapterId).css({'text-decoration': 'none', 'color': 'black','display': '-webkit-box','-webkit-line-clamp': 1,'-webkit-box-orient': 'vertical','overflow': 'hidden'}).text(item.title);
                 $col.append($link);
                 $row.append($col);
             });

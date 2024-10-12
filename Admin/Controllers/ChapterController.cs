@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StoryManagement.Model;
 using StoryManagement.Model.Entity;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
 
 namespace Admin.Controllers
 {
@@ -152,6 +156,108 @@ namespace Admin.Controllers
                     message = ex.Message,
                 });
             }
+        }
+        [HttpPost]
+        public JsonResult AddByText(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
+                }
+                int po = 0;
+                int newId = 1;
+                string newName = "";
+                string pattern = @"^chương\s\d+"; //@"^(chương|tự chương)\s\d+";
+                bool skipOpening = false;
+                string chapterTitle = "Giới thiệu";
+                StringBuilder chapterContent = new StringBuilder();
+
+                // Đọc tệp theo từng dòng
+                foreach (string line in File.ReadLines(@"D:\Code\CSharp\story.txt"))
+                {
+                    if (line.Trim().StartsWith("Phần truyện: "))
+                    {
+                        Part = line.Trim().Replace("Phần truyện:", "").Trim();
+                        _ibase.part_ChapterRespository.CreatePart(idStory, name, ref newId, ref newName);
+                        continue;
+                    }
+                    else
+                    {
+                        if (Regex.IsMatch(line.Trim().ToLower(), pattern))
+                        {
+                            if (chapterContent.Length > 0)
+                            {
+                                if (skipOpening)
+                                {
+                                    _ibase.chapterRespository.CreateOrUpdate(new Chapters()
+                                    {
+                                        Id = 0,
+                                        IdStory = id,
+                                        Title = chapterTitle,
+                                        Content = ConvertToHtml(chapterContent.ToString()),
+                                        Belong = newId
+                                    })
+                                }
+                                else
+                                {
+                                    skipOpening = true;
+                                }
+                                chapterContent.Clear();
+                            }
+                            chapterTitle = line.Trim();
+                        }
+                        else
+                        {
+                            chapterContent.AppendLine(line);
+                        }
+                    }
+                }
+                if (chapterContent.Length > 0)
+                {
+                    _ibase.chapterRespository.CreateOrUpdate(new Chapters()
+                    {
+                        Id = 0,
+                        IdStory = id,
+                        Title = chapterTitle,
+                        Content = ConvertToHtml(chapterContent.ToString()),
+                        Belong = newId
+                    })
+                }
+                //_ibase.Commit();
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Thêm thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = ex.Message,
+                });
+            }
+
+        }
+        public string ConvertToHtml(string text)
+        {
+            text = "<p>" + text.Replace(Environment.NewLine + Environment.NewLine, "</p><p>");
+
+            text = text.Replace("\t", "<span style='display:inline-block; width: 40px;'></span>");
+            text = text.Replace("    ", "<span style='display:inline-block; width: 40px;'></span>");
+
+            text = text.Replace(Environment.NewLine, "<br>");
+
+            text += "</p>";
+
+            return text;
         }
     }
 }

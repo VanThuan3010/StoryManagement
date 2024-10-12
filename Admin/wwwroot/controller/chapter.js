@@ -9,11 +9,24 @@
         },
 
         action: function () {
+            $('#addByText').click(function () {
+                $.ajax({
+                    url: '/Chapter/AddByText',
+                    type: 'post',
+                    data: { id: $('#saveStoryId').val() },
+                    success: function (res) {
+                        if (res.status) {
+                            base.notification('success', res.message);
+                        } else {
+                            base.notification('error', res.message);
+                        }
+                    }
+                })
+            })
             $('#savePosition').click(function () {
                 let chapterIdsString = $('#tblChapter').bootstrapTable('getData').map(function (row) {
                     return row.chapterId;
                 }).join(',');
-                alert(chapterIdsString);
                 $.ajax({
                     url: '/Chapter/UpdatePosition',
                     type: 'post',

@@ -52,17 +52,14 @@
                     <div class="col-lg-3">
                         <select class="form-select" id="sltAuthor" multiple>
                             <option value="0">--Tất cả tác giả--</option>
-                            @* @if (lstAuthors != null && lstAuthors.Count > 0)
-                            {
-                                foreach (var item in lstAuthors)
-                                {
-                                    <option value="@item.Id">@item.Pseudonym</option>
-                                }
-                            } *@
                         </select>
                     </div>
-                    <div class="col-lg-3">
-                        <button type="button" id="btnSearch" class="btn btn-primary btn-xs mr-5"><i class="fas fa-search"></i></button>
+                    <div class="col-lg-2">
+                        <input type="checkbox" name="checkbox" value="All" id="chk" checked>
+                        <label for="chk" id="lblStt">Tất cả</label>
+                    </div>
+                    <div class="col-lg-1">
+                        <button type="button" id="btnSearch" class="btn btn-primary btn-sm mr-5"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
                 <div class="col-lg-12 table-responsive" style="height: 480px;">
@@ -84,12 +81,10 @@
                     <input type="text" hidden id="txtIdModal" name="Id" />
                     <div class="form-group mb-3">
                         <label class="form-label required">Tên truyện</label>
-                        <!-- <input type="text" class="form-control" id="txtName" name="Name" style="height: 50px;" /> -->
                         <textarea class="form-control" name="txtName" id="txtName"></textarea>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">Chương truyện</label>
-                        <!-- <input type="text" class="form-control" name="NumberChapter" id="txtNumberChapter" style="height: 50px;" /> -->
                         <textarea class="form-control" name="NumberChapter" id="txtNumberChapter"></textarea>
                     </div>
                     <div class="form-group mb-3">
@@ -105,11 +100,25 @@
                                     }
                                 </select>
                             </div> *@
-                            <div class="col">
+                            <div class="col-1"></div>
+                            <div class="col-4">
                                 <label class="form-label">Đã đọc?</label><br/>
                                 <input class="form-check-input ms-2" type="checkbox" name="IsRead" id="ckRead"/>
                             </div>
+                            <div class="col-4">
+                                <label class="form-label">File tổng hợp (hệ liệt)?</label><br/>
+                                <input class="form-check-input ms-2" type="checkbox" name="IsCollection" id="ckRead"/>
+                            </div>
                         </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Nguồn</label>
+                        <select class="form-select" id="sources" name="sources">
+                            <option value="SacHiepVien">SacHiepVien</option>
+                            <option value="SangTacViet">SangTacViet</option>
+                            <option value="Wattpad">Wattpad</option>
+                            <option value="Other">Khác</option>
+                        </select>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">Thẻ</label>
@@ -144,8 +153,3 @@
         </div>
     </div>
 </div>
-@* @section Scripts {
-    <script>
-        CKEDITOR.replace('txtReview');
-    </script>
-} *@

@@ -22,6 +22,33 @@
         },
 
         action: function () {
+            $('#chk').data('checked', 2).click(function(e) {
+                el = $(this);
+                switch (el.data('checked')) {
+                  // unchecked, going indeterminate
+                  case 0:
+                    el.val('Read');
+                    el.data('checked', 1);
+                    el.prop('indeterminate', true);
+                    $('#lblStt').text("Đã");
+                    break;
+                    // indeterminate, going checked
+                  case 1:
+                    el.val('Pending');
+                    el.data('checked', 2);
+                    el.prop('indeterminate', false);
+                    el.prop('checked', true);
+                    $('#lblStt').text("Chưa");
+                    break;
+                    // checked, going unchecked
+                  default:
+                    el.val('All');
+                    el.data('checked', 0);
+                    el.prop('indeterminate', false);
+                    el.prop('checked', false);
+                    $('#lblStt').text("Tất cả");
+                }
+            });
             $('#btnSearch').on('click', function () {
                 story.tblStory();
             });
@@ -33,7 +60,7 @@
                 datas.append('Status', $('#idStatus').val());
                 datas.append('IsRead', $('#ckRead').is(':checked'));
                 datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
-                /*datas.append('AuthorId', "");*/
+                // datas.append('Source', $('#sources').val());
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
@@ -80,7 +107,7 @@
                     data: function (params) {
                         return {
                             search: params.term, // Từ khóa tìm kiếm
-                            offset: 0, // Phân trang nếu cần
+                            offset: 0,
                             limit: 10
                         };
                     },
@@ -124,6 +151,7 @@
                         search: $('#txtSearch').val(),
                         tags: $('#sltTag').val(),
                         authors: $('#sltAuthor').val(),
+                        stt: $('#chk').val()
                     }, p);
                     return param;
                 },
