@@ -14,7 +14,7 @@
                 $('#txtNumberChapter').val('');
                 $('#sltFormTag').select2();
                 story.initSelect2_Authors();
-                /*$('#sltFormAuthor').select2();*/
+                $('#sources').val('SacHiepVien');
                 $('#labelAction').text('Thêm mới truyện');
 
                 $('#modalCreateOrEdit').modal('show');
@@ -22,31 +22,31 @@
         },
 
         action: function () {
-            $('#chk').data('checked', 2).click(function(e) {
+            $('#chk').data('checked', 2).click(function (e) {
                 el = $(this);
                 switch (el.data('checked')) {
-                  // unchecked, going indeterminate
-                  case 0:
-                    el.val('Read');
-                    el.data('checked', 1);
-                    el.prop('indeterminate', true);
-                    $('#lblStt').text("Đã");
-                    break;
+                    // unchecked, going indeterminate
+                    case 0:
+                        el.val('Read');
+                        el.data('checked', 1);
+                        el.prop('indeterminate', true);
+                        $('#lblStt').text("Đã");
+                        break;
                     // indeterminate, going checked
-                  case 1:
-                    el.val('Pending');
-                    el.data('checked', 2);
-                    el.prop('indeterminate', false);
-                    el.prop('checked', true);
-                    $('#lblStt').text("Chưa");
-                    break;
+                    case 1:
+                        el.val('Pending');
+                        el.data('checked', 2);
+                        el.prop('indeterminate', false);
+                        el.prop('checked', true);
+                        $('#lblStt').text("Chưa");
+                        break;
                     // checked, going unchecked
-                  default:
-                    el.val('All');
-                    el.data('checked', 0);
-                    el.prop('indeterminate', false);
-                    el.prop('checked', false);
-                    $('#lblStt').text("Tất cả");
+                    default:
+                        el.val('All');
+                        el.data('checked', 0);
+                        el.prop('indeterminate', false);
+                        el.prop('checked', false);
+                        $('#lblStt').text("Tất cả");
                 }
             });
             $('#btnSearch').on('click', function () {
@@ -60,7 +60,7 @@
                 datas.append('Status', $('#idStatus').val());
                 datas.append('IsRead', $('#ckRead').is(':checked'));
                 datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
-                // datas.append('Source', $('#sources').val());
+                 datas.append('Source', $('#sources').val());
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
@@ -151,7 +151,7 @@
                         search: $('#txtSearch').val(),
                         tags: $('#sltTag').val(),
                         authors: $('#sltAuthor').val(),
-                        stt: $('#chk').val()
+                        status: $('#chk').val()
                     }, p);
                     return param;
                 },
@@ -272,6 +272,7 @@
                                 $('#txtIdModal').val(row.id);
                                 $('#txtName').val(row.name);
                                 $('#txtNumberChapter').val(row.numberChapter);
+                                $('#sources').val(row.source.trim());
                                 $('#sltFormTag').select2().val(row.tagId ? row.tagId.split(",") : null).trigger('change');
                                 if (row.authorId == null) {
                                     story.initSelect2_Authors();

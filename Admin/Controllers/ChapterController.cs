@@ -157,95 +157,94 @@ namespace Admin.Controllers
                 });
             }
         }
-        [HttpPost]
-        public JsonResult AddByText(int id)
-        {
-            try
-            {
-                if (id <= 0)
-                {
-                    return new JsonResult(new
-                    {
-                        status = false,
-                        message = "Có lỗi xảy ra"
-                    });
-                }
-                int po = 0;
-                int newId = 1;
-                string newName = "";
-                string pattern = @"^chương\s\d+"; //@"^(chương|tự chương)\s\d+";
-                bool skipOpening = false;
-                string chapterTitle = "Giới thiệu";
-                StringBuilder chapterContent = new StringBuilder();
+        //[HttpPost]
+        //public JsonResult AddByText(int id)
+        //{
+        //    try
+        //    {
+        //        if (id <= 0)
+        //        {
+        //            return new JsonResult(new
+        //            {
+        //                status = false,
+        //                message = "Có lỗi xảy ra"
+        //            });
+        //        }
+        //        int po = 0;
+        //        int newId = 1;
+        //        string newName = "";
+        //        string pattern = @"^(chương|tự chương)\s\d+";
+        //        bool skipOpening = false;
+        //        string chapterTitle = "Giới thiệu";
+        //        StringBuilder chapterContent = new StringBuilder();
+        //        string Part = "";
 
-                // Đọc tệp theo từng dòng
-                foreach (string line in File.ReadLines(@"D:\Code\CSharp\story.txt"))
-                {
-                    if (line.Trim().StartsWith("Phần truyện: "))
-                    {
-                        Part = line.Trim().Replace("Phần truyện:", "").Trim();
-                        _ibase.part_ChapterRespository.CreatePart(idStory, name, ref newId, ref newName);
-                        continue;
-                    }
-                    else
-                    {
-                        if (Regex.IsMatch(line.Trim().ToLower(), pattern))
-                        {
-                            if (chapterContent.Length > 0)
-                            {
-                                if (skipOpening)
-                                {
-                                    _ibase.chapterRespository.CreateOrUpdate(new Chapters()
-                                    {
-                                        Id = 0,
-                                        IdStory = id,
-                                        Title = chapterTitle,
-                                        Content = ConvertToHtml(chapterContent.ToString()),
-                                        Belong = newId
-                                    })
-                                }
-                                else
-                                {
-                                    skipOpening = true;
-                                }
-                                chapterContent.Clear();
-                            }
-                            chapterTitle = line.Trim();
-                        }
-                        else
-                        {
-                            chapterContent.AppendLine(line);
-                        }
-                    }
-                }
-                if (chapterContent.Length > 0)
-                {
-                    _ibase.chapterRespository.CreateOrUpdate(new Chapters()
-                    {
-                        Id = 0,
-                        IdStory = id,
-                        Title = chapterTitle,
-                        Content = ConvertToHtml(chapterContent.ToString()),
-                        Belong = newId
-                    })
-                }
-                //_ibase.Commit();
-                return new JsonResult(new
-                {
-                    status = true,
-                    message = "Thêm thành công"
-                });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new
-                {
-                    status = true,
-                    message = ex.Message,
-                });
-            }
+        //        foreach (string line in File.ReadLines(@"D:\Code\CSharp\story.txt"))
+        //        {
+        //            if (line.Trim().StartsWith("Phần truyện: "))
+        //            {
+        //                Part = line.Trim().Replace("Phần truyện:", "").Trim();
+        //                _ibase.part_ChapterRespository.CreatePart(id, Part, ref newId, ref newName);
+        //                continue;
+        //            }
+        //            else
+        //            {
+        //                if (Regex.IsMatch(line.Trim().ToLower(), pattern))
+        //                {
+        //                    if (chapterContent.Length > 0)
+        //                    {
+        //                        if (skipOpening)
+        //                        {
+        //                            _ibase.chapterRespository.CreateOrUpdate(new Chapters()
+        //                            {
+        //                                Id = 0,
+        //                                StoryId = id,
+        //                                Title = chapterTitle,
+        //                                Content = ConvertToHtml(chapterContent.ToString()),
+        //                                Belong = newId
+        //                            });
+        //                        }
+        //                        else
+        //                        {
+        //                            skipOpening = true;
+        //                        }
+        //                        chapterContent.Clear();
+        //                    }
+        //                    chapterTitle = line.Trim();
+        //                }
+        //                else
+        //                {
+        //                    chapterContent.AppendLine(line);
+        //                }
+        //            }
+        //        }
+        //        if (chapterContent.Length > 0)
+        //        {
+        //            _ibase.chapterRespository.CreateOrUpdate(new Chapters()
+        //            {
+        //                Id = 0,
+        //                StoryId = id,
+        //                Title = chapterTitle,
+        //                Content = ConvertToHtml(chapterContent.ToString()),
+        //                Belong = newId
+        //            });
+        //        }
+        //        return new JsonResult(new
+        //        {
+        //            status = true,
+        //            message = "Thêm thành công"
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new JsonResult(new
+        //        {
+        //            status = true,
+        //            message = ex.Message,
+        //        });
+        //    }
 
-        }
+        //}
         public string ConvertToHtml(string text)
         {
             text = "<p>" + text.Replace(Environment.NewLine + Environment.NewLine, "</p><p>");

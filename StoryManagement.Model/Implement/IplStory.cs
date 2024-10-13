@@ -20,7 +20,7 @@ namespace StoryManagement.Model.Implement
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public List<Story> GetAll(int pageIndex, int pageSize, string search,string tags, string authors, ref int Total)
+        public List<Story> GetAll(int pageIndex, int pageSize, string search,string tags, string authors, string status, ref int Total)
         {
             List<Story> List = new List<Story>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -35,6 +35,7 @@ namespace StoryManagement.Model.Implement
                     p.Add("@search", search);
                     p.Add("@tags", tags);
                     p.Add("@authors", authors);
+                    p.Add("@stt", status);
                     p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
                     List = u.GetIEnumerable<Story>("Get_Story", p).ToList();
                     Total = p.Get<int>("@totalRow");
@@ -81,6 +82,7 @@ namespace StoryManagement.Model.Implement
                     p.Add("@read", storyModel.IsRead);
                     p.Add("@tags", storyModel.TagId);
                     p.Add("@authors", storyModel.AuthorId);
+                    p.Add("@source", storyModel.Source);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Story", p);
                 }

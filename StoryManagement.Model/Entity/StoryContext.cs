@@ -39,6 +39,7 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.IsRead);
                 entity.Property(e => e.AuthorId);
                 entity.Property(e => e.TagId);
+                entity.Property(e => e.Source);
             });
             modelBuilder.Entity<Authors>(entity =>
             {

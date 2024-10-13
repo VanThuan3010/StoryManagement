@@ -20,10 +20,10 @@ namespace Admin.Controllers
             //ViewBag.lstAuthor = _ibase.authorRespository.GetAll(0, 1000, null, ref total);
             return View();
         }
-        public JsonResult GetStory(string search, int offset, int limit, string tags = "", string authors = "")
+        public JsonResult GetStory(string search, int offset, int limit, string status, string tags = "", string authors = "")
         {
             int total = 0;
-            var data = _ibase.storyRespository.GetAll(offset, limit, search, tags, authors, ref total);
+            var data = _ibase.storyRespository.GetAll(offset, limit, search, tags, authors, status, ref total);
             return Json(new { rows = data, total = total });
         }
         [HttpPost]
