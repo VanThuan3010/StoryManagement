@@ -79,8 +79,9 @@ namespace StoryManagement.Model.Implement
                     p.Add("@Id", storyModel.Id);
                     p.Add("@name", storyModel.Name);
                     p.Add("@numberChapter", storyModel.NumberChapter);
+                    p.Add("@tagName", storyModel.Tags_Name);
                     p.Add("@read", storyModel.IsRead);
-                    p.Add("@tags", storyModel.TagId);
+                    p.Add("@tagId", storyModel.TagId);
                     p.Add("@authors", storyModel.AuthorId);
                     p.Add("@source", storyModel.Source);
 
