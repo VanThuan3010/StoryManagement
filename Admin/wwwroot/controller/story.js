@@ -151,7 +151,7 @@
                     var param = $.extend(true, {
                         limit: p.limit,
                         offset: p.offset,
-                        search: $('#txtSearch').val(),
+                        search: $.trim($('#txtSearch').val()),
                         tags: $('#sltTag').val(),
                         authors: $('#sltAuthor').val(),
                         status: $('#chk').val()

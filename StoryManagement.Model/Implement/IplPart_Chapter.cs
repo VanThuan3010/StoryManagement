@@ -24,18 +24,20 @@ namespace StoryManagement.Model.Implement
             _configuration = configuration;
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
-        public List<Part_Chapter> GetAll(int idStory)
+        public List<Part_Chapter> GetAll(int idStory, ref int ChapterCount)
         {
             List<Part_Chapter> List = new List<Part_Chapter>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             try
             {
-                using (var u = unitOfWork.Create(false))
+                using (var u = unitOfWork.Create(true))
                 {
                     var p = new DynamicParameters();
 
                     p.Add("@idStory", idStory);
+                    p.Add("@totalChapters", ChapterCount, DbType.Int32, ParameterDirection.Output);
                     List = u.GetIEnumerable<Part_Chapter>("Get_PartChapter", p).ToList();
+                    ChapterCount = p.Get<int>("@totalChapters");
                 }
             }
             catch (Exception ex)

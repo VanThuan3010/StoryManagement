@@ -23,6 +23,21 @@
                     }
                 })
             })
+            $('#btnSearchChapter').click(function () {
+                $.ajax({
+                    url: '/Chapter/SearchByOrder',
+                    type: 'post',
+                    data: { id: $('#saveStoryId').val(), Order: $('#searchOrder').val() },
+                    success: function (res) {
+                        if (res.status) {
+                            $('#titleFound').text(res.title);
+                            $('#searchBelong').val(res.belong);
+                        } else {
+                            base.notification('success', res.message);
+                        }
+                    }
+                })
+            })
             $('#savePosition').click(function () {
                 let chapterIdsString = $('#tblChapter').bootstrapTable('getData').map(function (row) {
                     return row.chapterId;
@@ -85,6 +100,7 @@
                 formData.append("Title", $('#txtTitle').val());
                 formData.append("Belong", $('#Belong').val());
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
+                formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
                 $.ajax({
                     url: '/Chapter/CreateOrUpdate',
                     type: 'POST',

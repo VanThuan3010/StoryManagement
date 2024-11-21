@@ -30,15 +30,17 @@ namespace Admin.Controllers
 
         public IActionResult CreateOrUpdate(int idStory, long idChapter)
         {
+            var ChapterCount = 0;
             ViewBag.idStory = idStory;
             ViewBag.idChapter = idChapter;
-            ViewBag.PartChapter = _ibase.part_ChapterRespository.GetAll(idStory);
+            ViewBag.PartChapter = _ibase.part_ChapterRespository.GetAll(idStory, ref ChapterCount);
             ViewBag.chapters = _ibase.chapterRespository.GetDetail(idChapter);
+            ViewBag.ChapterCount = ChapterCount;
             return View();
         }
 
         [HttpPost]
-        public JsonResult CreateOrUpdate(Chapters chapters)
+        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo)
         {
             try
             {
@@ -50,11 +52,37 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.chapterRespository.CreateOrUpdate(chapters);
+                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
                 return new JsonResult(new
                 {
                     status = true,
                     message = "/Chapter/Index?idStory=" + chapters.StoryId
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public JsonResult SearchByOrder(int Id, int Order)
+        {
+            try
+            {
+                if (Id < 0)
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
+                }
+                Chapters chapter = _ibase.chapterRespository.SearchByOrder(Id, Order);
+                return new JsonResult(new
+                {
+                    status = true,
+                    title = chapter == null ? "" : chapter.Title,
+                    belong = chapter == null ? 1 : chapter.Belong
                 });
             }
             catch (Exception ex)
