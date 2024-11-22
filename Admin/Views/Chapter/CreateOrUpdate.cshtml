@@ -4,6 +4,7 @@
     ViewData["Title"] = ViewBag.id <= 0 ? "Thêm mới chương truyện" : "Sửa nội dung chương";
     List<Part_Chapter> part_Chapters = (List<Part_Chapter>)ViewBag.PartChapter;
     Chapters chapter = (Chapters)ViewBag.chapters;
+    var ChapterCount = (int)ViewBag.ChapterCount;
 }
 
 <div class="row">
@@ -31,6 +32,29 @@
                             </select>
                             <a id="addPart" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary">+</a>
                         </div>                        
+                    </div>
+                    <div class="form-group col-lg-12 mb-3">
+                        <label class="form-label">Vị trí thêm</label>
+                        <div class="row">
+                            <select class="form-select col-6" id="searchBelong" name="searchBelong">
+                                @if (part_Chapters.Count > 0)
+                                {
+                                    foreach (Part_Chapter item in part_Chapters)
+                                    {
+                                        <option value="@item.Id">@item.Name (@item.ChapterCount) </option>
+                                    }
+                                }
+                            </select>
+                            <div class="col-6">
+                                <span id="titleFound" disabled></span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <input class="form-control" type="text" id="searchOrder" value="@(ChapterCount + 1)" />
+                            </div>
+                            <div class="col-2 mt-3">
+                                <button type="button" id="btnSearchChapter" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group col-lg-12 mb-3">
                         <label class="form-label">Nội dung chương</label>

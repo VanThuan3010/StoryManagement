@@ -69,7 +69,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Chapters chapters)
+        public int CreateOrUpdate(Chapters chapters, int OrderTo)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -83,8 +83,31 @@ namespace StoryManagement.Model.Implement
                     p.Add("@title", chapters.Title);
                     p.Add("@content", chapters.Content);
                     p.Add("@belong", chapters.Belong);
+                    p.Add("@orderSetup", OrderTo);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Chapter", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
+        public Chapters SearchByOrder(int Id, int Order)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            Chapters list = new Chapters() { };
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@storyId", Id);
+                    p.Add("@order", Order);
+
+                    list = u.GetIEnumerable<Chapters>("Search_ChapterToOrder", p).FirstOrDefault(); ;
                 }
                 return list;
             }

@@ -17,6 +17,8 @@ namespace StoryManagement.Model.Entity
         public string? AuthorId { get; set; }
         public string? Source {  get; set; }
         public string? TagId { get; set; }
+        public bool? IsCollection { get; set; }
+        public string? Tags_Name { get; set; }
         [NotMapped]
         public string? Review {  get; set; }
         [NotMapped]

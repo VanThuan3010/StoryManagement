@@ -12,6 +12,7 @@
                 $('#txtIdModal').val(0);
                 $('#txtName').val('');
                 $('#txtNumberChapter').val('');
+                $('#txtTagName').val('');
                 $('#sltFormTag').select2();
                 story.initSelect2_Authors();
                 $('#sources').val('SacHiepVien');
@@ -57,10 +58,12 @@
                 datas.append('Id', $('#txtIdModal').val());
                 datas.append('Name', $('#txtName').val());
                 datas.append('NumberChapter', $('#txtNumberChapter').val());
+                datas.append('Tags_Name', $('#txtTagName').val());
                 datas.append('Status', $('#idStatus').val());
-                datas.append('IsRead', $('#ckRead').is(':checked'));
+                datas.append('IsRead', 0);
+                datas.append('IsCollection', $('#IsCollection').is(':checked'));
                 datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
-                 datas.append('Source', $('#sources').val());
+                datas.append('Source', $('#sources').val());
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
@@ -148,7 +151,7 @@
                     var param = $.extend(true, {
                         limit: p.limit,
                         offset: p.offset,
-                        search: $('#txtSearch').val(),
+                        search: $.trim($('#txtSearch').val()),
                         tags: $('#sltTag').val(),
                         authors: $('#sltAuthor').val(),
                         status: $('#chk').val()
@@ -272,6 +275,7 @@
                                 $('#txtIdModal').val(row.id);
                                 $('#txtName').val(row.name);
                                 $('#txtNumberChapter').val(row.numberChapter);
+                                $('#txtTagName').val(row.tags_Name);
                                 $('#sources').val(row.source.trim());
                                 $('#sltFormTag').select2().val(row.tagId ? row.tagId.split(",") : null).trigger('change');
                                 if (row.authorId == null) {
