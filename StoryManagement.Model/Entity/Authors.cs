@@ -10,6 +10,6 @@ namespace StoryManagement.Model.Entity
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string? Pseudonym { get; set; }
+        public string? Style { get; set; }
     }
 }

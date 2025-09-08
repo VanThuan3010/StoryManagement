@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace StoryManagement.Model.Entity
 {
-    public class Series
+    public class Seri_Story
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
+        public int SeriId { get; set; }
+        public int StoryId { get; set; }
+        public int Position { get; set; }
     }
 }

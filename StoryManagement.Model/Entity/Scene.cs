@@ -11,10 +11,9 @@ namespace StoryManagement.Model.Entity
     public class Scenes
     {
         public int Id { get; set; }
-        public string FromStory { get; set; }
-        public string Scene { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public bool? HighRate { get; set; }
+        public int StoryId { get; set; }
+        public string? Scene { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
     }
 }

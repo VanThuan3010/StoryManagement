@@ -60,7 +60,7 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
                     p.Add("@Id", authors.Id);
                     p.Add("@name", authors.Name);
-                    p.Add("@pseudonym", authors.Pseudonym);
+                    p.Add("@pseudonym", authors.Style);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Author", p);
                 }
