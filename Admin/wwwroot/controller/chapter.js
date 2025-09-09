@@ -23,6 +23,10 @@
                     }
                 })
             })
+            $('#partList').change(function () {
+                $('#idPartChaptCU').val($(this).val());
+                $('#partChapterName').val($(this).text().trim());
+            })
             $('#btnSearchChapter').click(function () {
                 $.ajax({
                     url: '/Chapter/SearchByOrder',
@@ -69,11 +73,12 @@
                     return;
                 }
                 $.ajax({
-                    url: '/Chapter/AddPartChapter',
+                    url: '/Chapter/CreateOrUpdatePartChapter',
                     type: 'post',
                     data: {
                         idStory: $('#idStoryAddPartChapt').val(),
-                        name: $('#partChapterName').val()
+                        idPart: $('#idPartChaptCU').val(),
+                        name: $('#partChapterName').val().trim()
                     },
                     beforeSend: function () {
                         $('#savePart').prop('disabled', true);
@@ -84,7 +89,14 @@
                         $('#savePart').html("Lưu");
                         $("#exampleModal").modal('hide');
                         if (res.status) {
-                            $("#Belong").append(new Option(res.newName, res.newId));
+                            var opt = $("#Belong option[value='" + res.newId + "']");
+                            if (opt.length > 0) {
+                                opt.text(res.newName);
+                                $("#partList option[value='" + res.newId + "']").text(res.newName);
+                            } else {
+                                $("#Belong").append(new Option(res.newName +" (0)", res.newId));
+                                $("#partList").append(new Option(res.newName, res.newId));
+                            }
                             base.notification('success', res.message);
                         } else {
                             base.notification('error', res.message);

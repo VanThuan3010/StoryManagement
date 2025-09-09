@@ -153,21 +153,13 @@ namespace Admin.Controllers
 
         }
         [HttpPost]
-        public JsonResult AddPartChapter(int idStory, string name)
+        public JsonResult CreateOrUpdatePartChapter(int idStory, int idPart, string name)
         {
             try
             {
-                if (idStory <= 0)
-                {
-                    return new JsonResult(new
-                    {
-                        status = false,
-                        message = "Có lỗi xảy ra"
-                    });
-                }
                 int newId = 0;
                 string newName = "";
-                _ibase.part_ChapterRespository.CreatePart(idStory, name, ref newId, ref newName);
+                _ibase.part_ChapterRespository.CreateOrUpdatePart(idStory, idPart, name, ref newId, ref newName);
                 return new JsonResult(new
                 {
                     status = true,
