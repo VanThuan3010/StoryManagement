@@ -1,13 +1,13 @@
 ﻿$(function () {
-    window.Tag = {
+    window.SubTag = {
         init: function () {
-            Tag.action();
-            Tag.tblTag();
+            SubTag.action();
+            SubTag.tblSubTag();
             $('#btnCreate').on('click', function () {
                 $('#txtIdModal').val(0);
                 $('#txtName').val('');
                 $('#txtDefinition').val('');
-                $('#labelAction').text('Thêm mới thẻ');
+                $('#labelAction').text('Thêm mới thẻ phụ');
 
                 $('#modalCreateOrEdit').modal('show');
             });
@@ -15,16 +15,15 @@
 
         action: function () {
             $('#btnSearch').on('click', function () {
-                Tag.tblTag();
+                SubTag.tblTag();
             });
             $('#btnSubmit').click(function () {
                 var datas = new FormData();
                 datas.append('Id', $('#txtIdModal').val());
                 datas.append('Name', $('#txtName').val());
                 datas.append('Definition', $('#txtDefinition').val());
-                debugger
                 $.ajax({
-                    url: '/Tag/CreateOrUpdate',
+                    url: '/SubTag/CreateOrUpdate',
                     type: 'post',
                     processData: false,
                     contentType: false,
@@ -50,12 +49,12 @@
                 })
             });
         },
-        tblTag: function () {
+        tblSubTag: function () {
             var objTable = $("#tblTag");
             objTable.bootstrapTable('destroy');
             objTable.bootstrapTable({
                 method: 'get',
-                url: '/Tag/GetTag',
+                url: '/SubTag/GetTag',
                 queryParams: function (p) {
                     var param = $.extend(true, {
                         limit: p.limit,
@@ -106,7 +105,7 @@
                             'click .btnDelete': function (e, value, row, index) {
                                 $.confirm({
                                     title: 'Cảnh báo!',
-                                    content: 'Bạn chắc chắn muốn xóa thẻ?',
+                                    content: 'Bạn chắc chắn muốn xóa thẻ phụ?',
                                     buttons: {
                                         formSubmit: {
                                             text: 'Xác nhận',
@@ -117,7 +116,7 @@
                                                     type: 'post',
                                                     data: {
                                                         id: row.id,
-                                                        type: 'Tag'
+                                                        type: 'SubTag'
                                                     },
                                                     success: function (res) {
                                                         if (res.status) {
@@ -142,7 +141,7 @@
                                 $('#txtIdModal').val(row.id);
                                 $('#txtName').val(row.name);
                                 $('#txtDefinition').val(row.definition);
-                                $('#labelAction').text('Sửa thẻ');
+                                $('#labelAction').text('Sửa thẻ phụ');
 
                                 $('#modalCreateOrEdit').modal('show');
                             },
@@ -157,5 +156,5 @@
     }
 });
 $(document).ready(function () {
-    Tag.init();
+    SubTag.init();
 });

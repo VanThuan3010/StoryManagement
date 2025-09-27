@@ -48,29 +48,6 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Tags tags)
-        {
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            int list = 0;
-            try
-            {
-                using (var u = unitOfWork.Create(true))
-                {
-                    var p = new DynamicParameters();
-                    p.Add("@Id", tags.Id);
-                    p.Add("@name", tags.Name);
-                    p.Add("@definition", tags.Definition);
-
-                    list = u.ProcedureExecute("CreateOrUpdate_Tag", p);
-                }
-                return list;
-            }
-            catch (Exception ex)
-            {
-                return list;
-            }
-
-        }
         public List<Tags> GetStoryTag(int id)
         {
             List<Tags> List = new List<Tags>();

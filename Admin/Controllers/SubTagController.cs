@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StoryManagement.Model;
-using StoryManagement.Model.Entity;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Admin.Controllers
 {
-    public class TagController : Controller
+    public class SubTagController : Controller
     {
         protected IBase _ibase;
-        public TagController(IBase ibase)
+        public SubTagController(IBase ibase)
         {
             _ibase = ibase;
         }
@@ -19,7 +17,7 @@ namespace Admin.Controllers
         public JsonResult GetTag(int offset, int limit, string search)
         {
             int total = 0;
-            var data = _ibase.tagRespository.GetAll(offset, limit, search, ref total);
+            var data = _ibase.sub_TagRespository.GetAll(offset, limit, search, ref total);
             return Json(new { rows = data, total = total });
         }
         [HttpPost]
@@ -29,7 +27,7 @@ namespace Admin.Controllers
             {
                 bool Status = false;
                 string Mess = "";
-                _ibase.groupTagRespository.CreateOrUpdateTag_SubTag(Id, "Tag", Name, Definition, ref Status, ref Mess);
+                _ibase.groupTagRespository.CreateOrUpdateTag_SubTag(Id, "SubTag", Name, Definition, ref Status, ref Mess);
                 return new JsonResult(new
                 {
                     status = Status,
@@ -45,27 +43,5 @@ namespace Admin.Controllers
                 });
             }
         }
-        [HttpPost]
-        public JsonResult GetStoryTag(int id)
-        {
-            try
-            {
-                _ibase.tagRespository.GetStoryTag(id);
-                return new JsonResult(new
-                {
-                    status = true,
-                    message = ""
-                });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new
-                {
-                    status = false,
-                    message = ex.Message,
-                });
-            }
-        }
-
     }
 }
