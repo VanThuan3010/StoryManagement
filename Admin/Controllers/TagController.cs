@@ -45,6 +45,12 @@ namespace Admin.Controllers
                 });
             }
         }
+        public JsonResult GetTagToCRUD(int id, string forType)
+        {
+            int total = 0;
+            var data = _ibase.tagRespository.GetTag(id, forType);
+            return Json(new { rows = data, total = total });
+        }
         [HttpPost]
         public JsonResult GetStoryTag(int id)
         {

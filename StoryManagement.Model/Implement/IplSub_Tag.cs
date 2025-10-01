@@ -48,5 +48,27 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public List<Sub_Tag> GetSubTag(int id, string forModule)
+        {
+            List<Sub_Tag> List = new List<Sub_Tag>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@id", id);
+                    p.Add("@getFrom", "SubTag");
+                    p.Add("@getFor", forModule);
+                    List = u.GetIEnumerable<Sub_Tag>("Get_TagOrSubTag_ById", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
     }
 }

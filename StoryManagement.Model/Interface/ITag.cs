@@ -11,6 +11,7 @@ namespace StoryManagement.Model.Interface
     public interface ITag : IRepository<Tags>
     {
         List<Tags> GetAll(int pageIndex, int pageSize, string search, ref int Total);
+        List<Tags> GetTag(int id, string forModule);
         List<Tags> GetStoryTag(int id);
     }
 }

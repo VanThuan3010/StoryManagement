@@ -3,7 +3,7 @@
 
 
 @{
-    ViewData["Title"] = "Danh sách thẻ phụ";
+    ViewData["Title"] = "Danh sách nhóm thẻ";
 }
 <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
     <div class="breadcrumb-title pe-3">Thẻ</div>
@@ -13,7 +13,7 @@
                 <li class="breadcrumb-item">
                     <a href="/"><i class="bx bx-home-alt"></i></a>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">Danh sách thẻ phụ</li>
+                <li class="breadcrumb-item active" aria-current="page">Danh sách nhóm thẻ</li>
             </ol>
         </nav>
     </div>
@@ -28,8 +28,8 @@
         <div class="card">
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-lg-3">
-                        <input type="text" class="form-control" id="txtSearch" placeholder="Tìm kiếm thẻ" />
+                    <div class="col-lg-3 mb-3">
+                        <input type="text" class="form-control" id="txtSearch" placeholder="Tìm kiếm" />
                     </div>
                     <div class="col-lg-12 table-responsive">
                         <table class="table table-bordered" id="tblTag"></table>
@@ -50,12 +50,24 @@
                 <form id="frmTag" method="post">
                     <input type="text" hidden id="txtIdModal" name="Id" />
                     <div class="form-group mb-3">
-                        <label class="form-label required">Tên thẻ phụ</label>
+                        <label class="form-label required">Tên nhóm</label>
                         <input type="text" class="form-control" id="txtName" />
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">Định nghĩa</label>
                         <textarea class="form-control" id="txtDefinition"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Chọn nhiều thẻ?</label>
+                        <input type="checkbox" name="name" id="ckMulti" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thẻ</label>
+                        <select class="form-control" id="slTag" multiple="multiple"></select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thẻ phụ</label>
+                        <select class="form-control" id="slSubTag" multiple="multiple"></select>
                     </div>
                 </form>
             </div>

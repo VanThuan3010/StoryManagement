@@ -24,6 +24,102 @@ namespace StoryManagement.Model.Implement
             _configuration = configuration;
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
+        public List<GroupTag> GetAll(int pageIndex, int pageSize, string search, ref int Total)
+        {
+            List<GroupTag> List = new List<GroupTag>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@pageIndex", pageIndex);
+                    p.Add("@pageSize", pageSize);
+                    p.Add("@search", search);
+                    p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
+                    List = u.GetIEnumerable<GroupTag>("Get_GroupTag", p).ToList();
+                    Total = p.Get<int>("@totalRow");
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public int CreateOrUpdate(GroupTag groupTag, string lstTag, string lstSubTag)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@Id", groupTag.Id);
+                    p.Add("@Name", groupTag.Name);
+                    p.Add("@Definition", groupTag.Definition);
+                    p.Add("@MultiSelect", groupTag.MultiSelect);
+                    p.Add("@listTag", lstTag);
+                    p.Add("@listsubTag", lstSubTag);
+
+                    list = u.ProcedureExecute("CreateOrUpdate_GroupTag", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
+        public List<Tags> SearchTag(string searchStr, string listId)
+        {
+            List<Tags> List = new List<Tags>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@search", searchStr);
+                    p.Add("@idSelected", listId);
+                    p.Add("@type", "Tag");
+                    p.Add("@for", "ForGroup");
+                    List = u.GetIEnumerable<Tags>("Get_SearchTag", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Sub_Tag> SearchSubTag(string searchStr, string listId)
+        {
+            List<Sub_Tag> List = new List<Sub_Tag>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@search", searchStr);
+                    p.Add("@idSelected", listId);
+                    p.Add("@type", "SubTag");
+                    p.Add("@for", "ForGroup");
+                    List = u.GetIEnumerable<Sub_Tag>("Get_SearchTag", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
         public int DeleteTagOrSubTag(int id, string type, ref bool Stt, ref string Mess)
         {
             int List = 0;
@@ -75,7 +171,6 @@ namespace StoryManagement.Model.Implement
             {
                 return list;
             }
-
         }
     }
 }
