@@ -51,27 +51,5 @@ namespace Admin.Controllers
             var data = _ibase.tagRespository.GetTag(id, forType);
             return Json(new { rows = data, total = total });
         }
-        [HttpPost]
-        public JsonResult GetStoryTag(int id)
-        {
-            try
-            {
-                _ibase.tagRespository.GetStoryTag(id);
-                return new JsonResult(new
-                {
-                    status = true,
-                    message = ""
-                });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new
-                {
-                    status = false,
-                    message = ex.Message,
-                });
-            }
-        }
-
     }
 }

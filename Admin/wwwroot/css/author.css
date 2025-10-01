@@ -1,27 +1,4 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
-}
-
-.tags {
+﻿.tags {
     list-style: none;
     margin: 0;
     overflow: hidden;
@@ -33,9 +10,9 @@ body {
 }
 
 .tag {
-    background: #eee;
+    background: #007bff; /* nền xanh primary */
     border-radius: 3px 0 0 3px;
-    color: #999;
+    color: #fff; /* chữ trắng */
     display: inline-block;
     height: 26px;
     line-height: 26px;
@@ -43,7 +20,7 @@ body {
     position: relative;
     margin: 0 10px 10px 0;
     text-decoration: none;
-    -webkit-transition: color 0.2s;
+    -webkit-transition: all 0.2s;
 }
 
 .tag::before {
@@ -61,19 +38,33 @@ body {
 .tag::after {
     background: #fff;
     border-bottom: 13px solid transparent;
-    border-left: 10px solid #eee;
+    border-left: 10px solid #007bff; /* đồng bộ nền */
     border-top: 13px solid transparent;
     content: '';
     position: absolute;
     right: 0;
     top: 0;
+    transition: border-left-color 0.2s;
 }
 
 .tag:hover {
-    background-color: crimson;
-    color: white;
+    background-color: #0056b3; /* xanh đậm hơn khi hover */
+    color: #fff;
 }
 
-.tag:hover::after {
-    border-left-color: crimson;
+    .tag:hover::after {
+        border-left-color: #0056b3;
+    }
+
+.tag .remove-tag {
+    margin-left: 12px;
+    font-size: 20px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
 }
+
+.tag:hover .remove-tag {
+    color: #ffdddd;
+}
+

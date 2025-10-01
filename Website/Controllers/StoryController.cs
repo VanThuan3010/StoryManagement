@@ -19,7 +19,6 @@ namespace Website.Controllers
         public IActionResult Details(int idStory)
         {
             Story str = _ibase.storyRespository.GetDetail(idStory);
-            ViewBag.listTags = _ibase.tagRespository.GetStoryTag(idStory);
             ViewBag.listAuthors = _ibase.authorRespository.GetStoryAuthor(idStory);
             ViewBag.review = _ibase.reviewRespository.GetStoryReview(idStory);
             //int id = GetStoryIdBySlug(slug);

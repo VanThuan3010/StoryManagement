@@ -25,7 +25,6 @@ namespace Admin.Controllers
             var data = _ibase.authorRespository.GetAll(offset, limit, search, ref total);
             return Json(new { rows = data, total = total });
         }
-
         [HttpPost]
         public JsonResult Delete(int id)
         {

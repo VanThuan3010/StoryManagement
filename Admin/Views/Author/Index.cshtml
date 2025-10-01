@@ -52,12 +52,27 @@
                 <form id="frmAuthor" method="post">
                     <input type="text" hidden id="txtIdModal" name="Id" />
                     <div class="form-group mb-3">
-                        <label class="form-label required">Tên thật</label>
+                        <label class="form-label required">Tên</label>
                         <input type="text" class="form-control" id="txtName" name="Name" />
                     </div>
                     <div class="form-group mb-3">
+                        <label class="form-label">Phong cách</label>
+                            <textarea class="form-control" name="txtStyle" id="txtStyle"></textarea>
+                    </div>
+                    <div class="form-group mb-3">
                         <label class="form-label">Bút danh</label>
-                        <input type="text" class="form-control" name="NumberChapter" id="txtPseudonym" />
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="txtPseudonym" name="Pseudonym" />
+                            <button type="button" class="btn btn-success" id="btnAddPseudonym">
+                                <i class="fas fa-plus"></i> Thêm
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Danh sách bút danh</label>
+                        <div id="pseudonymList">
+                            <ul class="tags list-unstyled d-flex flex-wrap gap-2"></ul>
+                        </div>
                     </div>
                 </form>
             </div>

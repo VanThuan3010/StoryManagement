@@ -3,7 +3,6 @@
 
 @{
     ViewData["Title"] = "Thông tin truyện";
-    List<Tags> tags = (List<Tags>)ViewBag.listTags;
     List<Authors> authors = (List<Authors>)ViewBag.listAuthors;
     Reviews reviews = (Reviews)ViewBag.review;
 }
@@ -47,7 +46,7 @@ padding: 5px 10px;
             </div>
             <div class="col-1 col-md-1 col-lg-1"></div>
         </div>
-        <div class="row mt-5">
+        <@* div class="row mt-5">
             <div class="col-12 col-md-12 col-lg-12 col-inner">
                 <ul class="tags">
                     @if(tags != null && tags.Count > 0)
@@ -59,7 +58,7 @@ padding: 5px 10px;
                     }
                 </ul>
             </div>
-        </div>
+        </div> *@
         <div class="row mt-5">
             <div class="col-9 col-md-9 col-lg-9 col-inner">
                 <div class="navtabs">
