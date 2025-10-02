@@ -58,11 +58,11 @@ namespace Admin.Controllers
         }
 
         [HttpPost]
-        public JsonResult CreateOrUpdate(Authors authors)
+        public JsonResult CreateOrUpdate(Authors authors, string Pseudonym)
         {
             try
             {
-                _ibase.authorRespository.CreateOrUpdate(authors);
+                _ibase.authorRespository.CreateOrUpdate(authors, Pseudonym);
                 return new JsonResult(new
                 {
                     status = true,

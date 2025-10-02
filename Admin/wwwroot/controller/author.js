@@ -64,7 +64,6 @@
                 datas.append('Name', $('#txtName').val());
                 datas.append('Pseudonym', JSON.stringify(pseus));
                 datas.append('Style', $('#txtStyle').val());
-                debugger
                 $.ajax({
                     url: '/Author/CreateOrUpdate',
                     type: 'post',
@@ -95,7 +94,7 @@
         addPseudonym: function() {
             var value = $.trim($('#txtPseudonym').val());
             if (value !== '') {
-                var li = '<li><a href="#" data-id="0" class="tag">' + value + '<span class="remove-tag">&times;</span></a></li>';
+                var li = '<li><a href="#" data-id="0" data-pseudonym="' + value + '" class="tag">' + value + '<span class="remove-tag">&times;</span></a></li>';
                 $('#pseudonymList ul.tags').append(li);
                 $('#txtPseudonym').val('');
             }
@@ -130,15 +129,15 @@
 
                 columns: [
                     {
-                        field: "pseudonym",
-                        title: "Bút danh",
-                        align: 'left',
-                        valign: 'left',
-                    },
-                    {
                         field: "name",
                         title: "Tên",
                         align: 'center',
+                        valign: 'left',
+                    },
+                    {
+                        field: "style",
+                        title: "Phong cách viết",
+                        align: 'left',
                         valign: 'left',
                     },
                     {

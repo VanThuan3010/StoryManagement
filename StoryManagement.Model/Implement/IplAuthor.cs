@@ -49,7 +49,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Authors authors)
+        public int CreateOrUpdate(Authors authors, string pseu)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -60,7 +60,8 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
                     p.Add("@Id", authors.Id);
                     p.Add("@name", authors.Name);
-                    p.Add("@pseudonym", authors.Style);
+                    p.Add("@pseudonym", pseu);
+                    p.Add("@style", authors.Style);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Author", p);
                 }

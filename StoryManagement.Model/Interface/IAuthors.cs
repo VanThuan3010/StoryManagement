@@ -11,7 +11,7 @@ namespace StoryManagement.Model.Interface
     public interface IAuthors : IRepository<Authors>
     {
         List<Authors> GetAll(int pageIndex, int pageSize, string search, ref int Total);
-        int CreateOrUpdate(Authors authors);
+        int CreateOrUpdate(Authors authors, string pseu);
         List<Authors> GetStoryAuthor(int id);
     }
 }
