@@ -15,9 +15,6 @@ namespace Admin.Controllers
         }
         public IActionResult Index()
         {
-            var total = 0;
-            ViewBag.lstTag = _ibase.tagRespository.GetAll(0,1000, null, ref total);
-            //ViewBag.lstAuthor = _ibase.authorRespository.GetAll(0, 1000, null, ref total);
             return View();
         }
         public JsonResult GetStory(string search, int offset, int limit, string status, string tags = "", string authors = "")
@@ -26,8 +23,18 @@ namespace Admin.Controllers
             var data = _ibase.storyRespository.GetAll(offset, limit, search, tags, authors, status, ref total);
             return Json(new { rows = data, total = total });
         }
+        public JsonResult SearchTag(string searchString, string listId)
+        {
+            var data = _ibase.storyRespository.SearchTag(searchString, listId);
+            return Json(data);
+        }
+        public JsonResult SearchSubTag(string searchString, string listId)
+        {
+            var data = _ibase.storyRespository.SearchSubTag(searchString, listId);
+            return Json(data);
+        }
         [HttpPost]
-        public JsonResult CreateOrUpdate(Story storyModel)
+        public JsonResult CreateOrUpdate(Story storyModel, string AuthorId, string TagId, string SubTagId)
         {
             try
             {
@@ -39,7 +46,7 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.storyRespository.CreateOrUpdate(storyModel);
+                _ibase.storyRespository.CreateOrUpdate(storyModel, TagId, SubTagId, AuthorId);
                 return new JsonResult(new
                 {
                     status = true,

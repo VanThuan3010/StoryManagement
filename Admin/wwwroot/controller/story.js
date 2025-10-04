@@ -6,42 +6,48 @@
             $('#sltTag').select2();
             $('#sltAuthor').select2();
             $('#btnCreate').on('click', function () {
-                $("#sltFormTag").select2().val(null).trigger("change");
-                $("#sltFormAuthor").select2().val(null).trigger("change");
-
                 $('#txtIdModal').val(0);
                 $('#txtName').val('');
                 $('#txtNumberChapter').val('');
-                $('#txtTagName').val('');
-                $('#sltFormTag').select2();
-                story.initSelect2_Authors();
+                story.init_Tag(0);
+                story.init_SubTag(0);
+                story.init_Author(0);
                 $('#sources').val('SacHiepVien');
                 $('#labelAction').text('Thêm mới truyện');
 
                 $('#modalCreateOrEdit').modal('show');
             });
+            story.init_searchTag();
+            //$("#txtImage").on("change", function () {
+            //    const file = this.files[0];
+            //    if (file) {
+            //        const reader = new FileReader();
+            //        reader.onload = function (e) {
+            //            $("#previewImage").attr("src", e.target.result).show();
+            //        }
+            //        reader.readAsDataURL(file);
+            //    } else {
+            //        $("#previewImage").hide().attr("src", "#");
+            //    }
+            //});
         },
-
         action: function () {
             $('#chk').data('checked', 2).click(function (e) {
                 el = $(this);
                 switch (el.data('checked')) {
-                    // unchecked, going indeterminate
                     case 0:
                         el.val('Read');
                         el.data('checked', 1);
                         el.prop('indeterminate', true);
-                        $('#lblStt').text("Đã");
+                        $('#lblStt').text("Đã đọc");
                         break;
-                    // indeterminate, going checked
                     case 1:
                         el.val('Pending');
                         el.data('checked', 2);
                         el.prop('indeterminate', false);
                         el.prop('checked', true);
-                        $('#lblStt').text("Chưa");
+                        $('#lblStt').text("Chưa đọc");
                         break;
-                    // checked, going unchecked
                     default:
                         el.val('All');
                         el.data('checked', 0);
@@ -58,13 +64,11 @@
                 datas.append('Id', $('#txtIdModal').val());
                 datas.append('Name', $('#txtName').val());
                 datas.append('NumberChapter', $('#txtNumberChapter').val());
-                datas.append('Tags_Name', $('#txtTagName').val());
-                datas.append('Status', $('#idStatus').val());
-                datas.append('IsRead', 0);
-                datas.append('IsCollection', $('#IsCollection').is(':checked'));
-                datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
                 datas.append('Source', $('#sources').val());
+                datas.append('IsRead', 0);
+                datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
                 datas.append('TagId', $('#sltFormTag').val().join(','));
+                datas.append('SubTagId', $('#sltFormAuthor').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
                     type: 'post',
@@ -82,13 +86,6 @@
                             base.notification('success', res.message);
                             $("#tblStory").bootstrapTable('refresh');
                             $('#modalCreateOrEdit').modal('hide');
-
-                            $("#sltFormTag").select2().val(null).trigger("change");
-                            $("#sltFormAuthor").select2().val(null).trigger("change");
-                            $('#txtIdModal').val(0);
-                            $('#txtName').val('');
-                            $('#txtNumberChapter').val('');
-                            $('#idStatus').val(1).change();
                         } else {
                             base.notification('error', res.message);
                         }
@@ -96,31 +93,64 @@
                 })
             });
         },
-        initSelect2_Authors: function (existingAuthors = []) {
-            existingAuthors = existingAuthors || [];
+        init_searchTag: function () {
+            $("#sltTag").on("keyup", function () {
+                let keyword = $(this).val().trim();
+                if (keyword.length < 2) return;
 
-            $('#sltFormAuthor').select2({
-                placeholder: 'Tìm kiếm tác giả...',
-                minimumInputLength: 2, // Chỉ tìm kiếm khi người dùng nhập ít nhất 2 ký tự
-                allowClear: true, // Cho phép xóa tác giả đã chọn
+                $.ajax({
+                    url: "/Tag/Search",
+                    type: "GET",
+                    data: { q: keyword },
+                    success: function (res) {
+                        $("#sltTag").empty();
+                        res.forEach(tag => {
+                            $("#sltTag").append(`<option value="${tag.id}">${tag.name}</option>`);
+                        });
+                    }
+                });
+            });
+
+            $("#sltTag").on("change", function () {
+                let selectedId = $(this).val();
+                let selectedText = $("#sltTag option:selected").text();
+
+                if (selectedId) {
+                    $("#tagSelected .tags").append(`
+                <li class="badge bg-info p-2 d-flex align-items-center gap-1" data-id="${selectedId}">
+                    ${selectedText}
+                    <span class="remove-tag" style="cursor:pointer;">&times;</span>
+                </li>
+            `);
+                }
+                $("#sltTag").empty();
+            });
+
+            $(document).on("click", ".remove-tag", function () {
+                $(this).closest("li").remove();
+            });
+        },
+        init_Tag: function (Id) {
+            $("#sltFormTag").select2({
+                placeholder: "Chọn thẻ...",
+                minimumInputLength: 2,
                 ajax: {
-                    url: '/Author/GetAuthor', // URL tới API tìm kiếm tác giả
-                    dataType: 'json',
-                    delay: 250, // Thời gian chờ giữa các lần tìm kiếm
+                    url: "/Story/SearchTag",
+                    dataType: "json",
+                    delay: 250,
                     data: function (params) {
                         return {
-                            search: params.term, // Từ khóa tìm kiếm
-                            offset: 0,
-                            limit: 10
+                            searchString: params.term,
+                            selected: $("#sltFormTag").val().join(',')
                         };
                     },
-                    processResults: function (res) {
+                    processResults: function (data) {
                         return {
-                            results: $.map(res.rows, function (item) {
+                            results: $.map(data, function (item) {
                                 return {
                                     id: item.id,
-                                    text: item.pseudonym
-                                };
+                                    text: item.name
+                                }
                             })
                         };
                     },
@@ -128,18 +158,109 @@
                 }
             });
 
-            if (existingAuthors.length > 0) {
-                let existingData = $('#sltFormAuthor').select2('data');
-                existingAuthors.forEach(function (author) {
-                    existingAuthors.forEach(function (author) {
-                        if (!existingData.some(e => e.id == author.id)) {
-                            var option = new Option(author.pseudonym, author.id, true, true);
-                            $('#sltFormAuthor').append(option);
-                        }
+            $.ajax({
+                url: "/Tag/GetTagToCRUD",
+                data: {
+                    id: Id,
+                    forType: 'Story'
+                },
+                success: function (data) {
+                    $("#sltFormTag").empty().trigger("change");
+                    (data.rows || []).forEach(function (item) {
+                        var option = new Option(item.name, item.id, true, true);
+                        $("#sltFormTag").append(option);
                     });
-                    $('#sltFormAuthor').trigger('change');
-                });
-            }
+                    $("#sltFormTag").trigger("change");
+                }
+            });
+        },
+        init_SubTag: function (Id) {
+            $("#sltFormSubTag").select2({
+                placeholder: "Chọn thẻ phụ...",
+                minimumInputLength: 2,
+                ajax: {
+                    url: "/Story/SearchSubTag",
+                    dataType: "json",
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            searchString: params.term,
+                            selected: $("#sltFormSubTag").val().join(',')
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (item) {
+                                return {
+                                    id: item.id,
+                                    text: item.name
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $.ajax({
+                url: "/SubTag/GetSubTagToCRUD",
+                data: {
+                    id: Id,
+                    forType: 'Story'
+                },
+                success: function (data) {
+                    $("#sltFormSubTag").empty().trigger("change");
+                    (data.rows || []).forEach(function (item) {
+                        var option = new Option(item.name, item.id, true, true);
+                        $("#sltFormSubTag").append(option);
+                    });
+                    $("#sltFormSubTag").trigger("change");
+                }
+            });
+        },
+        init_Author: function (Id) {
+            $("#sltFormAuthor").select2({
+                placeholder: "Chọn tác giả...",
+                minimumInputLength: 2,
+                ajax: {
+                    url: "/Author/SearchAuthorForStory",
+                    dataType: "json",
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            searchString: params.term,
+                            selected: $("#sltFormAuthor").val().join(',')
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data, function (item) {
+                                return {
+                                    id: item.id,
+                                    text: item.name
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            $.ajax({
+                url: "/Author/GetAuthorForStory",
+                data: {
+                    id: Id,
+                    forType: 'Story'
+                },
+                success: function (data) {
+                    $("#sltFormAuthor").empty().trigger("change");
+                    (data.rows || []).forEach(function (item) {
+                        var option = new Option(item.name, item.id, true, true);
+                        $("#sltFormAuthor").append(option);
+                    });
+                    $("#sltFormAuthor").trigger("change");
+                }
+            });
         },
         tblStory: function () {
             var objTable = $("#tblStory");
@@ -171,7 +292,6 @@
                 search: false,
                 pageSize: 100,
                 pageList: [100, 150],
-
                 columns: [
                     {
                         field: "name",
@@ -271,27 +391,29 @@
                                 });
                             },
                             'click .btnEdit': function (e, value, row, index) {
-
                                 $('#txtIdModal').val(row.id);
                                 $('#txtName').val(row.name);
                                 $('#txtNumberChapter').val(row.numberChapter);
-                                $('#txtTagName').val(row.tags_Name);
+                                //$('#txtTagName').val(row.tags_Name);
                                 $('#sources').val(row.source.trim());
-                                $('#sltFormTag').select2().val(row.tagId ? row.tagId.split(",") : null).trigger('change');
-                                if (row.authorId == null) {
-                                    story.initSelect2_Authors();
-                                } else {
-                                    $("#sltFormAuthor").select2().val(null).trigger("change");
-                                    $.ajax({
-                                        url: '/Story/GetAuthorByStory',
-                                        data: {
-                                            id: row.id
-                                        },
-                                        success: function (res) {
-                                            story.initSelect2_Authors(res.rows);
-                                        }
-                                    })
-                                }
+                                story.init_Tag(row.id);
+                                story.init_SubTag(row.id);
+                                story.init_Author(row.id);
+                                //$('#sltFormTag').select2().val(row.tagId ? row.tagId.split(",") : null).trigger('change');
+                                //if (row.authorId == null) {
+                                //    story.initSelect2_Authors();
+                                //} else {
+                                //    $("#sltFormAuthor").select2().val(null).trigger("change");
+                                //    $.ajax({
+                                //        url: '/Story/GetAuthorByStory',
+                                //        data: {
+                                //            id: row.id
+                                //        },
+                                //        success: function (res) {
+                                //            story.initSelect2_Authors(res.rows);
+                                //        }
+                                //    })
+                                //}
                                 /*$('#sltFormAuthor').select2().val(row.authorId == null ? null : row.authorId.split(",")).trigger('change');*/
                                 $('#labelAction').text('Sửa truyện');
 

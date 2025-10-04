@@ -49,6 +49,26 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public List<Authors> SearchAuthorForStory(string search)
+        {
+            List<Authors> List = new List<Authors>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@search", search);
+                    List = u.GetIEnumerable<Authors>("Get_SearchAuthor", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
         public int CreateOrUpdate(Authors authors, string pseu)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);

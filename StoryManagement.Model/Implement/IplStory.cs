@@ -47,6 +47,52 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public List<Tags> SearchTag(string searchStr, string listId)
+        {
+            List<Tags> List = new List<Tags>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@search", searchStr);
+                    p.Add("@idSelected", listId);
+                    p.Add("@type", "Tag");
+                    p.Add("@for", "ForStory");
+                    List = u.GetIEnumerable<Tags>("Get_SearchTag", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Sub_Tag> SearchSubTag(string searchStr, string listId)
+        {
+            List<Sub_Tag> List = new List<Sub_Tag>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@search", searchStr);
+                    p.Add("@idSelected", listId);
+                    p.Add("@type", "SubTag");
+                    p.Add("@for", "ForStory");
+                    List = u.GetIEnumerable<Sub_Tag>("Get_SearchTag", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
         public Story GetDetail(int id)
         {
             Story List = new Story();
@@ -67,7 +113,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Story storyModel)
+        public int CreateOrUpdate(Story storyModel, string tagId, string subTagId, string authorId)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -79,10 +125,10 @@ namespace StoryManagement.Model.Implement
                     p.Add("@Id", storyModel.Id);
                     p.Add("@name", storyModel.Name);
                     p.Add("@numberChapter", storyModel.NumberChapter);
-                    p.Add("@tagName", storyModel.Tags_Name);
                     p.Add("@read", storyModel.IsRead);
-                    p.Add("@tagId", storyModel.TagId);
-                    p.Add("@authors", storyModel.AuthorId);
+                    p.Add("@tagId", tagId);
+                    p.Add("@subTagId", subTagId);
+                    p.Add("@authors", authorId);
                     p.Add("@source", storyModel.Source);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Story", p);
