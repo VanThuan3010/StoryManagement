@@ -93,9 +93,9 @@ namespace StoryManagement.Model.Implement
             }
 
         }
-        public List<Authors> GetStoryAuthor(int id)
+        public List<Pseu> GetStoryAuthor(int id)
         {
-            List<Authors> List = new List<Authors>();
+            List<Pseu> List = new List<Pseu>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             try
             {
@@ -104,7 +104,7 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
 
                     p.Add("@Id", id);
-                    List = u.GetIEnumerable<Authors>("Get_StoryAuthor", p).ToList();
+                    List = u.GetIEnumerable<Pseu>("Get_StoryAuthor", p).ToList();
                 }
             }
             catch (Exception ex)

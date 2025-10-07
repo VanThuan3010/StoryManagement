@@ -37,13 +37,17 @@
                     <div class="col-lg-3">
                         <input type="text" class="form-control" id="txtSearch" placeholder="Tìm kiếm tên truyện" />
                     </div>
-                    <div class="col-lg-3">
-                        <select class="form-select" id="sltTag" multiple>
-                        </select>
+                    <div class="col-lg-2">
+                        <input type="text" class="form-control" name="name" value="" id="searchTag" />
+                        <div id="sTagRes"></div>
                     </div>
-                    <div class="col-lg-3">
-                        <select class="form-select" id="sltAuthor" multiple>
-                        </select>
+                    <div class="col-lg-2">
+                        <input type="text" class="form-control" name="name" value="" id="searchSubTag" />
+                        <div id="sSubTagRes"></div>
+                    </div>
+                    <div class="col-lg-2">
+                        <input type="text" class="form-control" name="name" value="" id="searchAuthor" />
+                        <div id="sAuthorRes"></div>
                     </div>
                     <div class="col-lg-1">
                         <input type="checkbox" name="checkbox" value="All" id="chk" checked>
@@ -52,10 +56,20 @@
                     <div class="col-lg-1">
                         <button type="button" id="btnSearch" class="btn btn-primary btn-sm mr-5"><i class="fas fa-search"></i></button>
                     </div>
-                    <div class="col-lg-5" style="max-height: 240px;overflow-y: scroll;" id="tagSelected"></div>
-                    <div class="col-lg-5" style="max-height: 240px;overflow-y: scroll;" id="authorSelected"></div>
+                    <div class="col-lg-12 mt-2">
+                        <h5>Danh sách tìm kiếm</h5>
+                    </div>
+                    <div class="col-lg-4 mt-2" style="max-height: 240px; overflow-y: scroll;" id="tagSelected">
+                        <ul class="lst-tag list-unstyled d-flex flex-wrap gap-2"></ul>
+                    </div>
+                    <div class="col-lg-4 mt-2" style="max-height: 240px; overflow-y: scroll;" id="subTagSelected">
+                        <ul class="lst-subTag list-unstyled d-flex flex-wrap gap-2"></ul>
+                    </div>
+                    <div class="col-lg-4 mt-2" style="max-height: 240px; overflow-y: scroll;" id="authorSelected">
+                        <ul class="lst-author list-unstyled d-flex flex-wrap gap-2"></ul>
+                    </div>
                 </div>
-                <div class="col-lg-12 table-responsive" style="height: 480px;">
+                <div class="col-lg-12 table-responsive" style="height: 520px;">
                     <table class="table table-bordered" id="tblStory"></table>
                 </div>
             </div>

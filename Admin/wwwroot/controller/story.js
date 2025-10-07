@@ -3,8 +3,6 @@
         init: function () {
             story.action();
             story.tblStory();
-            $('#sltTag').select2();
-            $('#sltAuthor').select2();
             $('#btnCreate').on('click', function () {
                 $('#txtIdModal').val(0);
                 $('#txtName').val('');
@@ -18,6 +16,8 @@
                 $('#modalCreateOrEdit').modal('show');
             });
             story.init_searchTag();
+            story.init_searchSubTag();
+            story.init_searchAuthor();
             //$("#txtImage").on("change", function () {
             //    const file = this.files[0];
             //    if (file) {
@@ -94,39 +94,203 @@
             });
         },
         init_searchTag: function () {
-            $("#sltTag").on("keyup", function () {
-                let keyword = $(this).val().trim();
-                if (keyword.length < 2) return;
+            let timer;
+            $("#searchTag").on("keyup", function () {
+                const keyword = $(this).val().trim();
+                clearTimeout(timer);
 
-                $.ajax({
-                    url: "/Tag/Search",
-                    type: "GET",
-                    data: { q: keyword },
-                    success: function (res) {
-                        $("#sltTag").empty();
-                        res.forEach(tag => {
-                            $("#sltTag").append(`<option value="${tag.id}">${tag.name}</option>`);
-                        });
-                    }
-                });
-            });
-
-            $("#sltTag").on("change", function () {
-                let selectedId = $(this).val();
-                let selectedText = $("#sltTag option:selected").text();
-
-                if (selectedId) {
-                    $("#tagSelected .tags").append(`
-                <li class="badge bg-info p-2 d-flex align-items-center gap-1" data-id="${selectedId}">
-                    ${selectedText}
-                    <span class="remove-tag" style="cursor:pointer;">&times;</span>
-                </li>
-            `);
+                if (keyword.length < 2) {
+                    $("#sTagRes").empty();
+                    return;
                 }
-                $("#sltTag").empty();
+
+                timer = setTimeout(function () {
+                    const idSelected = $("#tagSelected .lst-tag li a.li-tag")
+                        .map(function () {
+                            return $(this).data("id");
+                        })
+                        .get();
+                    $.ajax({
+                        url: "/Story/GetTagSearch",
+                        type: "GET",
+                        data: {
+                            searchStr: keyword,
+                            idSelected: idSelected.join(','),
+                            type: "Tag"
+                        },
+                        success: function (res) {
+                            $("#sTagRes").empty();
+                            if (res && res.length > 0) {
+                                let html = `<div class="tag-result-list" 
+                            style="border:1px solid #ccc; border-radius:6px; padding:4px;">`;
+                                res.forEach(tag => {
+                                    html += `
+                                    <div class="tag-item" data-id="${tag.id}" 
+                                        style="padding:4px; cursor:pointer; border-bottom:1px solid #eee;">
+                                        ${tag.name}
+                                    </div>`;
+                                });
+                                html += `</div>`;
+                                $("#sTagRes").html(html);
+                            } else {
+                                $("#sTagRes").html(`<div style="color:red;">Không tìm thấy kết quả</div>`);
+                            }
+                        },
+                        error: function () {
+                            $("#sTagRes").html(`<div style="color:red;">Lỗi tải dữ liệu</div>`);
+                        }
+                    });
+                }, 1000);
             });
 
-            $(document).on("click", ".remove-tag", function () {
+            $(document).on("click", ".tag-item", function () {
+                const selectedId = $(this).data("id");
+                const selectedText = $(this).text();
+                const exists = $("#tagSelected .tags li[data-id='" + selectedId + "']").length > 0;
+                if (!exists) {
+                    $("#tagSelected .lst-tag").append(`
+                        <li><a href="#" data-id="${selectedId}" data-value="${selectedText}" class="li-tag">${selectedText}<span class="remove-searchTag">&times;</span></a></li>
+                    `);
+                }
+                $("#searchTag").val('');
+                $("#sTagRes").empty();
+            });
+
+            $(document).on("click", ".remove-searchTag", function () {
+                $(this).closest("li").remove();
+            });
+        },
+        init_searchSubTag: function () {
+            let timer;
+            $("#searchSubTag").on("keyup", function () {
+                const keyword = $(this).val().trim();
+                clearTimeout(timer);
+
+                if (keyword.length < 2) {
+                    $("#sTagRes").empty();
+                    return;
+                }
+
+                timer = setTimeout(function () {
+                    const idSelected = $("#subTagSelected .lst-subTag li a.li-subTag")
+                        .map(function () {
+                            return $(this).data("id");
+                        })
+                        .get();
+                    $.ajax({
+                        url: "/Story/GetTagSearch",
+                        type: "GET",
+                        data: {
+                            searchStr: keyword,
+                            idSelected: idSelected.join(','),
+                            type: "SubTag"
+                        },
+                        success: function (res) {
+                            $("#sSubTagRes").empty();
+                            if (res && res.length > 0) {
+                                let html = `<div class="subTag-result-list" 
+                            style="border:1px solid #ccc; border-radius:6px; padding:4px;">`;
+                                res.forEach(tag => {
+                                    html += `
+                                    <div class="subTag-item" data-id="${tag.id}" 
+                                        style="padding:4px; cursor:pointer; border-bottom:1px solid #eee;">
+                                        ${tag.name}
+                                    </div>`;
+                                });
+                                html += `</div>`;
+                                $("#sSubTagRes").html(html);
+                            } else {
+                                $("#sSubTagRes").html(`<div style="color:red;">Không tìm thấy kết quả</div>`);
+                            }
+                        },
+                        error: function () {
+                            $("#sSubTagRes").html(`<div style="color:red;">Lỗi tải dữ liệu</div>`);
+                        }
+                    });
+                }, 1000);
+            });
+
+            $(document).on("click", ".subTag-item", function () {
+                const selectedId = $(this).data("id");
+                const selectedText = $(this).text();
+                const exists = $("#subTagSelected .tags li[data-id='" + selectedId + "']").length > 0;
+                if (!exists) {
+                    $("#subTagSelected .lst-subTag").append(`
+                        <li><a href="#" data-id="${selectedId}" data-value="${selectedText}" class="li-subTag">${selectedText}<span class="remove-searchSubTag">&times;</span></a></li>
+                    `);
+                }
+                $("#searchSubTag").val('');
+                $("#sSubTagRes").empty();
+            });
+
+            $(document).on("click", ".remove-searchSubTag", function () {
+                $(this).closest("li").remove();
+            });
+        },
+        init_searchAuthor: function () {
+            let timer;
+            $("#searchAuthor").on("keyup", function () {
+                const keyword = $(this).val().trim();
+                clearTimeout(timer);
+
+                if (keyword.length < 2) {
+                    $("#sAuthorRes").empty();
+                    return;
+                }
+
+                timer = setTimeout(function () {
+                    const idSelected = $("#authorSelected .lst-author li a.li-author")
+                        .map(function () {
+                            return $(this).data("id");
+                        })
+                        .get();
+                    $.ajax({
+                        url: "/Story/GetTagSearch",
+                        type: "GET",
+                        data: {
+                            searchStr: keyword,
+                            idSelected: idSelected.join(','),
+                            type: "Author"
+                        },
+                        success: function (res) {
+                            $("#sAuthorRes").empty();
+                            if (res && res.length > 0) {
+                                let html = `<div class="author-result-list" 
+                            style="border:1px solid #ccc; border-radius:6px; padding:4px;">`;
+                                res.forEach(tag => {
+                                    html += `
+                                    <div class="author-item" data-id="${tag.id}"
+                                        style="padding:4px; cursor:pointer; border-bottom:1px solid #eee;">
+                                        ${tag.name}
+                                    </div>`;
+                                });
+                                html += `</div>`;
+                                $("#sAuthorRes").html(html);
+                            } else {
+                                $("#sAuthorRes").html(`<div style="color:red;">Không tìm thấy kết quả</div>`);
+                            }
+                        },
+                        error: function () {
+                            $("#sAuthorRes").html(`<div style="color:red;">Lỗi tải dữ liệu</div>`);
+                        }
+                    });
+                }, 1000);
+            });
+
+            $(document).on("click", ".author-item", function () {
+                const selectedId = $(this).data("id");
+                const selectedText = $(this).text();
+                const exists = $("#authorSelected .tags li[data-id='" + selectedId + "']").length > 0;
+                if (!exists) {
+                    $("#authorSelected .lst-author").append(`
+                        <li><a href="#" data-id="${selectedId}" data-value="${selectedText}" class="li-author">${selectedText}<span class="remove-searchAuthor">&times;</span></a></li>
+                    `);
+                }
+                $("#searchAuthor").val('');
+                $("#sAuthorRes").empty();
+            });
+
+            $(document).on("click", ".remove-searchAuthor", function () {
                 $(this).closest("li").remove();
             });
         },
@@ -249,13 +413,12 @@
             $.ajax({
                 url: "/Author/GetAuthorForStory",
                 data: {
-                    id: Id,
-                    forType: 'Story'
+                    id: Id
                 },
                 success: function (data) {
                     $("#sltFormAuthor").empty().trigger("change");
                     (data.rows || []).forEach(function (item) {
-                        var option = new Option(item.name, item.id, true, true);
+                        var option = new Option(item.pseudonym, item.id, true, true);
                         $("#sltFormAuthor").append(option);
                     });
                     $("#sltFormAuthor").trigger("change");
@@ -273,8 +436,15 @@
                         limit: p.limit,
                         offset: p.offset,
                         search: $.trim($('#txtSearch').val()),
-                        tags: $('#sltTag').val(),
-                        authors: $('#sltAuthor').val(),
+                        tags: $("#tagSelected .lst-tag li a.li-tag").map(function () {
+                                    return $(this).data("id");
+                        }).get().join(','),
+                        subTags: $("#subTagSelected .lst-subTag li a.li-subTag").map(function () {
+                                    return $(this).data("id");
+                        }).get().join(','),
+                        authors: $("#authorSelected .lst-author li a.li-author").map(function () {
+                            return $(this).data("id");
+                        }).get().join(','),
                         status: $('#chk').val()
                     }, p);
                     return param;

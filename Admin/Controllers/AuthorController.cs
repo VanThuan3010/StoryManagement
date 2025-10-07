@@ -30,10 +30,10 @@ namespace Admin.Controllers
             var data = _ibase.authorRespository.SearchAuthorForStory(search);
             return Json(data);
         }
-        public JsonResult GetAuthorForStory(string search)
+        public JsonResult GetAuthorForStory(int id)
         {
-            var data = _ibase.authorRespository.SearchAuthorForStory(search);
-            return Json(data);
+            var data = _ibase.authorRespository.GetStoryAuthor(id);
+            return Json(new { rows = data });
         }
         [HttpPost]
         public JsonResult Delete(int id)

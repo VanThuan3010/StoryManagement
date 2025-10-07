@@ -20,7 +20,7 @@ namespace StoryManagement.Model.Implement
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public List<Story> GetAll(int pageIndex, int pageSize, string search,string tags, string authors, string status, ref int Total)
+        public List<Story> GetAll(int pageIndex, int pageSize, string search,string tags, string subTags, string authors, string status, ref int Total)
         {
             List<Story> List = new List<Story>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -34,10 +34,11 @@ namespace StoryManagement.Model.Implement
                     p.Add("@pageSize", pageSize);
                     p.Add("@search", search);
                     p.Add("@tags", tags);
+                    p.Add("@subTags", subTags);
                     p.Add("@authors", authors);
                     p.Add("@stt", status);
                     p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
-                    List = u.GetIEnumerable<Story>("Get_Story", p).ToList();
+                    List = u.GetIEnumerable<Story>("Get_Story3", p).ToList();
                     Total = p.Get<int>("@totalRow");
                 }
             }
@@ -252,6 +253,69 @@ namespace StoryManagement.Model.Implement
                     p.Add("@id", id);
                     p.Add("@typeId", "Story");
                     List = u.GetIEnumerable<Authors>("StoryAuthor_GetByOther", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Tags> GetTagSearchFilter(string searchStr, string selectedId)
+        {
+            List<Tags> List = new List<Tags>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@search", searchStr);
+                    p.Add("@idSelected", selectedId);
+                    p.Add("@type", "Tag");
+                    List = u.GetIEnumerable<Tags>("Get_SearchToFilter", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Sub_Tag> GetSubTagSearchFilter(string searchStr, string selectedId)
+        {
+            List<Sub_Tag> List = new List<Sub_Tag>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@search", searchStr);
+                    p.Add("@idSelected", selectedId);
+                    p.Add("@type", "SubTag");
+                    List = u.GetIEnumerable<Sub_Tag>("Get_SearchToFilter", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Authors> GetAuthorSearchFilter(string searchStr, string selectedId)
+        {
+            List<Authors> List = new List<Authors>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@search", searchStr);
+                    p.Add("@idSelected", selectedId);
+                    p.Add("@type", "Author");
+                    List = u.GetIEnumerable<Authors>("Get_SearchToFilter", p).ToList();
                 }
             }
             catch (Exception ex)

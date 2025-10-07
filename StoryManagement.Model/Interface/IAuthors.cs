@@ -12,7 +12,7 @@ namespace StoryManagement.Model.Interface
     {
         List<Authors> GetAll(int pageIndex, int pageSize, string search, ref int Total);
         int CreateOrUpdate(Authors authors, string pseu);
-        List<Authors> GetStoryAuthor(int id);
+        List<Pseu> GetStoryAuthor(int id);
         List<Authors> SearchAuthorForStory(string search);
     }
 }

@@ -17,10 +17,10 @@ namespace Admin.Controllers
         {
             return View();
         }
-        public JsonResult GetStory(string search, int offset, int limit, string status, string tags = "", string authors = "")
+        public JsonResult GetStory(string search, int offset, int limit, string status, string tags, string subTags, string authors)
         {
             int total = 0;
-            var data = _ibase.storyRespository.GetAll(offset, limit, search, tags, authors, status, ref total);
+            var data = _ibase.storyRespository.GetAll(offset, limit, search, tags, subTags, authors, status, ref total);
             return Json(new { rows = data, total = total });
         }
         public JsonResult SearchTag(string searchString, string listId)
@@ -131,6 +131,24 @@ namespace Admin.Controllers
         public IActionResult Chapter(int idStory)
         {
             return View();
+        }
+        public JsonResult GetTagSearch(string searchStr, string idSelected, string type)
+        {
+            if(type == "Tag")
+            {
+                var data = _ibase.storyRespository.GetTagSearchFilter(searchStr, idSelected);
+                return Json(data);
+            }
+            else if(type == "SubTag")
+            {
+                var data = _ibase.storyRespository.GetSubTagSearchFilter(searchStr, idSelected);
+                return Json(data);
+            }
+            else
+            {
+                var data = _ibase.storyRespository.GetAuthorSearchFilter(searchStr, idSelected);
+                return Json(data);
+            }
         }
     }
 }
