@@ -62,8 +62,8 @@
             $('#btnSubmit').click(function () {
                 var datas = new FormData();
                 datas.append('Id', $('#txtIdModal').val());
-                datas.append('Name', $('#txtName').val());
-                datas.append('NumberChapter', $('#txtNumberChapter').val());
+                datas.append('Name', JSON.stringify($('#txtName').val().split(/\r?\n/).filter(line => line.trim() !== '')));
+                datas.append('NumberChapter', JSON.stringify($('#txtNumberChapter').val().split(/\r?\n/).filter(line => line.trim() !== '')));
                 datas.append('Source', $('#sources').val());
                 datas.append('IsRead', 0);
                 datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
