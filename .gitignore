@@ -9,8 +9,6 @@
 /Admin/obj
 /Admin/Properties
 /Admin/appsettings.Development.json
-/Admin/appsettings.json
-/Admin/Program.cs
 /Admin/Website.csproj
 /Admin/Website.cspro.user
 

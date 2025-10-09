@@ -1,6 +1,7 @@
 using MFTech.Model;
 using MFTech.Model.Entity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using StoryManagement.Model;
 using System.Text.Json.Serialization;
 
@@ -41,7 +42,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+var chapterImagePath = builder.Configuration["SaveImage:Chapter"]; // D:\StoryImages
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(chapterImagePath),
+    RequestPath = "/StoryImages"
+});
 app.UseRouting();
 
 app.UseAuthorization();

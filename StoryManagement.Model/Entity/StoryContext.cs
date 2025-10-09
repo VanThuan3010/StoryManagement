@@ -43,7 +43,6 @@ namespace MFTech.Model.Entity
                 entity.ToTable("Chapters");
 
                 entity.Property(e => e.StoryId);
-
                 entity.Property(e => e.Title);
                 entity.Property(e => e.Content);
             });

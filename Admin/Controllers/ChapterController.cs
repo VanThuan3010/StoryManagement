@@ -11,9 +11,13 @@ namespace Admin.Controllers
     public class ChapterController : Controller
     {
         protected IBase _ibase;
-        public ChapterController(IBase ibase)
+        private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _config;
+        public ChapterController(IBase ibase, IWebHostEnvironment env, IConfiguration config)
         {
             _ibase = ibase;
+            _env = env;
+            _config = config;
         }
         public IActionResult Index(int idStory)
         {
@@ -45,14 +49,105 @@ namespace Admin.Controllers
             try
             {
                 if (chapters == null)
+                    return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
+
+                string basePath = _config["SaveImage:Chapter"];                // D:\StoryImages
+                string requestPath = _config["SaveImage:ChapterRequestPath"] ?? "/StoryImages";
+
+                string uploadFolder = Path.Combine(basePath, chapters.StoryId.ToString());
+                if (!Directory.Exists(uploadFolder))
+                    Directory.CreateDirectory(uploadFolder);
+
+                // Nếu đang sửa (Id > 0) => xóa ảnh cũ
+                if (chapters.Id > 0)
                 {
-                    return new JsonResult(new
+                    var oldChapter = _ibase.chapterRespository.GetDetail(chapters.Id);
+                    if (oldChapter != null && !string.IsNullOrEmpty(oldChapter.Content))
                     {
-                        status = false,
-                        message = "Có lỗi xảy ra"
-                    });
+                        var oldMatches = Regex.Matches(oldChapter.Content, "<img[^>]+src=\"([^\"]+)\"");
+                        foreach (Match m in oldMatches)
+                        {
+                            string oldSrc = m.Groups[1].Value;
+                            // Chỉ xử lý những ảnh thuộc hệ thống của bạn (hoặc local path)
+                            if (oldSrc.Contains(requestPath, StringComparison.OrdinalIgnoreCase) ||
+                                oldSrc.StartsWith(basePath, StringComparison.OrdinalIgnoreCase) ||
+                                !oldSrc.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                            {
+                                string fileName = GetFileNameFromSrc(oldSrc, requestPath);
+                                if (!string.IsNullOrEmpty(fileName))
+                                {
+                                    fileName = MakeSafeFileName(fileName);
+                                    string filePath = Path.Combine(uploadFolder, fileName);
+                                    try
+                                    {
+                                        if (System.IO.File.Exists(filePath))
+                                            System.IO.File.Delete(filePath);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        // log ex nếu bạn có logger, đừng throw tiếp để mất thông tin gốc
+                                        Console.WriteLine("Delete file error: " + ex.Message);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+
+                // Xử lý ảnh mới trong nội dung
+                string html = chapters.Content;
+                var matches = Regex.Matches(html, "<img[^>]+src=\"([^\"]+)\"");
+
+                foreach (Match match in matches)
+                {
+                    string src = match.Groups[1].Value;
+
+                    if (src.StartsWith("data:image"))
+                    {
+                        var mimeMatch = Regex.Match(src, @"data:image/(?<type>.+?);base64,(?<data>.+)");
+                        if (!mimeMatch.Success) continue;
+
+                        string fileType = mimeMatch.Groups["type"].Value;
+                        string base64Data = mimeMatch.Groups["data"].Value;
+                        byte[] bytes = Convert.FromBase64String(base64Data);
+
+                        string fileName = $"image_{Guid.NewGuid()}_{DateTime.Now:yyyyMMdd_HHmmss_fff}.{fileType}";
+                        fileName = MakeSafeFileName(fileName);
+
+                        string filePath = Path.Combine(uploadFolder, fileName);
+                        System.IO.File.WriteAllBytes(filePath, bytes);
+
+                        string newSrc = $"{requestPath}/{chapters.StoryId}/{fileName}".Replace("\\", "/");
+                        html = html.Replace(src, newSrc);
+                    }
+                    else if (src.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    {
+                        using (var client = new HttpClient())
+                        {
+                            byte[] data = client.GetByteArrayAsync(src).Result;
+
+                            // Lấy tên file an toàn từ URL (loại bỏ query)
+                            string rawName = GetFileNameFromSrc(src, requestPath);
+                            string ext = Path.GetExtension(rawName);
+                            if (string.IsNullOrEmpty(ext)) ext = ".jpg";
+
+                            string fileName = Path.GetFileNameWithoutExtension(rawName);
+                            if (string.IsNullOrEmpty(fileName)) fileName = "image";
+                            fileName = $"{fileName}_{Guid.NewGuid()}_{DateTime.Now:yyyyMMdd_HHmmss_fff}{ext}";
+                            fileName = MakeSafeFileName(fileName);
+
+                            string filePath = Path.Combine(uploadFolder, fileName);
+                            System.IO.File.WriteAllBytes(filePath, data);
+
+                            string newSrc = $"{requestPath}/{chapters.StoryId}/{fileName}".Replace("\\", "/");
+                            html = html.Replace(src, newSrc);
+                        }
+                    }
+                }
+
+                chapters.Content = html;
                 _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
+
                 return new JsonResult(new
                 {
                     status = true,
@@ -61,8 +156,43 @@ namespace Admin.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                // Trả về JSON lỗi để client biết, đừng throw ex để mất ngữ cảnh debug
+                return new JsonResult(new { status = false, message = "Lỗi server: " + ex.Message });
             }
+        }
+
+        // --- Helpers ---
+        private string GetFileNameFromSrc(string src, string requestPath)
+        {
+            if (string.IsNullOrWhiteSpace(src)) return null;
+
+            // 1) loại bỏ query & fragment
+            string clean = src.Split(new[] { '?', '#' }, 2)[0];
+
+            // 2) nếu là requestPath (ví dụ /StoryImages/...)
+            if (!string.IsNullOrEmpty(requestPath) &&
+                clean.IndexOf(requestPath, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                int idx = clean.IndexOf(requestPath, StringComparison.OrdinalIgnoreCase);
+                string after = clean.Substring(idx + requestPath.Length).TrimStart('/', '\\');
+                return Path.GetFileName(after);
+            }
+
+            // 3) nếu là URL tuyệt đối => lấy LocalPath
+            if (Uri.TryCreate(clean, UriKind.Absolute, out var uri))
+            {
+                return Path.GetFileName(uri.LocalPath);
+            }
+
+            // 4) còn lại coi như path local
+            return Path.GetFileName(clean);
+        }
+
+        private string MakeSafeFileName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return name;
+            // thay tất cả ký tự không hợp lệ bằng dấu gạch dưới
+            return Regex.Replace(name, @"[<>:""/\\|?*]", "_");
         }
         [HttpPost]
         public JsonResult SearchByOrder(int Id, int Order)
@@ -103,7 +233,27 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.chapterRespository.Delete(id);
+                Chapters chapters = _ibase.chapterRespository.GetDetail(id);
+                string basePath = _config["SaveImage:Chapter"];
+                string requestPath = _config["SaveImage:ChapterRequestPath"];
+                string uploadFolder = Path.Combine(basePath, chapters.StoryId.ToString());
+                if (chapters != null && !string.IsNullOrEmpty(chapters.Content))
+                {
+                    var oldMatches = Regex.Matches(chapters.Content, "<img[^>]+src=\"([^\"]+)\"");
+
+                    foreach (Match m in oldMatches)
+                    {
+                        string oldSrc = m.Groups[1].Value;
+                        if (oldSrc.Contains(requestPath))
+                        {
+                            string fileName = Path.GetFileName(oldSrc);
+                            string filePath = Path.Combine(uploadFolder, fileName);
+                            if (System.IO.File.Exists(filePath))
+                                System.IO.File.Delete(filePath);
+                        }
+                    }
+                }
+                _ibase.chapterRespository.DeleteChapter(id);
                 _ibase.Commit();
                 return new JsonResult(new
                 {
@@ -115,7 +265,7 @@ namespace Admin.Controllers
             {
                 return new JsonResult(new
                 {
-                    status = true,
+                    status = false,
                     message = ex.Message,
                 });
             }

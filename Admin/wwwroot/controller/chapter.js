@@ -184,7 +184,7 @@
                         formatter: function (value, row, index) {
                             var action = "<div style='width: 200px;'>";
                             action += '<a href="/Chapter/CreateOrUpdate?idStory=' + row.storyId + '&idChapter=' + row.chapterId + '" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
-                            action += '<a href="/Chapter/Delete?Id=' + row.id + '" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
+                            action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
                             action += '</div>';
                             return action;
                         },
@@ -202,7 +202,7 @@
                                                     url: '/Chapter/Delete',
                                                     type: 'post',
                                                     data: {
-                                                        id: row.id,
+                                                        id: row.chapterId,
                                                     },
                                                     success: function (res) {
                                                         if (res.status) {

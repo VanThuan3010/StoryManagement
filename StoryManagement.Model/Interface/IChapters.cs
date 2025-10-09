@@ -16,5 +16,6 @@ namespace StoryManagement.Model.Interface
         int UpdatePosition(string listId);
         Chapters GetChapterToRead(long ChapterId, int StoryId, ref long CurrentChaterId, ref long PrevChaterId, ref string PrevChaterTitle, ref long NextChaterId, ref string NextChaterTitle);
         Chapters SearchByOrder(int Id, int Order);
+        int DeleteChapter(long id);
     }
 }
