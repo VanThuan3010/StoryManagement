@@ -468,12 +468,35 @@
                         title: "Tên",
                         align: 'center',
                         valign: 'left',
+                        width: 700,
+                        formatter: function (value) {
+                            try {
+                                let arr = JSON.parse(value);
+                                if (Array.isArray(arr) && arr.length > 0) return arr[0]; // chỉ dòng đầu
+                                return value;
+                            } catch (e) {
+                                return value;
+                            }
+                        }
                     },
                     {
                         field: "numberChapter",
                         title: "Số chương",
                         align: 'left',
                         valign: 'left',
+                        width: 400,
+                        formatter: function (value) {
+                            try {
+                                let arr = JSON.parse(value);
+                                if (Array.isArray(arr)) {
+                                    // Ghép từng dòng, mỗi dòng xuống dòng HTML
+                                    return arr.join("<br>");
+                                }
+                                return value;
+                            } catch {
+                                return value;
+                            }
+                        }
                     },
                     {
                         field: "isRead",
@@ -562,29 +585,32 @@
                             },
                             'click .btnEdit': function (e, value, row, index) {
                                 $('#txtIdModal').val(row.id);
-                                $('#txtName').val(row.name);
-                                $('#txtNumberChapter').val(row.numberChapter);
-                                //$('#txtTagName').val(row.tags_Name);
+                                //$('#txtName').val(row.name);
+                                //$('#txtNumberChapter').val(row.numberChapter);
+                                try {
+                                    let names = JSON.parse(row.name);
+                                    if (Array.isArray(names))
+                                        $('#txtName').val(names.join("\n"));
+                                    else
+                                        $('#txtName').val(row.name);
+                                } catch {
+                                    $('#txtName').val(row.name);
+                                }
+
+                                // --- Xử lý số chương ---
+                                try {
+                                    let chapters = JSON.parse(row.numberChapter);
+                                    if (Array.isArray(chapters))
+                                        $('#txtNumberChapter').val(chapters.join("\n"));
+                                    else
+                                        $('#txtNumberChapter').val(row.numberChapter);
+                                } catch {
+                                    $('#txtNumberChapter').val(row.numberChapter);
+                                }
                                 $('#sources').val(row.source.trim());
                                 story.init_Tag(row.id);
                                 story.init_SubTag(row.id);
                                 story.init_Author(row.id);
-                                //$('#sltFormTag').select2().val(row.tagId ? row.tagId.split(",") : null).trigger('change');
-                                //if (row.authorId == null) {
-                                //    story.initSelect2_Authors();
-                                //} else {
-                                //    $("#sltFormAuthor").select2().val(null).trigger("change");
-                                //    $.ajax({
-                                //        url: '/Story/GetAuthorByStory',
-                                //        data: {
-                                //            id: row.id
-                                //        },
-                                //        success: function (res) {
-                                //            story.initSelect2_Authors(res.rows);
-                                //        }
-                                //    })
-                                //}
-                                /*$('#sltFormAuthor').select2().val(row.authorId == null ? null : row.authorId.split(",")).trigger('change');*/
                                 $('#labelAction').text('Sửa truyện');
 
                                 $('#modalCreateOrEdit').modal('show');

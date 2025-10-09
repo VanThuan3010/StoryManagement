@@ -1,5 +1,6 @@
 using Admin.Models;
 using Microsoft.AspNetCore.Mvc;
+using StoryManagement.Model;
 using System.Diagnostics;
 
 namespace Admin.Controllers
@@ -7,10 +8,11 @@ namespace Admin.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        protected IBase _ibase;
+        public HomeController(ILogger<HomeController> logger, IBase ibase)
         {
             _logger = logger;
+            _ibase = ibase;
         }
 
         public IActionResult Index()

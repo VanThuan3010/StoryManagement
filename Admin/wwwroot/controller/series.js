@@ -1,78 +1,139 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
-    var allStories = [
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-    ];
-    var seriesStories = ['B', 'C', 'D'];
+﻿$(function () {
+    window.series = {
+        init: function () {
+            author.action();
+            series.tblSeries();
+            $('#btnCreate').on('click', function () {
+                $('#txtIdModal').val(0);
+                $('#txtName').val('');
+                $('#txtPseudonym').val('');
+                $('#txtStyle').val('');
+                $('#pseudonymList ul.tags').empty();
+                $('#labelAction').text('Thêm mới tác giả');
 
-    // Tạo danh sách truyện còn lại
-    var remainingStories = allStories.filter(function (story) {
-        return !seriesStories.includes(story);
-    });
-
-    // Hàm hiển thị truyện còn lại
-    function displayStories(stories) {
-        var storiesList = document.getElementById('storiesList');
-        storiesList.innerHTML = ''; // Xóa các mục hiện có
-
-        stories.forEach(function (story) {
-            var li = document.createElement('li');
-            li.className = 'list-group-item';
-            li.dataset.id = story;
-            li.textContent = 'Truyện ' + story;
-            storiesList.appendChild(li);
-        });
-    }
-
-    // Hiển thị truyện còn lại
-    displayStories(remainingStories);
-
-    // Hiển thị truyện trong series
-    var seriesList = document.getElementById('seriesList');
-    seriesStories.forEach(function (story) {
-        var li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.dataset.id = story;
-        li.textContent = 'Truyện ' + story;
-        seriesList.appendChild(li);
-    });
-
-    // Kích hoạt SortableJS
-    Sortable.create(document.getElementById('storiesList'), {
-        group: 'shared',
-        animation: 150
-    });
-
-    Sortable.create(document.getElementById('seriesList'), {
-        group: 'shared',
-        animation: 150,
-        onAdd: function (evt) {
-            // Xử lý khi truyện được thêm vào series
-            updateOrder();
+                $('#modalCreateOrEdit').modal('show');
+            });
         },
-        onUpdate: function (evt) {
-            // Xử lý khi thứ tự của truyện thay đổi
-            updateOrder();
-        }
-    });
+        action: function () {
+            
+        },
+        tblSeries: function () {
+            var objTable = $("#tblAuthor");
+            objTable.bootstrapTable('destroy');
+            objTable.bootstrapTable({
+                method: 'get',
+                url: '/Series/GetSeries',
+                queryParams: function (p) {
+                    var param = $.extend(true, {
+                        limit: p.limit,
+                        offset: p.offset,
+                        search: $('#txtSearch').val(),
+                    }, p);
+                    return param;
+                },
+                formatLoadingMessage: function () {
+                    return 'Đang tải dữ liệu...';
+                },
+                formatNoMatches: function () {
+                    return 'Không có dữ liệu';
+                },
+                striped: true,
+                sidePagination: 'server',
+                pagination: true,
+                paginationVAlign: 'bottom',
+                search: false,
+                pageSize: 100,
+                pageList: [100],
 
-    function updateOrder() {
-        var items = seriesList.getElementsByClassName('list-group-item');
-        var order = [];
+                columns: [
+                    {
+                        field: "name",
+                        title: "Tên",
+                        align: 'center',
+                        valign: 'left',
+                    },
+                    {
+                        title: "Chức năng",
+                        valign: 'middle',
+                        align: 'center',
+                        class: 'CssAction',
+                        formatter: function (value, row, index) {
+                            var action = "<div style='width: 100px;'>";
+                            action += '<a href="javascript:void(0)" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
+                            action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
+                            return action;
+                        },
+                        events: {
+                            'click .btnDelete': function (e, value, row, index) {
+                                $.confirm({
+                                    title: 'Cảnh báo!',
+                                    content: 'Bạn chắc chắn muốn xóa tác giả?',
+                                    buttons: {
+                                        formSubmit: {
+                                            text: 'Xác nhận',
+                                            btnClass: 'btn btn-primary',
+                                            action: function () {
+                                                $.ajax({
+                                                    url: '/Author/Delete',
+                                                    type: 'post',
+                                                    data: {
+                                                        id: row.id,
+                                                    },
+                                                    success: function (res) {
+                                                        if (res.status) {
+                                                            base.notification('success', res.message);
+                                                            $("#tblAuthor").bootstrapTable('refresh', { silent: true });
+                                                        }
+                                                        else {
+                                                            base.notification('error', res.message);
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        },
+                                        cancel: {
+                                            text: 'Đóng',
+                                            btnClass: 'btn btn-danger'
+                                        },
+                                    }
+                                });
+                            },
+                            'click .btnEdit': function (e, value, row, index) {
+                                $('#txtIdModal').val(row.id);
+                                $('#txtName').val(row.name);
+                                $('#txtPseudonym').val("");
+                                $('#pseudonymList ul.tags').empty();
+                                $.ajax({
+                                    url: '/Pseu/GetPseu',
+                                    data: {
+                                        id: row.id,
+                                        type: 'Author'
+                                    },
+                                    success: function (res) {
+                                        if (res && res.length > 0) {
+                                            $.each(res, function (i, item) {
+                                                var li = '<li><a href="#" class="tag" data-id="' + item.id + '" data-pseudonym="' + item.pseudonym + '">'
+                                                    + item.pseudonym
+                                                    + '<span class="remove-tag">&times;</span></a></li>';
+                                                $('#pseudonymList ul.tags').append(li);
+                                            });
+                                        }
+                                    }
+                                });
+                                $('#labelAction').text('Sửa thông tin tác giả');
 
-        for (var i = 0; i < items.length; i++) {
-            order.push(items[i].dataset.id);
-        }
+                                $('#modalCreateOrEdit').modal('show');
+                            },
+                        }
+                    }
+                ],
+                onLoadSuccess: function (data) {
 
-        console.log('Thứ tự mới:', order.join(''));
+                },
+            })
+        },
     }
-
-    // Tìm kiếm truyện
-    document.getElementById('searchInput').addEventListener('input', function () {
-        var query = this.value.toLowerCase();
-        var filteredStories = remainingStories.filter(function (story) {
-            return story.toLowerCase().includes(query);
-        });
-
-        displayStories(filteredStories);
-    });
+});
+$(document).ready(function () {
+    series.init();
 });
