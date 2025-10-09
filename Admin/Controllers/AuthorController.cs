@@ -8,11 +8,13 @@ using Range = Microsoft.Office.Interop.Excel.Range;
 
 namespace Admin.Controllers
 {
-    public class AuthorController : HomeController
+    public class AuthorController : Controller
     {
-        public AuthorController(ILogger<HomeController> logger, IBase ibase)
-        : base(logger, ibase)
-        {}
+        protected IBase _ibase;
+        public AuthorController(IBase ibase)
+        {
+            _ibase = ibase;
+        }
         public IActionResult Index()
         {
             return View();

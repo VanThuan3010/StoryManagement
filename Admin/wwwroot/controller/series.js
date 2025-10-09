@@ -1,24 +1,17 @@
 ﻿$(function () {
     window.series = {
         init: function () {
-            author.action();
+            series.action();
             series.tblSeries();
             $('#btnCreate').on('click', function () {
-                $('#txtIdModal').val(0);
-                $('#txtName').val('');
-                $('#txtPseudonym').val('');
-                $('#txtStyle').val('');
-                $('#pseudonymList ul.tags').empty();
-                $('#labelAction').text('Thêm mới tác giả');
-
-                $('#modalCreateOrEdit').modal('show');
+                window.location.href = '/Series/CreateOrUpdate?Id=0';
             });
         },
         action: function () {
             
         },
         tblSeries: function () {
-            var objTable = $("#tblAuthor");
+            var objTable = $("#tblSeries");
             objTable.bootstrapTable('destroy');
             objTable.bootstrapTable({
                 method: 'get',
@@ -51,6 +44,7 @@
                         title: "Tên",
                         align: 'center',
                         valign: 'left',
+                        with: '60%',
                     },
                     {
                         title: "Chức năng",
@@ -59,7 +53,7 @@
                         class: 'CssAction',
                         formatter: function (value, row, index) {
                             var action = "<div style='width: 100px;'>";
-                            action += '<a href="javascript:void(0)" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
+                            action += '<a href="/Series/CreateOrUpdate?Id=' + row.id + '" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
                             action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
                             return action;
                         },
@@ -67,7 +61,7 @@
                             'click .btnDelete': function (e, value, row, index) {
                                 $.confirm({
                                     title: 'Cảnh báo!',
-                                    content: 'Bạn chắc chắn muốn xóa tác giả?',
+                                    content: 'Chắc chắn muốn xóa?',
                                     buttons: {
                                         formSubmit: {
                                             text: 'Xác nhận',
@@ -82,7 +76,7 @@
                                                     success: function (res) {
                                                         if (res.status) {
                                                             base.notification('success', res.message);
-                                                            $("#tblAuthor").bootstrapTable('refresh', { silent: true });
+                                                            $("#tblSeries").bootstrapTable('refresh', { silent: true });
                                                         }
                                                         else {
                                                             base.notification('error', res.message);
@@ -97,33 +91,7 @@
                                         },
                                     }
                                 });
-                            },
-                            'click .btnEdit': function (e, value, row, index) {
-                                $('#txtIdModal').val(row.id);
-                                $('#txtName').val(row.name);
-                                $('#txtPseudonym').val("");
-                                $('#pseudonymList ul.tags').empty();
-                                $.ajax({
-                                    url: '/Pseu/GetPseu',
-                                    data: {
-                                        id: row.id,
-                                        type: 'Author'
-                                    },
-                                    success: function (res) {
-                                        if (res && res.length > 0) {
-                                            $.each(res, function (i, item) {
-                                                var li = '<li><a href="#" class="tag" data-id="' + item.id + '" data-pseudonym="' + item.pseudonym + '">'
-                                                    + item.pseudonym
-                                                    + '<span class="remove-tag">&times;</span></a></li>';
-                                                $('#pseudonymList ul.tags').append(li);
-                                            });
-                                        }
-                                    }
-                                });
-                                $('#labelAction').text('Sửa thông tin tác giả');
-
-                                $('#modalCreateOrEdit').modal('show');
-                            },
+                            }
                         }
                     }
                 ],

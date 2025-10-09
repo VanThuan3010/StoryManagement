@@ -10,5 +10,6 @@ namespace StoryManagement.Model.Interface
 {
     public interface ISeries : IRepository<Series>
     {
+        List<Series> GetAll(int pageIndex, int pageSize, string search, ref int Total);
     }
 }
