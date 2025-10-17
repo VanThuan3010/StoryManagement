@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StoryManagement.Model;
+using StoryManagement.Model.Entity;
 
 namespace Admin.Controllers
 {
@@ -20,6 +21,37 @@ namespace Admin.Controllers
         public IActionResult CreateOrUpdate()
         {
             return View();
+        }
+        public JsonResult SearchStory(string search, string idSelected)
+        {
+            var data = _ibase.seriesRespository.SearchStory(search, idSelected);
+            return Json(data);
+        }
+        public JsonResult GetStory(int Id)
+        {
+            var data = _ibase.seriesRespository.GetStory(Id);
+            return Json(data);
+        }
+        [HttpPost]
+        public JsonResult SaveSeries(Series series, string lstStory)
+        {
+            try
+            {
+                _ibase.seriesRespository.SaveSeries(series, lstStory);
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Lưu thành công",
+                });
+            }
+            catch
+            {
+                return new JsonResult(new
+                {
+                    status = false,
+                    message = "Có lỗi xảy ra",
+                });
+            }
         }
     }
 }

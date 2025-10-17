@@ -20,5 +20,7 @@ namespace StoryManagement.Model.Entity
         public string? Review {  get; set; }
         [NotMapped]
         public int StoryId { get; set; }
+        [NotMapped]
+        public string? Position { get; set; }
     }
 }

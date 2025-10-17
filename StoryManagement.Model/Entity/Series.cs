@@ -9,6 +9,6 @@ namespace StoryManagement.Model.Entity
     public class Series
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
+        public string? SeriesName { get; set; }
     }
 }

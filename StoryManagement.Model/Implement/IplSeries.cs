@@ -48,5 +48,68 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public List<Story> SearchStory(string search, string idSelected)
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@search", search);
+                    p.Add("@idSelected", idSelected);
+                    List = u.GetIEnumerable<Story>("Get_SearchStoryForSeries", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Story> GetStory(int Id)
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@idSeries", Id);
+                    List = u.GetIEnumerable<Story>("Get_StoryForSeries", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public int SaveSeries(Series series, string lstStory)
+        {
+            int list = 0;
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@id", series.Id);
+                    p.Add("@name", series.SeriesName);
+                    p.Add("@lstStory", lstStory);
+                    list = u.ProcedureExecute("CreateOrUpdate_Series", p);
+                }
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+            return list;
+        }
     }
 }
