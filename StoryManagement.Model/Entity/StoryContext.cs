@@ -104,7 +104,7 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.Name).HasMaxLength(300);
                 entity.Property(e => e.NumberChapter).HasMaxLength(4000);
                 entity.Property(e => e.IsRead);
-                entity.Property(e => e.Tags_Name);
+                entity.Property(e => e.TagsName);
                 entity.Property(e => e.Source);
             });
             modelBuilder.Entity<Sub_Tag>(entity =>

@@ -15,7 +15,7 @@ namespace StoryManagement.Model.Entity
         public string? NumberChapter { get; set; }
         public bool? IsRead { get; set; }
         public string? Source {  get; set; }
-        public string? Tags_Name { get; set; }
+        public string? TagsName { get; set; }
         [NotMapped]
         public string? Review {  get; set; }
         [NotMapped]

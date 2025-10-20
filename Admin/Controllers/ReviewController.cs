@@ -13,7 +13,7 @@ namespace Admin.Controllers
         }
         public IActionResult Index(int idStory)
         {
-            var data = _ibase.reviewRespository.GetStoryReview(idStory);
+            var data = _ibase.reviewRespository.GetStoryReview(idStory) ?? new Reviews { IdStory = idStory };
             return View(data);
         }
 

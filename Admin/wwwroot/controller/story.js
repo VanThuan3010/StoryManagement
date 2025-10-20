@@ -10,6 +10,7 @@
                 story.init_Tag(0);
                 story.init_SubTag(0);
                 story.init_Author(0);
+                $('#txtTagName').val('');
                 $('#sources').val('SacHiepVien');
                 $('#labelAction').text('Thêm mới truyện');
 
@@ -66,6 +67,7 @@
                 datas.append('NumberChapter', JSON.stringify($('#txtNumberChapter').val().split(/\r?\n/).filter(line => line.trim() !== '')));
                 datas.append('Source', $('#sources').val());
                 datas.append('IsRead', 0);
+                datas.append('TagsName', $('#txtTagName').val());
                 datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
                 datas.append('TagId', $('#sltFormTag').val().join(','));
                 datas.append('SubTagId', $('#sltFormAuthor').val().join(','));
@@ -585,7 +587,7 @@
                             },
                             'click .btnEdit': function (e, value, row, index) {
                                 $('#txtIdModal').val(row.id);
-                                //$('#txtName').val(row.name);
+                                $('#txtTagName').val(row.tagsName);
                                 //$('#txtNumberChapter').val(row.numberChapter);
                                 try {
                                     let names = JSON.parse(row.name);
