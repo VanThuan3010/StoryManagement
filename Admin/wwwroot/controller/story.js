@@ -547,6 +547,7 @@
                             action += '<a href="javascript:void(0)" title="Xóa" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
                             action += '<a href="/Review/Index?idStory=' + row.id + '" title="Cập nhật" class="btn btn-success btn-sm btnReview ms-1"><i class="fa fa-user-check"></i></a>';
                             action += '<a href="/Chapter/index?idStory=' + row.id + '" title="Chương" class="btn btn-secondary btn-sm btnReview ms-1"><i class="fa fa-book"></i></a>';
+                            action += '<a href="/Comic/index?idStory=' + row.id + '" title="Truyện tranh" class="btn btn-secondary btn-sm btnReview ms-1"><i class="fa fa-image"></i></a>';
                             action += '</div>';
                             return action;
                         },

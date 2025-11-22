@@ -90,7 +90,11 @@
 @section Scripts {
     <script type="text/javascript">
         CKEDITOR.replace('txtContent', {
-            height: '700px'
+            height: '700px',
+            extraPlugins: 'uploadimage,image2',
+            uploadUrl: '/Chapter/UploadImage',
+            filebrowserUploadUrl: '/Chapter/UploadImage',
+            filebrowserUploadMethod: 'form'
         });
     </script>
 }

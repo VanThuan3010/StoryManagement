@@ -22,5 +22,7 @@ namespace StoryManagement.Model.Entity
         public int StoryId { get; set; }
         [NotMapped]
         public string? Position { get; set; }
+        [NotMapped]
+        public int NumberEpisode { get; set; }
     }
 }

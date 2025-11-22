@@ -18,13 +18,16 @@ namespace MFTech.Model.Entity
         }
         public virtual DbSet<Authors> Authors { get; set; } = null!;
         public virtual DbSet<Chapters> Chapters { get; set; } = null!;
+        public virtual DbSet<Comic> Comics { get; set; } = null!;
         public virtual DbSet<GroupTag> GroupTags { get; set; } = null!;
         public virtual DbSet<Part_Chapter> Part_Chapters { get; set; } = null!;
         public virtual DbSet<Pseu> Pseus { get; set; } = null!;
         public virtual DbSet<Reviews> Reviews { get; set; } = null!;
+        public virtual DbSet<Scenes> Scenes { get; set; } = null!;
         public virtual DbSet<Seri_Story> Seri_Stories { get; set; } = null!;
         public virtual DbSet<Series> Series { get; set; } = null!;
         public virtual DbSet<Story> Stories { get; set; } = null!;
+        public virtual DbSet<Story_Comic> Story_Comics { get; set; } = null!;
         public virtual DbSet<Sub_Tag> Sub_Tags { get; set; } = null!;
         public virtual DbSet<Tags> Tags { get; set; } = null!;
 
@@ -45,6 +48,14 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.StoryId);
                 entity.Property(e => e.Title);
                 entity.Property(e => e.Content);
+            });
+            modelBuilder.Entity<Comic>(entity =>
+            {
+                entity.ToTable("Comics");
+
+                entity.Property(e => e.IdChapter);
+                entity.Property(e => e.Name);
+                entity.Property(e => e.Images);
             });
             modelBuilder.Entity<GroupTag>(entity =>
             {
@@ -106,6 +117,15 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.IsRead);
                 entity.Property(e => e.TagsName);
                 entity.Property(e => e.Source);
+            });
+            modelBuilder.Entity<Story_Comic>(entity =>
+            {
+                entity.ToTable("Story_Comic");
+
+                entity.Property(e => e.IdStory);
+                entity.Property(e => e.ChapterName);
+                entity.Property(e => e.OrderChapter);
+                entity.Property(e => e.Description);
             });
             modelBuilder.Entity<Sub_Tag>(entity =>
             {

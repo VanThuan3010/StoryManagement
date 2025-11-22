@@ -1,0 +1,69 @@
+﻿@using Newtonsoft.Json
+@using StoryManagement.Model.Entity
+@using StoryManagement.Model.Enum
+
+@{
+    ViewData["Title"] = "Truyện tranh";
+    Story story = (Story)ViewBag.getStory;
+    var list = JsonConvert.DeserializeObject<List<string>>(story.Name);
+}
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="breadcrumb-title pe-3">Truyện</div>
+    <div class="ps-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 p-0">
+                <li class="breadcrumb-item">
+                    <a href="/"><i class="bx bx-home-alt"></i></a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">@list?[0]</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="ms-auto">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" id="btnCreate">Thêm mới</button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="col-lg-12 table-responsive">
+                    <input type="hidden" value="@ViewBag.StoryId" id="saveStoryId" />
+                    <input type="hidden" value="@ViewBag.NumberEpisode" id="svNumberOrder" />
+                    <table class="table table-bordered" id="tblEpisode"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalCreateOrEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="labelAction"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" hidden id="txtIdModal" name="Id" />
+                <div class="form-group mb-3">
+                    <label class="form-label required">Tên tập</label>
+                    <textarea rows="3" class="form-control" name="txtName" id="txtName"></textarea>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label">Mô tả</label>
+                    <textarea rows="6" class="form-control" name="txtDescription" id="txtDescription"></textarea>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label">Thứ tự</label>
+                    <input type="number" class="form-control" name="txtOrder" id="txtOrder" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnSubmit">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>

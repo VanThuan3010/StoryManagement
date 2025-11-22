@@ -1,0 +1,266 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Upload Ảnh";
+}
+<div class="upload-container">
+    <h1 class="text-center mb-4">
+        <i class="fas fa-images"></i> Quản lý Upload Ảnh
+    </h1>
+
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <h4>Kéo thả ảnh vào đây</h4>
+        <p class="text-muted">hoặc nhấp để chọn ảnh</p>
+        <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+    </div>
+
+    <div id="imageCount" class="text-center" style="display: none;">
+        <span class="image-count">Đã chọn: <span id="countNumber">0</span> ảnh</span>
+    </div>
+
+    <div class="image-preview-container" id="previewContainer"></div>
+
+    <div class="action-buttons" id="actionButtons" style="display: none;">
+        <button class="btn btn-success btn-custom" onclick="saveImages()">
+            <i class="fas fa-save"></i> Lưu thông tin
+        </button>
+        <button class="btn btn-danger btn-custom" onclick="clearAll()">
+            <i class="fas fa-trash"></i> Xóa tất cả
+        </button>
+    </div>
+</div>
+
+<script>
+    let imageFiles = [];
+    let imageCounter = 0;
+
+    $(document).ready(function() {
+        // Click to upload
+        $('#uploadArea').on('click', function() {
+            $('#fileInput').click();
+        });
+
+        // File input change
+        $('#fileInput').on('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and drop
+        $('#uploadArea').on('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).addClass('dragover');
+        });
+
+        $('#uploadArea').on('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass('dragover');
+        });
+
+        $('#uploadArea').on('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).removeClass('dragover');
+
+            const files = e.originalEvent.dataTransfer.files;
+            handleFiles(files);
+        });
+    });
+
+    function handleFiles(files) {
+        for (let file of files) {
+            if (file.type.startsWith('image/')) {
+                const imageId = 'img_' + imageCounter++;
+                imageFiles.push({
+                    id: imageId,
+                    file: file,
+                    order: imageFiles.length + 1
+                });
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addImagePreview(imageId, e.target.result, file.name);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        updateUI();
+    }
+
+    function addImagePreview(id, src, name) {
+        const imageIndex = imageFiles.findIndex(img => img.id === id);
+        const orderValue = imageFiles[imageIndex].order;
+
+        const card = `
+            <div class="image-card" id="${id}" data-index="${imageIndex}">
+                <button class="remove-btn" onclick="removeImage('${id}')">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="image-wrapper">
+                    <img src="${src}" alt="${name}">
+                </div>
+                <div class="image-info">
+                    <div class="image-name" title="${name}">
+                        <i class="fas fa-file-image"></i> ${name}
+                    </div>
+                    <label class="form-label mb-1">Thứ tự:</label>
+                    <input type="number"
+                            class="order-input"
+                            value="${orderValue}"
+                            min="1"
+                            placeholder="Nhập thứ tự"
+                            onchange="updateOrder('${id}', this.value)">
+                </div>
+            </div>
+        `;
+
+        $('#previewContainer').append(card);
+    }
+
+    function removeImage(id) {
+        const removedImage = imageFiles.find(img => img.id === id);
+        const removedOrder = removedImage ? removedImage.order : 0;
+
+        imageFiles = imageFiles.filter(img => img.id !== id);
+
+        // Cập nhật lại thứ tự cho các ảnh có order lớn hơn ảnh bị xóa
+        imageFiles.forEach(img => {
+            if (img.order > removedOrder) {
+                img.order--;
+            }
+        });
+
+        $(`#${id}`).fadeOut(300, function() {
+            $(this).remove();
+
+            // Cập nhật lại các input order còn lại
+            imageFiles.forEach(img => {
+                $(`#${img.id} .order-input`).val(img.order);
+            });
+
+            updateUI();
+        });
+    }
+
+    function updateOrder(id, newValue) {
+        newValue = parseInt(newValue) || 1;
+
+        const image = imageFiles.find(img => img.id === id);
+        if (!image) return;
+
+        const oldOrder = image.order;
+
+        // Giới hạn giá trị trong khoảng hợp lệ
+        if (newValue < 1) newValue = 1;
+        if (newValue > imageFiles.length) newValue = imageFiles.length;
+
+        // Nếu không thay đổi thì không làm gì
+        if (oldOrder === newValue) return;
+
+        // Cập nhật thứ tự cho các ảnh khác
+        if (newValue < oldOrder) {
+            // Đẩy xuống: các ảnh từ newValue đến oldOrder-1 tăng lên 1
+            imageFiles.forEach(img => {
+                if (img.id !== id && img.order >= newValue && img.order < oldOrder) {
+                    img.order++;
+                }
+            });
+        } else {
+            // Đẩy lên: các ảnh từ oldOrder+1 đến newValue giảm đi 1
+            imageFiles.forEach(img => {
+                if (img.id !== id && img.order > oldOrder && img.order <= newValue) {
+                    img.order--;
+                }
+            });
+        }
+
+        // Cập nhật ảnh hiện tại
+        image.order = newValue;
+
+        // Cập nhật lại tất cả các input
+        imageFiles.forEach(img => {
+            $(`#${img.id} .order-input`).val(img.order);
+        });
+
+        // Hiệu ứng nhấp nháy để người dùng thấy thay đổi
+        imageFiles.forEach(img => {
+            if (img.id !== id) {
+                $(`#${img.id}`).addClass('bg-light');
+                setTimeout(() => {
+                    $(`#${img.id}`).removeClass('bg-light');
+                }, 500);
+            }
+        });
+    }
+
+    function updateUI() {
+        $('#countNumber').text(imageFiles.length);
+
+        if (imageFiles.length > 0) {
+            $('#imageCount').fadeIn();
+            $('#actionButtons').fadeIn();
+        } else {
+            $('#imageCount').fadeOut();
+            $('#actionButtons').fadeOut();
+        }
+    }
+
+    function saveImages() {
+        if (imageFiles.length === 0) {
+            alert('Chưa có ảnh nào để lưu!');
+            return;
+        }
+
+        // Sắp xếp theo thứ tự
+        const sortedImages = [...imageFiles].sort((a, b) => a.order - b.order);
+
+        // Tạo dữ liệu để lưu
+        const imageData = sortedImages.map(img => ({
+            name: img.file.name,
+            size: img.file.size,
+            type: img.file.type,
+            order: img.order
+        }));
+
+        console.log('Dữ liệu ảnh:', imageData);
+        console.log('Các file ảnh:', sortedImages.map(img => img.file));
+
+        alert(`Đã chuẩn bị lưu ${imageFiles.length} ảnh!\n\nKiểm tra Console để xem chi tiết dữ liệu.`);
+
+        // TODO: Ở đây bạn có thể gửi dữ liệu lên server
+        // Ví dụ với FormData:
+        /*
+        const formData = new FormData();
+        sortedImages.forEach((img, index) => {
+            formData.append('images[]', img.file);
+            formData.append('orders[]', img.order);
+        });
+
+        $.ajax({
+            url: '/your-upload-endpoint',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                alert('Upload thành công!');
+            },
+            error: function(error) {
+                alert('Upload thất bại!');
+            }
+        });
+        */
+    }
+
+    function clearAll() {
+        if (confirm('Bạn có chắc muốn xóa tất cả ảnh?')) {
+            imageFiles = [];
+            $('#previewContainer').empty();
+            $('#fileInput').val('');
+            updateUI();
+        }
+    }
+</script>

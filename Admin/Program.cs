@@ -42,12 +42,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-var chapterImagePath = builder.Configuration["SaveImage:Chapter"]; // D:\StoryImages
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(chapterImagePath),
-    RequestPath = "/StoryImages"
-});
+//var chapterImagePath = builder.Configuration["SaveImage:Chapter"];
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(chapterImagePath),
+//    RequestPath = "/StoryImages"
+//});
 app.UseRouting();
 
 app.UseAuthorization();

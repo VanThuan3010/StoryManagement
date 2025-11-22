@@ -13,6 +13,7 @@ namespace StoryManagement.Model
     {
         IAuthors authorRespository { get; }
         IChapters chapterRespository { get; }
+        IComic comicRespository { get; }
         IGroupTag groupTagRespository { get; }
         IPart_Chapter part_ChapterRespository { get; }
         IPseu pseuRespository { get; }
@@ -21,6 +22,7 @@ namespace StoryManagement.Model
         ISeri_Story seri_StoryRespository { get; }
         ISeries seriesRespository { get; }
         IStory storyRespository { get; }
+        IStory_Comic storyComicRepository { get; }
         ISub_Tag sub_TagRespository { get; }
         ITag tagRespository { get; }
         ITbl_Relationship relationshipRespository { get; }
