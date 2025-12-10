@@ -54,6 +54,7 @@ namespace MFTech.Model.Entity
                 entity.ToTable("Comics");
 
                 entity.Property(e => e.IdChapter);
+                entity.Property(e => e.PhysicPath);
                 entity.Property(e => e.Name);
                 entity.Property(e => e.Images);
             });
@@ -70,7 +71,6 @@ namespace MFTech.Model.Entity
                 entity.ToTable("Part_Chapter");
 
                 entity.Property(e => e.Name).HasMaxLength(1000);
-
                 entity.Property(e => e.IdStory);
             });
             modelBuilder.Entity<Pseu>(entity =>

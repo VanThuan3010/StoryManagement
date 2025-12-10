@@ -1,6 +1,7 @@
 ﻿
 @{
     var controller = this.Context.GetRouteData().Values["controller"].ToString().ToLower();
+    var action = this.Context.GetRouteData().Values["action"].ToString().ToLower();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -85,6 +86,7 @@
     <script src="~/lib/adminlte/js/adminlte.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/controller/@(controller).js?v=@DateTime.UtcNow.ToString()"></script>
+    <script src="~/controller/Upload.js?v =@DateTime.UtcNow.ToString()"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Upload Ảnh";
+}
+<div class="row">
+    <div id="leftPanel" class="col-9">
+        <h1>Upload ảnh → Preview → Base64</h1>
+        <input type="hidden" value="@ViewBag.Id" id="saveIdChapter" />
+        <input type="hidden" value="@ViewBag.IdStory" id="saveIdStory" />
+        <div class="card">
+            <div class="uploader" id="dropZone">
+                <label for="fileInput"><b>Chọn ảnh</b> hoặc kéo-thả (có thể chọn nhiều ảnh)</label>
+                <br><br>
+                <input id="fileInput" type="file" accept="image/*" multiple>
+
+                <div style="margin-top:12px;">
+                    <button id="clearBtn" class="btn btn-muted">Xóa tất cả</button>
+                </div>
+
+                <div class="preview-area" id="previewArea"></div>
+            </div>
+        </div>
+
+        <div class="card" style="display: none;">
+            <h3>Base64 Output</h3>
+            <div id="base64Box">Chưa có dữ liệu.</div>
+        </div>
+        <input type="hidden" id="saveNumberImg" />
+    </div>
+    <div id="gallerySidebar" class="col-2">
+        <h3>Gallery</h3>
+        <div id="galleryList"></div>
+    </div>
+</div>
+<!-- =========================================================
+     MODAL
+========================================================== -->
+<div id="imageModal">
+    <span id="closeModal">&times;</span>
+    <span id="prevBtn" class="nav-btn">&#10094;</span>
+    <img id="modalImg" src="">
+    <span id="nextBtn" class="nav-btn">&#10095;</span>
+</div>

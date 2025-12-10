@@ -61,7 +61,6 @@ namespace Admin.Controllers
                     message = ex.Message,
                 });
             }
-
         }
         [HttpPost]
         public JsonResult Delete(int id)

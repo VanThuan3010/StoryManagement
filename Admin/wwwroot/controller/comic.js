@@ -17,9 +17,10 @@
             $('#btnSubmit').click(function () {
                 var datas = new FormData();
                 datas.append('Id', $('#txtIdModal').val());
-                datas.append('Name', $('#txtName').val());
+                datas.append('IdStory', $('#saveStoryId').val());
+                datas.append('ChapterName', $('#txtName').val());
                 datas.append('Description', $('#txtDescription').val());
-                datas.append('Order', $('#txtOrder').val());
+                datas.append('OrderChapter', $('#txtOrder').val());
                 $.ajax({
                     url: '/Comic/CreateOrUpdateEpisode',
                     type: 'post',
@@ -35,7 +36,7 @@
                         $('#btnSubmit').html("Lưu");
                         if (res.status) {
                             base.notification('success', res.message);
-                            $("#tblStory").bootstrapTable('refresh');
+                            $("#tblEpisode").bootstrapTable('refresh');
                             $('#modalCreateOrEdit').modal('hide');
                         } else {
                             base.notification('error', res.message);
@@ -74,7 +75,6 @@
                 pageList: [50, 100],
                 reorderableRows: true,
                 useRowAttrFunc: true,
-
                 columns: [
                     {
                         field: "chapterName",
@@ -89,7 +89,7 @@
                         valign: 'left',
                     },
                     {
-                        field: "part_Name",
+                        field: "number_Image",
                         title: "Số ảnh",
                         align: 'left',
                         valign: 'left',
@@ -101,8 +101,10 @@
                         class: 'CssAction',
                         formatter: function (value, row, index) {
                             var action = "<div style='width: 200px;'>";
-                            action += '<a href="/Chapter/CreateOrUpdate?idStory=' + row.storyId + '&idChapter=' + row.chapterId + '" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
+                            action += '<a href="javascript:void(0)" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
                             action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
+                            action += '<a href="/Comic/Detail?id=' + row.id + '" class="btn btn-secondary btn-sm ms-1"><i class="fa fa-book"></i></a>';
+                            action += '<a href="/Comic/CreateOrUpdateComic?id=' + row.id + '&idStory=' + $('#saveStoryId').val() + '" title="Cập nhật ảnh truyện" class="btn btn-secondary btn-sm ms-1"><i class="fa fa-image"></i></a>';
                             action += '</div>';
                             return action;
                         },
@@ -120,7 +122,7 @@
                                                     url: '/Comic/DeleteEpisode',
                                                     type: 'post',
                                                     data: {
-                                                        id: row.chapterId,
+                                                        id: row.id,
                                                     },
                                                     success: function (res) {
                                                         if (res.status) {
@@ -140,6 +142,15 @@
                                         },
                                     }
                                 });
+                            },
+                            'click .btnEdit': function (e, value, row, index) {
+                                $('#txtIdModal').val(row.id);
+                                $('#txtName').val(row.chapterName);
+                                $('#txtDescription').val(row.description);
+                                $('#txtOrder').val(row.orderChapter);
+                                $('#labelAction').text('Sửa Episode');
+
+                                $('#modalCreateOrEdit').modal('show');
                             },
                         }
                     }
