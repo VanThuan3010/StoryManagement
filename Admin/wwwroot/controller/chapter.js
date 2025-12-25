@@ -231,6 +231,64 @@
             })
         },
     }
+    window.ImportTxt = {
+        indexChapter: 0,
+
+        upload: function () {
+            if ($('#txtFile')[0].files.length === 0) {
+                base.notification("error", "Vui lòng Upload file text");
+                return;
+            }
+            let file = $('#txtFile')[0].files[0];
+            let fd = new FormData();
+            fd.append('file', file);
+
+            $.ajax({
+                url: '/Chapter/UploadTxt',
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.status) {
+                        $('#saveIndexChapter').val(0);
+                        ImportTxt.load();
+                    }
+                }
+            });
+        },
+        load: function () {
+            let index = Number($('#saveIndexChapter').val());
+            $.get('/Chapter/GetImportChapter', { index: index }, function (res) {
+                if (!res.status) return;
+
+                $('#txtTitleChapter').text(res.data.chapterTitle);
+                CKEDITOR.instances.importEditor.setData(res.data.content);
+                $('#btnNext').prop('disabled', res.data.isLastChapter);
+                $('#importModal').modal('show');
+            });
+        },
+        Save: function () {
+            $.post('/Chapter/CreateOrUpdate', {
+                Id: 0,
+                StoryId: $('#saveStoryId').val(),
+                Title: $('#txtTitleChapter').text(),
+                Belong: $('#BelongPart').val(),
+                Content: base.convertToHTML(CKEDITOR.instances.importEditor.getData()),
+                OrderTo: $('#orderChapter').val() || 1
+            }, function () {
+                ImportTxt.nextIndex();
+            });
+        },
+        Next: function () {
+            ImportTxt.nextIndex();
+        },
+        nextIndex: function () {
+            let index = Number($('#saveIndexChapter').val());
+            $('#saveIndexChapter').val(index + 1);
+            ImportTxt.load();
+        }
+    };
 });
 $(document).ready(function () {
     Chapter.init();

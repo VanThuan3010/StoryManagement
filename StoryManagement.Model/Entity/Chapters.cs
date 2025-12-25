@@ -19,4 +19,11 @@ namespace StoryManagement.Model.Entity
         [NotMapped]
         public long ChapterId { get; set; }
     }
+    public class ImportChapterDto
+    {
+        public int IndexChapter { get; set; }
+        public string ChapterTitle { get; set; }
+        public string Content { get; set; }
+        public int IsLastChapter { get; set; }
+    }
 }

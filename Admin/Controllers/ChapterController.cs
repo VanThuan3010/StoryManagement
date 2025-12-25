@@ -22,8 +22,11 @@ namespace Admin.Controllers
         }
         public IActionResult Index(int idStory)
         {
+            var ChapterCount = 0;
             ViewBag.StoryId = idStory;
             ViewBag.getStory = _ibase.storyRespository.GetDetail(idStory);
+            ViewBag.PartChapter = _ibase.part_ChapterRespository.GetAll(idStory, ref ChapterCount);
+            ViewBag.ChapterCount = ChapterCount;
             return View();
         }
         public JsonResult GetChapter(int offset, int limit, int idStory)
@@ -385,10 +388,10 @@ namespace Admin.Controllers
         //}
         public string ConvertToHtml(string text)
         {
-            text = "<p>" + text.Replace(Environment.NewLine + Environment.NewLine, "</p><p>");
+            text = "<p>" + text.Replace(Environment.NewLine + Environment.NewLine, "</p><p>&nbsp;&nbsp;&nbsp;&nbsp;");
 
-            text = text.Replace("\t", "<span style='display:inline-block; width: 40px;'></span>");
-            text = text.Replace("    ", "<span style='display:inline-block; width: 40px;'></span>");
+            text = text.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+            text = text.Replace("    ", "&nbsp;&nbsp;&nbsp;&nbsp;");
             text = text.Replace(Environment.NewLine, "<br>");
             text += "</p>";
 
@@ -416,6 +419,57 @@ namespace Admin.Controllers
                 fileName = fileName,
                 url = "/uploads/" + fileName
             });
+        }
+        [HttpPost]
+        public async Task<JsonResult> UploadTxt(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return Json(new { status = false, message = "File không hợp lệ" });
+
+            string text;
+            using (var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
+            {
+                text = await reader.ReadToEndAsync();
+            }
+
+            var regex = new Regex(
+                @"(?<title>Chương\s+\d+\s*:\s*.+?)\r?\n(?<content>.*?)(?=(\r?\nChương\s+\d+\s*:)|$)",
+                RegexOptions.Singleline
+            );
+
+            var matches = regex.Matches(text);
+            var chapters = new List<ImportChapterDto>();
+
+            for (int i = 0; i < matches.Count; i++)
+            {
+                chapters.Add(new ImportChapterDto
+                {
+                    IndexChapter = i,
+                    ChapterTitle = matches[i].Groups["title"].Value.Trim(),
+                    Content = ConvertToHtml(matches[i].Groups["content"].Value.Trim()),
+                    IsLastChapter = i == matches.Count - 1 ? 1 : 0
+                });
+            }
+
+            var path = Path.Combine(_env.ContentRootPath, "App_Data", "TempImport.json");
+            System.IO.File.WriteAllText(path, System.Text.Json.JsonSerializer.Serialize(chapters));
+
+            return Json(new { status = true, total = chapters.Count });
+        }
+        [HttpGet]
+        public JsonResult GetImportChapter(int index)
+        {
+            var path = Path.Combine(_env.ContentRootPath, "App_Data", "TempImport.json");
+            if (!System.IO.File.Exists(path))
+                return Json(new { status = false });
+
+            var chapters = System.Text.Json.JsonSerializer
+                .Deserialize<List<ImportChapterDto>>(System.IO.File.ReadAllText(path));
+
+            if (index < 0 || index >= chapters.Count)
+                return Json(new { status = false });
+
+            return Json(new { status = true, data = chapters[index] });
         }
     }
 }
