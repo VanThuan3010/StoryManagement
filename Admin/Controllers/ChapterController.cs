@@ -48,7 +48,7 @@ namespace Admin.Controllers
         }
 
         [HttpPost]
-        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo)
+        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo, List<string> deletedImages)
         {
             try
             {
@@ -119,7 +119,16 @@ namespace Admin.Controllers
 
                 chapters.Content = html;
                 _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
-
+                if (deletedImages?.Count > 0) {
+                    foreach (var img in deletedImages)
+                    {
+                        var path = Path.Combine("wwwroot", img.TrimStart('/'));
+                        if (System.IO.File.Exists(path))
+                        {
+                            System.IO.File.Delete(path);
+                        }
+                    }
+                }
                 return new JsonResult(new
                 {
                     status = true,
@@ -404,9 +413,9 @@ namespace Admin.Controllers
                 return Json(new { uploaded = 0, error = new { message = "No file" } });
 
             var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
-            var savePath = Path.Combine("wwwroot/uploads", fileName);
+            var savePath = Path.Combine("wwwroot/uploads/chapter", fileName);
 
-            Directory.CreateDirectory("wwwroot/uploads");
+            Directory.CreateDirectory("wwwroot/uploads/chapter");
 
             using (var stream = new FileStream(savePath, FileMode.Create))
             {
@@ -417,7 +426,7 @@ namespace Admin.Controllers
             {
                 uploaded = 1,
                 fileName = fileName,
-                url = "/uploads/" + fileName
+                url = "/uploads/chapter/" + fileName
             });
         }
         [HttpPost]

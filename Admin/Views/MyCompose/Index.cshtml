@@ -1,0 +1,83 @@
+﻿@{
+    // ViewData["Title"] = "Danh sách truyện";
+}
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="breadcrumb-title pe-3">Truyện tự sáng tác</div>
+    <div class="ps-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 p-0">
+                <li class="breadcrumb-item">
+                    <a href="/"><i class="bx bx-home-alt"></i></a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Thông tin</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="ms-auto">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" id="btnCreate">Thêm mới</button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-9">
+        <input type="hidden" id="idUpdate" />
+        <input type="hidden" id="idPar" />
+        <div class="form-group mb-3">
+            <label class="form-label required">Tên</label>
+            <textarea rows="2" class="form-control" name="txName" id="txName"></textarea>
+        </div>
+        <div class="form-group mb-3">
+            <label class="form-label">Thuộc</label>
+            <select class="form-select" id="belongTo">
+                <option value="0">0 - Không</option>
+            </select>
+        </div>
+        <div class="form-group mb-3">
+            <label class="form-label">Nội dung</label>
+            <textarea class="form-control" id="txtContent" name="txtContent"></textarea>
+        </div>
+        <div class="mt-4">
+            <button class="btn btn-success" style="width:100px;" id="btnSave">Lưu</button>
+        </div>
+    </div>
+    <div class="col-3" id="ideal-tree"></div>
+</div>
+<div class="modal fade" id="modalCreateOrEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="labelAction"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" hidden id="txtIdModal" name="Id" />
+                <div class="form-group mb-3">
+                    <label class="form-label required">Tên</label>
+                    <textarea rows="3" class="form-control" name="txtName" id="txtName"></textarea>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="form-label">Thuộc</label>
+                    <select class="form-select" id="sources" name="sources">
+                        <option value="0">0 - Không</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnSubmit">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        CKEDITOR.replace('txtContent', {
+            height: '500px',
+            extraPlugins: 'uploadimage,image2',
+            uploadUrl: '/MyCompose/UploadImage',
+            filebrowserUploadUrl: '/MyCompose/UploadImage',
+            filebrowserUploadMethod: 'form'
+        });
+    </script>
+}

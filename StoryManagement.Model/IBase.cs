@@ -15,6 +15,7 @@ namespace StoryManagement.Model
         IChapters chapterRespository { get; }
         IComic comicRespository { get; }
         IGroupTag groupTagRespository { get; }
+        IMy_Compose my_ComposeRepository { get; }
         IPart_Chapter part_ChapterRespository { get; }
         IPseu pseuRespository { get; }
         IReviews reviewRespository { get; }

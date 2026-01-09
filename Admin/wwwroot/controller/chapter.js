@@ -1,6 +1,11 @@
 ﻿$(function () {
     window.Chapter = {
         init: function () {
+            var originalImages = [];
+            if ($('#Id').val() != 0) {
+                const html = $('#txtContent').val() || base.convertToHTML(CKEDITOR.instances.txtContent.getData());
+                originalImages = extractChapterImagePaths(html);
+            }
             Chapter.action();
             Chapter.tblChapter();
             $('#btnCreate').on('click', function () {
@@ -269,13 +274,19 @@
             });
         },
         Save: function () {
+            const newHtml = CKEDITOR.instances.txtContent.getData();
+            const currentImages = extractChapterImagePaths(newHtml);
+            const deletedImages = originalImages.filter(
+                x => !currentImages.includes(x)
+            );
             $.post('/Chapter/CreateOrUpdate', {
                 Id: 0,
                 StoryId: $('#saveStoryId').val(),
                 Title: $('#txtTitleChapter').text(),
                 Belong: $('#BelongPart').val(),
                 Content: base.convertToHTML(CKEDITOR.instances.importEditor.getData()),
-                OrderTo: $('#orderChapter').val() || 1
+                OrderTo: $('#orderChapter').val() || 1,
+                deletedImages: deletedImages
             }, function () {
                 ImportTxt.nextIndex();
             });
@@ -287,6 +298,19 @@
             let index = Number($('#saveIndexChapter').val());
             $('#saveIndexChapter').val(index + 1);
             ImportTxt.load();
+        },
+        extractChapterImagePaths: function (html) {
+            const div = document.createElement('div');
+            div.innerHTML = html || '';
+
+            const imgs = div.querySelectorAll('img');
+
+            return Array.from(imgs)
+                .map(img => img.getAttribute('src'))
+                .filter(src =>
+                    src &&
+                    src.startsWith('/uploads/chapter/')
+                );
         }
     };
 });

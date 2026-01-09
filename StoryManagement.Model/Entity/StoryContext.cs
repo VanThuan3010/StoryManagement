@@ -20,6 +20,7 @@ namespace MFTech.Model.Entity
         public virtual DbSet<Chapters> Chapters { get; set; } = null!;
         public virtual DbSet<Comic> Comics { get; set; } = null!;
         public virtual DbSet<GroupTag> GroupTags { get; set; } = null!;
+        public virtual DbSet<My_Compose> My_Composes { get; set; } = null!;
         public virtual DbSet<Part_Chapter> Part_Chapters { get; set; } = null!;
         public virtual DbSet<Pseu> Pseus { get; set; } = null!;
         public virtual DbSet<Reviews> Reviews { get; set; } = null!;
@@ -64,6 +65,15 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.Name);
                 entity.Property(e => e.Definition);
                 entity.Property(e => e.MultiSelect);
+            });
+            modelBuilder.Entity<My_Compose>(entity =>
+            {
+                entity.ToTable("My_Compose");
+
+                entity.Property(e => e.Name);
+                entity.Property(e => e.Contents);
+                entity.Property(e => e.ParentId);
+                entity.Property(e => e.Level);
             });
             modelBuilder.Entity<Part_Chapter>(entity =>
             {

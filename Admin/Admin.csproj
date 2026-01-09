@@ -17,4 +17,10 @@
     <ProjectReference Include="..\StoryManagement.Model\StoryManagement.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\jsTree\" />
+    <Folder Include="wwwroot\SQL_Update\" />
+    <Folder Include="wwwroot\uploads\" />
+  </ItemGroup>
+
 </Project>
