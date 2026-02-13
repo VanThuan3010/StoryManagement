@@ -55,69 +55,69 @@ namespace Admin.Controllers
                 if (chapters == null)
                     return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
 
-                string html = chapters.Content ?? "";
+                //string html = chapters.Content ?? "";
 
-                // Chỉ bắt đúng src trong img
-                string pattern = @"(<img\b[^>]*?\ssrc\s*=\s*[""'])(?<src>[^""']+)([""'])";
-                var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                //// Chỉ bắt đúng src trong img
+                //string pattern = @"(<img\b[^>]*?\ssrc\s*=\s*[""'])(?<src>[^""']+)([""'])";
+                //var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-                html = regex.Replace(html, match =>
-                {
-                    string prefix = match.Groups[1].Value; // <img ... src="
-                    string src = match.Groups["src"].Value; // giá trị src
-                    string quote = match.Groups[3].Value;   // " hoặc '
+                //html = regex.Replace(html, match =>
+                //{
+                //    string prefix = match.Groups[1].Value; // <img ... src="
+                //    string src = match.Groups["src"].Value; // giá trị src
+                //    string quote = match.Groups[3].Value;   // " hoặc '
 
-                    try
-                    {
-                        // Đã là base64 rồi thì bỏ qua
-                        if (src.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
-                            return match.Value;
+                //    try
+                //    {
+                //        // Đã là base64 rồi thì bỏ qua
+                //        if (src.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+                //            return match.Value;
 
-                        byte[] bytes = null;
-                        string mime = "image/jpeg";
+                //        byte[] bytes = null;
+                //        string mime = "image/jpeg";
 
-                        // Trường hợp src là URL
-                        if (src.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                        {
-                            using var httpClient = new HttpClient();
-                            bytes = httpClient.GetByteArrayAsync(src).Result;
+                //        // Trường hợp src là URL
+                //        if (src.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                //        {
+                //            using var httpClient = new HttpClient();
+                //            bytes = httpClient.GetByteArrayAsync(src).Result;
 
-                            // cố lấy phần mở rộng để suy mime
-                            string ext = Path.GetExtension(new Uri(src).AbsolutePath).ToLower();
-                            if (ext == ".png") mime = "image/png";
-                            else if (ext == ".gif") mime = "image/gif";
-                            else if (ext == ".webp") mime = "image/webp";
-                        }
-                        else if (System.IO.File.Exists(src))
-                        {
-                            // src là local file path
-                            bytes = System.IO.File.ReadAllBytes(src);
+                //            // cố lấy phần mở rộng để suy mime
+                //            string ext = Path.GetExtension(new Uri(src).AbsolutePath).ToLower();
+                //            if (ext == ".png") mime = "image/png";
+                //            else if (ext == ".gif") mime = "image/gif";
+                //            else if (ext == ".webp") mime = "image/webp";
+                //        }
+                //        else if (System.IO.File.Exists(src))
+                //        {
+                //            // src là local file path
+                //            bytes = System.IO.File.ReadAllBytes(src);
 
-                            string ext = Path.GetExtension(src).ToLower();
-                            if (ext == ".png") mime = "image/png";
-                            else if (ext == ".gif") mime = "image/gif";
-                            else if (ext == ".webp") mime = "image/webp";
-                        }
-                        else
-                        {
-                            // Nếu không phải URL và không phải file hợp lệ, giữ nguyên
-                            return match.Value;
-                        }
+                //            string ext = Path.GetExtension(src).ToLower();
+                //            if (ext == ".png") mime = "image/png";
+                //            else if (ext == ".gif") mime = "image/gif";
+                //            else if (ext == ".webp") mime = "image/webp";
+                //        }
+                //        else
+                //        {
+                //            // Nếu không phải URL và không phải file hợp lệ, giữ nguyên
+                //            return match.Value;
+                //        }
 
-                        if (bytes == null) return match.Value;
+                //        if (bytes == null) return match.Value;
 
-                        string base64 = Convert.ToBase64String(bytes);
-                        string newSrc = $"data:{mime};base64,{base64}";
+                //        string base64 = Convert.ToBase64String(bytes);
+                //        string newSrc = $"data:{mime};base64,{base64}";
 
-                        return $"{prefix}{newSrc}{quote}";
-                    }
-                    catch
-                    {
-                        return match.Value;
-                    }
-                });
+                //        return $"{prefix}{newSrc}{quote}";
+                //    }
+                //    catch
+                //    {
+                //        return match.Value;
+                //    }
+                //});
 
-                chapters.Content = html;
+                //chapters.Content = html;
                 _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
                 if (deletedImages?.Count > 0) {
                     foreach (var img in deletedImages)
@@ -407,26 +407,32 @@ namespace Admin.Controllers
             return text;
         }
         [HttpPost]
-        public async Task<IActionResult> UploadImage(IFormFile upload)
+        public async Task<IActionResult> UploadImage(IFormFile upload, int storyId)
         {
             if (upload == null || upload.Length == 0)
                 return Json(new { uploaded = 0, error = new { message = "No file" } });
 
             var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
-            var savePath = Path.Combine("wwwroot/uploads/chapter", fileName);
-
-            Directory.CreateDirectory("wwwroot/uploads/chapter");
-
-            using (var stream = new FileStream(savePath, FileMode.Create))
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(),
+                                  "wwwroot",
+                                  "uploads",
+                                  "chapter",
+                                  storyId.ToString());
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            var filePath = Path.Combine(folderPath, fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await upload.CopyToAsync(stream);
             }
-
+            var fileUrl = $"/uploads/chapter/{storyId}/{fileName}";
             return Json(new
             {
                 uploaded = 1,
                 fileName = fileName,
-                url = "/uploads/chapter/" + fileName
+                url = fileUrl
             });
         }
         [HttpPost]

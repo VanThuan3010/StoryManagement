@@ -34,10 +34,10 @@
                         </div>                        
                     </div>
                     <div class="form-group col-lg-12 mb-3">
-                        <label class="form-label">Vị trí thêm</label>
+                        <label class="form-label">Vị trí đọc</label>
                         <div class="row">
                             <div class="col-3 mt-3">
-                                <input class="form-control" type="text" id="searchOrder" value="@(ChapterCount + 1)" />
+                                <input class="form-control" type="text" id="searchOrder" value="@(ViewBag.idChapter == 0 ? ChapterCount + 1 : ChapterCount)" />
                             </div>
                             <div class="col-2 mt-3">
                                 <button type="button" id="btnSearchChapter" class="btn btn-primary"><i class="fas fa-search"></i></button>
@@ -92,8 +92,8 @@
         CKEDITOR.replace('txtContent', {
             height: '700px',
             extraPlugins: 'uploadimage,image2',
-            uploadUrl: '/Chapter/UploadImage',
-            filebrowserUploadUrl: '/Chapter/UploadImage',
+            uploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
+            filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
             filebrowserUploadMethod: 'form'
         });
     </script>

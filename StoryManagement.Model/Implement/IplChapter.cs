@@ -83,7 +83,7 @@ namespace StoryManagement.Model.Implement
                     p.Add("@title", chapters.Title);
                     p.Add("@content", chapters.Content);
                     p.Add("@belong", chapters.Belong);
-                    p.Add("@orderSetup", OrderTo);
+                    p.Add("@order", OrderTo);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Chapter", p);
                 }
