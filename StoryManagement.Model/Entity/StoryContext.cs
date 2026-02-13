@@ -49,6 +49,8 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.StoryId);
                 entity.Property(e => e.Title);
                 entity.Property(e => e.Content);
+                entity.Property(e => e.Belong);
+                entity.Property(e => e.Orders);
             });
             modelBuilder.Entity<Comic>(entity =>
             {
