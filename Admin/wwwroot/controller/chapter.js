@@ -1,11 +1,11 @@
 ﻿$(function () {
     window.Chapter = {
         init: function () {
-            var originalImages = [];
-            if ($('#Id').val() != 0) {
-                const html = $('#txtContent').val() || base.convertToHTML(CKEDITOR.instances.txtContent.getData());
-                originalImages = extractChapterImagePaths(html);
-            }
+            //var originalImages = [];
+            //if ($('#Id').val() != 0) {
+            //    const html = $('#txtContent').val() || base.convertToHTML(CKEDITOR.instances.txtContent.getData());
+            //    originalImages = extractChapterImagePaths(html);
+            //}
             Chapter.action();
             Chapter.tblChapter();
             $('#btnCreate').on('click', function () {
@@ -109,7 +109,7 @@
                     }
                 })
             })
-            $('#frmChapter').submit(function(e){
+            $('#SaveChap').on('click', function(e){
                 e.preventDefault();
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
@@ -118,6 +118,7 @@
                 formData.append("Belong", $('#Belong').val());
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
+                formData.append("deletedImages", []);
                 $.ajax({
                     url: '/Chapter/CreateOrUpdate',
                     type: 'POST',
@@ -269,16 +270,17 @@
 
                 $('#txtTitleChapter').text(res.data.chapterTitle);
                 CKEDITOR.instances.importEditor.setData(res.data.content);
-                $('#btnNext').prop('disabled', res.data.isLastChapter);
+                $('#btnNext').prop('disabled', res.data.isLastChapter == 1);
+                $('#isLastChapter').val(res.data.isLastChapter);
                 $('#importModal').modal('show');
             });
         },
         Save: function () {
-            const newHtml = CKEDITOR.instances.txtContent.getData();
-            const currentImages = extractChapterImagePaths(newHtml);
-            const deletedImages = originalImages.filter(
-                x => !currentImages.includes(x)
-            );
+            //const newHtml = CKEDITOR.instances.importEditor.getData();
+            //const currentImages = extractChapterImagePaths(newHtml);
+            //const deletedImages = originalImages.filter(
+            //    x => !currentImages.includes(x)
+            //);
             $.post('/Chapter/CreateOrUpdate', {
                 Id: 0,
                 StoryId: $('#saveStoryId').val(),
@@ -286,9 +288,22 @@
                 Belong: $('#BelongPart').val(),
                 Content: base.convertToHTML(CKEDITOR.instances.importEditor.getData()),
                 OrderTo: $('#orderChapter').val() || 1,
-                deletedImages: deletedImages
-            }, function () {
-                ImportTxt.nextIndex();
+                deletedImages: []
+            }, function (res) {
+                if (res.status) {
+                    base.notification('success', res.message);
+                    if ($('#isLastChapter').val() == 0) {
+                        ImportTxt.nextIndex();
+                    } else {
+                        $('#importModal').modal('hide');
+                        window.location.reload();
+                    }
+                } else {
+                    base.notification('error', res.message);
+                }
+            }).fail(function (xhr, status, error) {
+                console.error('Error:', status, error);
+                base.notification('error', "Có lỗi xảy ra, vui lòng thử lại.");
             });
         },
         Next: function () {

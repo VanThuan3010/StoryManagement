@@ -1,7 +1,7 @@
 ﻿$(function () {
     window.myCompose = {
+        originalImagePaths: [],
         init: function () {
-            var originalImagePaths = [];
             myCompose.action();
             $('#ideal-tree').jstree({
                 core: {
@@ -49,7 +49,7 @@
 
                         if (CKEDITOR.instances.txtContent) {
                             CKEDITOR.instances.txtContent.setData(data.contents);
-                            originalImagePaths = myCompose.extractImagePaths(data.contents);
+                            myCompose.originalImagePaths = myCompose.extractImagePaths(data.contents);
                         }
 
                         $.ajax({
@@ -145,8 +145,8 @@
                 datas.append('Name', $('#txName').val());
                 datas.append('Content', currentHtml);
                 datas.append('ParentId', $('#idPar').val());
-                const currentImagePaths = extractImagePaths(currentHtml);
-                const deletedImages = originalImagePaths.filter(
+                const currentImagePaths = myCompose.extractImagePaths(currentHtml);
+                const deletedImages = myCompose.originalImagePaths.filter(
                     x => !currentImagePaths.includes(x)
                 );
                 datas.append('deletedImages', deletedImages);
@@ -171,7 +171,7 @@
                 })
             });
         },
-        extractImagePaths: function () {
+        extractImagePaths: function (html) {
             const div = document.createElement('div');
             div.innerHTML = html;
 

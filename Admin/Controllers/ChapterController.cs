@@ -119,20 +119,21 @@ namespace Admin.Controllers
 
                 //chapters.Content = html;
                 _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
-                if (deletedImages?.Count > 0) {
-                    foreach (var img in deletedImages)
-                    {
-                        var path = Path.Combine("wwwroot", img.TrimStart('/'));
-                        if (System.IO.File.Exists(path))
-                        {
-                            System.IO.File.Delete(path);
-                        }
-                    }
-                }
+                //if (deletedImages?.Count > 0) {
+                //    foreach (var img in deletedImages)
+                //    {
+                //        var path = Path.Combine("wwwroot", img.TrimStart('/'));
+                //        if (System.IO.File.Exists(path))
+                //        {
+                //            System.IO.File.Delete(path);
+                //        }
+                //    }
+                //}
                 return new JsonResult(new
                 {
                     status = true,
-                    message = "/Chapter/Index?idStory=" + chapters.StoryId
+                    //message = "/Chapter/Index?idStory=" + chapters.StoryId,
+                    message = "Thao tác thành công"
                 });
             }
             catch (Exception ex)
