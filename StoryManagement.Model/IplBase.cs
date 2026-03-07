@@ -28,6 +28,7 @@ namespace StoryManagement.Model
         private ISeries _seriesRespository;
         private IStory _storyRespository;
         private IStory_Comic _storyComicRespository;
+        private IStorySearch _storySearchRespository;
         private ISub_Tag _subTagRespository;
         private ITag _tagRespository;
         private ITbl_Relationship _relationshipRespository;
@@ -128,6 +129,13 @@ namespace StoryManagement.Model
             get
             {
                 return _storyComicRespository ?? (_storyComicRespository = new IplStory_Comic(_dbContext, _Configuration));
+            }
+        }
+        public IStorySearch storySearchRepository
+        {
+            get
+            {
+                return _storySearchRespository ?? (_storySearchRespository = new IplStorySearch(_dbContext, _Configuration));
             }
         }
         public ISub_Tag sub_TagRespository

@@ -29,6 +29,7 @@ namespace MFTech.Model.Entity
         public virtual DbSet<Series> Series { get; set; } = null!;
         public virtual DbSet<Story> Stories { get; set; } = null!;
         public virtual DbSet<Story_Comic> Story_Comics { get; set; } = null!;
+        public virtual DbSet<Story_Search> Story_Searches { get; set; } = null!;
         public virtual DbSet<Sub_Tag> Sub_Tags { get; set; } = null!;
         public virtual DbSet<Tags> Tags { get; set; } = null!;
 
@@ -138,6 +139,14 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.ChapterName);
                 entity.Property(e => e.OrderChapter);
                 entity.Property(e => e.Description);
+            });
+            modelBuilder.Entity<Story_Search>(entity =>
+            {
+                entity.ToTable("Story_Search");
+
+                entity.Property(e => e.Request);
+                entity.Property(e => e.Result);
+                entity.Property(e => e.SearchBy);
             });
             modelBuilder.Entity<Sub_Tag>(entity =>
             {
