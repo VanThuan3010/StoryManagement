@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Newtonsoft.Json;
 using StoryManagement.Model;
 using StoryManagement.Model.Entity;
 using System;
@@ -48,91 +49,40 @@ namespace Admin.Controllers
         }
 
         [HttpPost]
-        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo, List<string> deletedImages)
+        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo, List<string> Images)
         {
             try
             {
                 if (chapters == null)
                     return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
+                List<string> ImagesDelete = _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, JsonConvert.SerializeObject(Images));
+                if (ImagesDelete != null && ImagesDelete.Count > 0)
+                {
+                    foreach (var img in ImagesDelete)
+                    {
+                        var path = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot",
+                            "uploads",
+                            "chapter",
+                            chapters.StoryId.ToString(),
+                            img
+                        );
 
-                //string html = chapters.Content ?? "";
-
-                //// Chỉ bắt đúng src trong img
-                //string pattern = @"(<img\b[^>]*?\ssrc\s*=\s*[""'])(?<src>[^""']+)([""'])";
-                //var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
-
-                //html = regex.Replace(html, match =>
-                //{
-                //    string prefix = match.Groups[1].Value; // <img ... src="
-                //    string src = match.Groups["src"].Value; // giá trị src
-                //    string quote = match.Groups[3].Value;   // " hoặc '
-
-                //    try
-                //    {
-                //        // Đã là base64 rồi thì bỏ qua
-                //        if (src.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
-                //            return match.Value;
-
-                //        byte[] bytes = null;
-                //        string mime = "image/jpeg";
-
-                //        // Trường hợp src là URL
-                //        if (src.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                //        {
-                //            using var httpClient = new HttpClient();
-                //            bytes = httpClient.GetByteArrayAsync(src).Result;
-
-                //            // cố lấy phần mở rộng để suy mime
-                //            string ext = Path.GetExtension(new Uri(src).AbsolutePath).ToLower();
-                //            if (ext == ".png") mime = "image/png";
-                //            else if (ext == ".gif") mime = "image/gif";
-                //            else if (ext == ".webp") mime = "image/webp";
-                //        }
-                //        else if (System.IO.File.Exists(src))
-                //        {
-                //            // src là local file path
-                //            bytes = System.IO.File.ReadAllBytes(src);
-
-                //            string ext = Path.GetExtension(src).ToLower();
-                //            if (ext == ".png") mime = "image/png";
-                //            else if (ext == ".gif") mime = "image/gif";
-                //            else if (ext == ".webp") mime = "image/webp";
-                //        }
-                //        else
-                //        {
-                //            // Nếu không phải URL và không phải file hợp lệ, giữ nguyên
-                //            return match.Value;
-                //        }
-
-                //        if (bytes == null) return match.Value;
-
-                //        string base64 = Convert.ToBase64String(bytes);
-                //        string newSrc = $"data:{mime};base64,{base64}";
-
-                //        return $"{prefix}{newSrc}{quote}";
-                //    }
-                //    catch
-                //    {
-                //        return match.Value;
-                //    }
-                //});
-
-                //chapters.Content = html;
-                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
-                //if (deletedImages?.Count > 0) {
-                //    foreach (var img in deletedImages)
-                //    {
-                //        var path = Path.Combine("wwwroot", img.TrimStart('/'));
-                //        if (System.IO.File.Exists(path))
-                //        {
-                //            System.IO.File.Delete(path);
-                //        }
-                //    }
-                //}
+                        if (System.IO.File.Exists(path))
+                        {
+                            System.IO.File.Delete(path);
+                        }
+                        else
+                        {
+                            ImagesDelete.Remove(img);
+                        }
+                    }
+                }
+                _ibase.chapterRespository.DeleteImageChapter(chapters.StoryId, JsonConvert.SerializeObject(ImagesDelete));
                 return new JsonResult(new
                 {
                     status = true,
-                    //message = "/Chapter/Index?idStory=" + chapters.StoryId,
                     message = "Thao tác thành công"
                 });
             }
@@ -215,27 +165,32 @@ namespace Admin.Controllers
                     });
                 }
                 Chapters chapters = _ibase.chapterRespository.GetDetail(id);
-                string basePath = _config["SaveImage:Chapter"];
-                string requestPath = _config["SaveImage:ChapterRequestPath"];
-                string uploadFolder = Path.Combine(basePath, chapters.StoryId.ToString());
-                if (chapters != null && !string.IsNullOrEmpty(chapters.Content))
+                List<string> ImagesDelete = _ibase.chapterRespository.DeleteChapter(id);
+                if (ImagesDelete != null && ImagesDelete.Count > 0)
                 {
-                    var oldMatches = Regex.Matches(chapters.Content, "<img[^>]+src=\"([^\"]+)\"");
-
-                    foreach (Match m in oldMatches)
+                    foreach (var img in ImagesDelete)
                     {
-                        string oldSrc = m.Groups[1].Value;
-                        if (oldSrc.Contains(requestPath))
+                        var path = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot",
+                            "uploads",
+                            "chapter",
+                            chapters.StoryId.ToString(),
+                            img
+                        );
+
+                        if (System.IO.File.Exists(path))
                         {
-                            string fileName = Path.GetFileName(oldSrc);
-                            string filePath = Path.Combine(uploadFolder, fileName);
-                            if (System.IO.File.Exists(filePath))
-                                System.IO.File.Delete(filePath);
+                            System.IO.File.Delete(path);
+                        }
+                        else
+                        {
+                            ImagesDelete.Remove(img);
                         }
                     }
                 }
-                _ibase.chapterRespository.DeleteChapter(id);
-                _ibase.Commit();
+                _ibase.chapterRespository.DeleteImageChapter(chapters.StoryId, JsonConvert.SerializeObject(ImagesDelete));
+                //_ibase.Commit();
                 return new JsonResult(new
                 {
                     status = true,
@@ -486,6 +441,30 @@ namespace Admin.Controllers
                 return Json(new { status = false });
 
             return Json(new { status = true, data = chapters[index] });
+        }
+        [HttpPost]
+        public IActionResult DeleteTempImages([FromBody] List<string> images)
+        {
+            foreach (var img in images)
+            {
+                if (string.IsNullOrWhiteSpace(img))
+                    continue;
+
+                string ig = Path.GetFileName(img);
+
+                var path = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "uploads",
+                    "chapter",
+                    ig
+                );
+
+                if (System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);
+            }
+
+            return Ok();
         }
     }
 }

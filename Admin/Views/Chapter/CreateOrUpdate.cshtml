@@ -94,7 +94,17 @@
             extraPlugins: 'uploadimage,image2',
             uploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
             filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
-            filebrowserUploadMethod: 'form'
+            filebrowserUploadMethod: 'form',
+            on: {
+                fileUploadResponse: function (evt) {
+
+                    var res = JSON.parse(evt.data.fileLoader.xhr.responseText);
+
+                    if (res.fileName) {
+                        uploadedImages.push(res.fileName);
+                    }
+                }
+            }
         });
     </script>
 }

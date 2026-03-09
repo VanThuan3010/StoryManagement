@@ -500,6 +500,18 @@
                             }
                         }
                     },
+                    //{
+                    //    field: "chapterUploaded",
+                    //    title: "Số chương trên hệ thống",
+                    //    align: 'left',
+                    //    valign: 'left',
+                    //    width: 400,
+                    //    formatter: function (value) {
+                    //        if (!value) return '';
+
+                    //        return value.replace(/\n/g, '<br>');
+                    //    }
+                    //},
                     {
                         field: "isRead",
                         title: "Đọc",
@@ -545,9 +557,10 @@
                             var action = "<div style='width: 200px;'>";
                             action += '<a href="javascript:void(0)" title="Sửa" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
                             action += '<a href="javascript:void(0)" title="Xóa" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
-                            action += '<a href="/Review/Index?idStory=' + row.id + '" title="Cập nhật" class="btn btn-success btn-sm btnReview ms-1"><i class="fa fa-user-check"></i></a>';
-                            action += '<a href="/Chapter/index?idStory=' + row.id + '" title="Chương" class="btn btn-secondary btn-sm btnReview ms-1"><i class="fa fa-book"></i></a>';
-                            //action += '<a href="/Comic/index?idStory=' + row.id + '" title="Truyện tranh" class="btn btn-secondary btn-sm btnReview ms-1"><i class="fa fa-image"></i></a>';
+                            action += '<a href="/Review/Index?idStory=' + row.id + '" title="Cập nhật" class="btn btn-success btn-sm ms-1"><i class="fa fa-user-check"></i></a>';
+                            action += '<a href="/Chapter/index?idStory=' + row.id + '" title="Chương" class="btn btn-secondary btn-sm ms-1"><i class="fa fa-book-open"></i></a>';
+                            action += '<a href="javascript:void(0)" title="Chương lưu trong hệ thống" class="btn btn-secondary btn-sm btnReview ms-1"><i class="fa fa-book"></i></a>';
+                            //action += '<a href="/Comic/index?idStory=' + row.id + '" title="Truyện tranh" class="btn btn-secondary btn-sm ms-1"><i class="fa fa-image"></i></a>';
                             action += '</div>';
                             return action;
                         },
@@ -617,6 +630,15 @@
                                 $('#labelAction').text('Sửa truyện');
 
                                 $('#modalCreateOrEdit').modal('show');
+                            },
+                            'click .btnReview': function (e, value, row, index) {
+                                if (!row.chapterUploaded) {
+                                    $('#savedChapters').html('Không có dữ liệu');
+                                } else {
+                                    var text = row.chapterUploaded.replace(/\n/g, '<br>');
+                                    $('#savedChapters').html(text);
+                                }
+                                $('#modalChapterUploaded').modal('show');
                             },
                         }
                     }

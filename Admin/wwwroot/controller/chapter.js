@@ -1,11 +1,6 @@
 ﻿$(function () {
     window.Chapter = {
         init: function () {
-            //var originalImages = [];
-            //if ($('#Id').val() != 0) {
-            //    const html = $('#txtContent').val() || base.convertToHTML(CKEDITOR.instances.txtContent.getData());
-            //    originalImages = extractChapterImagePaths(html);
-            //}
             Chapter.action();
             Chapter.tblChapter();
             $('#btnCreate').on('click', function () {
@@ -118,7 +113,7 @@
                 formData.append("Belong", $('#Belong').val());
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
-                formData.append("deletedImages", []);
+                formData.append("Images", base.getImageNamesFromCKeditor('txtContent'));
                 $.ajax({
                     url: '/Chapter/CreateOrUpdate',
                     type: 'POST',
@@ -236,10 +231,24 @@
                 },
             })
         },
+        getGarbageImages: function () {
+            var usedImages = base.getImageNamesFromEditor('txtContent');
+
+            return uploadedImages.filter(x => !usedImages.includes(x));
+        },
+        cleanupImages: function () {
+            var garbage = Chapter.getGarbageImages();
+
+            if (garbage.length === 0) return;
+
+            navigator.sendBeacon(
+                '/Chapter/DeleteTempImages',
+                JSON.stringify(garbage)
+            );
+        }
     }
     window.ImportTxt = {
         indexChapter: 0,
-
         upload: function () {
             if ($('#txtFile')[0].files.length === 0) {
                 base.notification("error", "Vui lòng Upload file text");
@@ -331,4 +340,13 @@
 });
 $(document).ready(function () {
     Chapter.init();
+});
+window.addEventListener("beforeunload", Chapter.cleanupImages());
+window.addEventListener("pagehide", Chapter.cleanupImages());
+
+document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") {
+        Chapter.cleanupImages();
+    }
+
 });

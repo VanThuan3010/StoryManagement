@@ -69,10 +69,10 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Chapters chapters, int OrderTo)
+        public List<string> CreateOrUpdate(Chapters chapters, int OrderTo, string Images)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            int list = 0;
+            List<string> list = new List<string>();
             try
             {
                 using (var u = unitOfWork.Create(true))
@@ -84,8 +84,9 @@ namespace StoryManagement.Model.Implement
                     p.Add("@content", chapters.Content);
                     p.Add("@belong", chapters.Belong);
                     p.Add("@order", OrderTo);
+                    p.Add("@chapterImages", Images);
 
-                    list = u.ProcedureExecute("CreateOrUpdate_Chapter", p);
+                    list = u.GetIEnumerable<string>("CreateOrUpdate_Chapter", p).ToList();
                 }
                 return list;
             }
@@ -169,7 +170,28 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int DeleteChapter(long id)
+        public List<string> DeleteChapter(long id)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            List<string> list = new List<string>();
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@id", id);
+
+                    list = u.GetIEnumerable<string>("Delete_Chapter", p).ToList();
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
+        public int DeleteImageChapter(int id, string lstImages)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -178,9 +200,10 @@ namespace StoryManagement.Model.Implement
                 using (var u = unitOfWork.Create(true))
                 {
                     var p = new DynamicParameters();
-                    p.Add("@id", id);
+                    p.Add("@idStory", id);
+                    p.Add("@images", lstImages);
 
-                    list = u.ProcedureExecute("Delete_Chapter", p);
+                    u.ProcedureExecute("Delete_ChapterImages", p);
                 }
                 return list;
             }

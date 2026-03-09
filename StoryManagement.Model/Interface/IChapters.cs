@@ -11,11 +11,12 @@ namespace StoryManagement.Model.Interface
     public interface IChapters : IRepository<Chapters>
     {
         List<Chapters> GetAll(int pageIndex, int pageSize, int idStory, ref int Total);
-        int CreateOrUpdate(Chapters chapters, int OrderTo);
+        List<string> CreateOrUpdate(Chapters chapters, int OrderTo, string Images);
         Chapters GetDetail(long idChapter);
         int UpdatePosition(string listId);
         Chapters GetChapterToRead(long ChapterId, int StoryId, ref long CurrentChaterId, ref long PrevChaterId, ref string PrevChaterTitle, ref long NextChaterId, ref string NextChaterTitle);
         Chapters SearchByOrder(int Id, int Order);
-        int DeleteChapter(long id);
+        List<string> DeleteChapter(long id);
+        int DeleteImageChapter(int id, string lstImages);
     }
 }
