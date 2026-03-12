@@ -50,7 +50,7 @@
                     </div>
                     <div class="mt-4">
                         <button class="btn btn-success" style="width:100px;" type="button" id="SaveChap">Lưu</button>
-                        <a href="/Chapter/index?idStory=@ViewBag.idStory" class="btn w-md btn-outline-info waves-effect waves-light">Quay lại</a>
+                        <a id="btnBack" href="/Chapter/index?idStory=@ViewBag.idStory" class="btn w-md btn-outline-info waves-effect waves-light">Quay lại</a>
                     </div>
                 </form>
             </div>
@@ -93,18 +93,10 @@
             height: '700px',
             extraPlugins: 'uploadimage,image2',
             uploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
-            filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
-            filebrowserUploadMethod: 'form',
-            on: {
-                fileUploadResponse: function (evt) {
-
-                    var res = JSON.parse(evt.data.fileLoader.xhr.responseText);
-
-                    if (res.fileName) {
-                        uploadedImages.push(res.fileName);
-                    }
-                }
-            }
+            pasteFromWordRemoveFontStyles: true,
+            pasteFromWordRemoveStyles: true
+            // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
+            // filebrowserUploadMethod: 'form'
         });
     </script>
 }

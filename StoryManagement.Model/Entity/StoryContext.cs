@@ -125,7 +125,7 @@ namespace MFTech.Model.Entity
             {
                 entity.ToTable("Story");
 
-                entity.Property(e => e.Name).HasMaxLength(300);
+                entity.Property(e => e.Name).HasMaxLength(3000);
                 entity.Property(e => e.NumberChapter).HasMaxLength(4000);
                 entity.Property(e => e.IsRead);
                 entity.Property(e => e.TagsName);

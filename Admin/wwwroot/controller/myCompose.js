@@ -1,185 +1,139 @@
 ﻿$(function () {
     window.myCompose = {
-        originalImagePaths: [],
         init: function () {
+            var parentTimeout = null;
             myCompose.action();
-            $('#ideal-tree').jstree({
-                core: {
-                    data: {
-                        url: '/MyCompose/GetInfor',
-                        dataType: 'json'
-                    },
-                    check_callback: true,
-                    themes: { icons: true }
-                },
-                types: {
-                    root: { icon: 'jstree-folder' },
-                    child: { icon: 'jstree-file' }
-                },
-                plugins: ['wholerow', 'types']
-            });
-            $('#ideal-tree').on('select_node.jstree', function (e, data) {
-
-                const tree = $('#ideal-tree').jstree(true);
-                const node = data.node;
-
-                // kiểm tra node có child hay không
-                const hasChild = node.children && node.children.length > 0;
-
-                if (hasChild) {
-                    // ❌ có con → KHÔNG gọi ajax
-                    return;
-                }
-
-                // ✅ node không có con (leaf) → GỌI AJAX
-                const id = node.id;
-                
-                $.ajax({
-                    url: '/MyCompose/GetDetail',
-                    type: 'GET',
-                    data: { Id: id },
-                    success: function (res) {
-
-                        if (!res || res.length === 0) return;
-
-                        const data = res[0];
-
-                        $('#idUpdate').val(data.id);
-                        $('#txName').val(data.name);
-
-                        if (CKEDITOR.instances.txtContent) {
-                            CKEDITOR.instances.txtContent.setData(data.contents);
-                            myCompose.originalImagePaths = myCompose.extractImagePaths(data.contents);
-                        }
-
-                        $.ajax({
-                            url: '/MyCompose/GetInfor',
-                            type: 'GET',
-                            success: function (res2) {
-                                const $select = $('#belongTo');
-                                $select.find('option').not('[value="0"]').remove();
-
-                                res2
-                                    .filter(x => x.level === 1)
-                                    .forEach(x => {
-                                        $select.append(
-                                            `<option value="${x.id}" ${data.parentId == x.id ? 'selected' : ''}>
-                            ${x.level} - ${x.text}
-                         </option>`
-                                        );
-                                    });
-                            }
-                        });
-                    }
-                });
-            });
+            myCompose.initTree();
         },
         action: function () {
-            $('#btnCreate').on('click', function () {
-                $('#txtIdModal').val(0);
-                $('#txtName').val('');
-
+            $("#videoFile").change(function () {
+                let file = this.files[0];
+                if (!file) return;
+                let formData = new FormData();
+                formData.append("video", file);
+                formData.append("oldVideo", $("#video_Upload").val());
                 $.ajax({
-                    url: '/MyCompose/GetInfor',
-                    type: 'GET',
+                    url: "/MyCompose/UploadVideo",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: function (res) {
-
-                        const $select = $('#sources');
-
-                        // giữ option value = 0
-                        $select.find('option').not('[value="0"]').remove();
-
-                        // 🔴 res là ARRAY
-                        res
-                            .filter(x => x.level === 1)
-                            .forEach(x => {
-                                $select.append(
-                                    `<option value="${x.id}">${x.level} - ${x.text}</option>`
-                                );
-                            });
+                        if (res.success) {
+                            // cập nhật video preview
+                            $("#videoPreview").attr("src", res.path);
+                            // lưu video hiện tại để lần sau xóa
+                            $("#video_Upload").val(res.path);
+                        }
                     }
                 });
-
-                $('#labelAction').text('Thêm mới');
-                $('#modalCreateOrEdit').modal('show');
             });
-
-            $('#btnSubmit').click(function () {
-                var datas = new FormData();
-                datas.append('Id', $('#txtIdModal').val());
-                datas.append('Act', "Create");
-                datas.append('Name', $('#txtName').val());
-                datas.append('Content', "");
-                datas.append('ParentId', $('#sources').val());
-                datas.append('deletedImages', []);
-                $.ajax({
-                    url: '/MyCompose/CreateOrUpdate',
-                    type: 'post',
-                    processData: false,
-                    contentType: false,
-                    data: datas,
-                    beforeSend: function () {
-                        $('#btnSubmit').prop('disabled', true);
-                        $('#btnSubmit').html(base.loadButton("Lưu"));
-                    },
-                    success: function (res) {
-                        var retur = res.rows[0];
-                        $('#btnSubmit').prop('disabled', false);
-                        $('#btnSubmit').html("Lưu");
-                        $('#modalCreateOrEdit').modal('hide');
-                        if (retur.status == 'Success') {
-                            base.notification('success', retur.message);
-                            window.location.reload();
-                        } else {
-                            base.notification('error', retur.message);
-                        }
-                    }
-                })
+            $('#btnCreate').on('click', function () {
+                $('#tile').text("Thêm mới");
+                $("#IdNode").val(0);
+                $("#Name").val("");
+                $('#chkOldVid').prop('checked', false);
+                $("#videoPreview").attr("src", "");
+                $("#Content").val("");
+            })
+            $('#ParentSearch').keyup(function () {
+                let keyword = $(this).val();
+                if (keyword.length < 2) {
+                    $("#parentDropdown").hide();
+                    return;
+                }
+                if (parentTimeout) clearTimeout(parentTimeout);
+                parentTimeout = setTimeout(function () {
+                    $.get("/MyCompose/SearchParent", { keyword: keyword }, function (res) {
+                        renderParentList(res);
+                    });
+                }, 300)
+            })
+            $(document).on("click", ".parent-item", function (e) {
+                e.preventDefault();
+                let id = $(this).data("id");
+                let text = $(this).text();
+                $("#ParentId").val(id);
+                $("#ParentSearch").val(text);
+                $("#parentDropdown").hide();
             });
-
-            $('#btnSave').click(function () {
-                const currentHtml = CKEDITOR.instances.txtContent.getData();
-                var datas = new FormData();
-                datas.append('Id', $('#idUpdate').val());
-                datas.append('Act', "Update");
-                datas.append('Name', $('#txName').val());
-                datas.append('Content', currentHtml);
-                datas.append('ParentId', $('#idPar').val());
-                const currentImagePaths = myCompose.extractImagePaths(currentHtml);
-                const deletedImages = myCompose.originalImagePaths.filter(
-                    x => !currentImagePaths.includes(x)
-                );
-                datas.append('deletedImages', deletedImages);
-                $.ajax({
-                    url: '/MyCompose/CreateOrUpdate',
-                    type: 'post',
-                    processData: false,
-                    contentType: false,
-                    data: datas,
-                    beforeSend: function () {
-                        $('#btnSubmit').prop('disabled', true);
-                        $('#btnSubmit').html(base.loadButton("Lưu"));
-                    },
-                    success: function (res) {
-                        if (retur.status == 'Success') {
-                            base.notification('success', retur.message);
-                            window.location.reload();
-                        } else {
-                            base.notification('error', retur.message);
-                        }
+            $('#btnSave').on('click', function () {
+                let data = {
+                    Id: $("#IdNode").val(),
+                    Name: $("#Name").val(),
+                    VideoRefer: $("#").val(),
+                    Content: base.convertToHTML(CKEDITOR.instances.txtContent.getData()),
+                    ParentId: $("#ParentId").val()
+                };
+                $.post('/MyCompose/CreaeOrUpdate', data, function (res) {
+                    if (res.success) {
+                        alert("Lưu thành công!");
+                        $('#tree').jstree(true).refresh();
+                    } else {
+                        alert("Lỗi: " + res.message);
                     }
-                })
+                });
             });
         },
-        extractImagePaths: function (html) {
-            const div = document.createElement('div');
-            div.innerHTML = html;
+        renderParentList: function (list) {
+            let html = "";
+            list.forEach(function (item) {
+                html += `
+                <a href="#" 
+                   class="list-group-item list-group-item-action parent-item"
+                   data-id="${item.id}">
+                   ${item.text}
+                </a>`;
+            });
+            $("#parentDropdown").html(html).show();
+        },
+        initTree: function () {
+            $('#tree').jstree({
+                core: {
+                    data: {
+                        url: '/MyCompose/GetTree',
+                        dataType: 'json'
+                    }
+                },
+                plugins: ["search"]
 
-            const imgs = div.querySelectorAll('img');
-            return Array.from(imgs)
-                .map(img => img.getAttribute('src'))
-                .filter(src => src && src.startsWith('/uploads/compose/'));
-        }
+            });
+            $('#tree').on("select_node.jstree", function (e, data) {
+                $('#tile').text("Chỉnh sửa");
+                loadDetail(data.node.id);
+            });
+        },
+        loadDetail: function (id) {
+            $.get('/MyCompose/GetDetail', { id: id }, function (res) {
+                $("#IdNode").val(res.id);
+                $("#Name").val(res.name);
+                $("#VideoRefer").val(res.video_Refer);
+                $("#videoPreview").attr("src", res.video_Refer);
+                CKEDITOR.instances.txtContent.setData(res.content);
+            });
+        },
+        initSearch: function (Id) {
+            var to = false;
+            $('#searchNode').keyup(function () {
+                if (to) {
+                    clearTimeout(to);
+                }
+                to = setTimeout(function () {
+                    var keyword = $('#searchNode').val();
+                    if (keyword.length === 0) {
+                        $('#tree').jstree(true).clear_search();
+                        return;
+                    }
+                    $.get('/MyCompose/SearchNode', { keyword: keyword }, function (ids) {
+                        var tree = $('#tree').jstree(true);
+                        tree.clear_search();
+                        ids.forEach(function (id) {
+                            tree.search(id);
+                        });
+                    });
+                }, 300);
+            });
+        },
     }
 });
 $(document).ready(function () {

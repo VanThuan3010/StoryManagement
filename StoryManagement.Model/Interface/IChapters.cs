@@ -11,7 +11,7 @@ namespace StoryManagement.Model.Interface
     public interface IChapters : IRepository<Chapters>
     {
         List<Chapters> GetAll(int pageIndex, int pageSize, int idStory, ref int Total);
-        List<string> CreateOrUpdate(Chapters chapters, int OrderTo, string Images);
+        int CreateOrUpdate(Chapters chapters, int OrderTo);
         Chapters GetDetail(long idChapter);
         int UpdatePosition(string listId);
         Chapters GetChapterToRead(long ChapterId, int StoryId, ref long CurrentChaterId, ref long PrevChaterId, ref string PrevChaterTitle, ref long NextChaterId, ref string NextChaterTitle);

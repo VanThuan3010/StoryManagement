@@ -1,10 +1,23 @@
 ﻿$(function () {
     window.Chapter = {
+        savedImages : [],
         init: function () {
+            if ($('#Id').val() > 0) {
+                savedImages = Chapter.getEditorImages();
+            }
             Chapter.action();
             Chapter.tblChapter();
             $('#btnCreate').on('click', function () {
                 window.location.href = '/Chapter/CreateOrUpdate?idStory=' + $('#saveStoryId').val() + '&idChapter=0';
+            });
+            $('#btnBack').on('click', function (e) {
+                e.preventDefault();
+                Chapter.deleteTempImages();
+                window.location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
+            });
+            window.addEventListener("beforeunload", function () {
+                Chapter.deleteTempImages();
+                window.location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
             });
         },
 
@@ -106,6 +119,7 @@
             })
             $('#SaveChap').on('click', function(e){
                 e.preventDefault();
+                var ImgNow = Chapter.getEditorImages();
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
                 formData.append("StoryId", $('#StoryId').val());
@@ -113,14 +127,15 @@
                 formData.append("Belong", $('#Belong').val());
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
-                formData.append("Images", base.getImageNamesFromCKeditor('txtContent'));
+                formData.append("Images", JSON.stringify(Chapter.getImagesFromEditor()));
+                formData.append("deleteImage", JSON.stringify(savedImages.filter(x => !ImgNow.includes(x))));
                 $.ajax({
                     url: '/Chapter/CreateOrUpdate',
                     type: 'POST',
                     data: formData,
                     success: function (res) {
                         if(res.status){
-                            location.href = res.message;
+                            location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
                         } else{
                             base.notification('error', res.message)
                         }
@@ -231,20 +246,30 @@
                 },
             })
         },
-        getGarbageImages: function () {
-            var usedImages = base.getImageNamesFromEditor('txtContent');
-
-            return uploadedImages.filter(x => !usedImages.includes(x));
+        deleteTempImages: function () {
+            $.ajax({
+                url: '/Chapter/DeleteTempImages',
+                type: 'POST',
+                async: false
+            });
         },
-        cleanupImages: function () {
-            var garbage = Chapter.getGarbageImages();
+        getEditorImages: function () {
+            const html = CKEDITOR.instances.txtContent.getData();
+            const div = document.createElement("div");
+            div.innerHTML = html;
+            return Array.from(div.querySelectorAll("img"))
+                .map(img => img.getAttribute("src"))
+                .filter(src => src && src.includes("/uploads/chapter/"));
+        },
+        getImagesFromEditor: function () {
+            const html = CKEDITOR.instances.txtContent.getData();
 
-            if (garbage.length === 0) return;
+            const div = document.createElement("div");
+            div.innerHTML = html;
 
-            navigator.sendBeacon(
-                '/Chapter/DeleteTempImages',
-                JSON.stringify(garbage)
-            );
+            return Array.from(div.querySelectorAll("img"))
+                .map(img => img.getAttribute("src"))
+                .filter(src => src && src.includes("/uploads/temp/"));
         }
     }
     window.ImportTxt = {
@@ -340,13 +365,4 @@
 });
 $(document).ready(function () {
     Chapter.init();
-});
-window.addEventListener("beforeunload", Chapter.cleanupImages());
-window.addEventListener("pagehide", Chapter.cleanupImages());
-
-document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "hidden") {
-        Chapter.cleanupImages();
-    }
-
 });

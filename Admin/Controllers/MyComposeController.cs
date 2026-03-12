@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StoryManagement.Model;
+using StoryManagement.Model.Entity;
 
 namespace Admin.Controllers
 {
@@ -15,6 +16,20 @@ namespace Admin.Controllers
             return View();
         }
         public JsonResult GetInfor()
+        {
+            var data = _ibase.my_ComposeRepository.GetAll(0, "Read", "", "", 0);
+            var treeData = data.Select(x => new
+            {
+                id = x.Id.ToString(),
+                parent = x.ParentId == 0 ? "#" : x.ParentId.ToString(),
+                text = x.Name,
+                type = x.Level == 1 ? "root" : "child",
+                level = x.Level
+            }).ToList();
+
+            return Json(treeData);
+        }
+        public JsonResult SearchParent(string keyword)
         {
             var data = _ibase.my_ComposeRepository.GetAll(0, "Read", "", "", 0);
             var treeData = data.Select(x => new
@@ -57,20 +72,63 @@ namespace Admin.Controllers
                 return Json(new { uploaded = 0, error = new { message = "No file" } });
 
             var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
-            var savePath = Path.Combine("wwwroot/uploads/compose", fileName);
-
-            Directory.CreateDirectory("wwwroot/uploads/compose");
-
-            using (var stream = new FileStream(savePath, FileMode.Create))
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(),
+                                  "wwwroot",
+                                  "uploads",
+                                  "compose",
+                                  "Images");
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            var filePath = Path.Combine(folderPath, fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await upload.CopyToAsync(stream);
             }
-
+            var fileUrl = $"/uploads/compose/Images/{fileName}";
             return Json(new
             {
                 uploaded = 1,
                 fileName = fileName,
-                url = "/uploads/compose/" + fileName
+                url = fileUrl
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> UploadVideo(IFormFile upload, string oldVideo)
+        {
+            if (upload == null || upload.Length == 0)
+                return Json(new { uploaded = 0, error = new { message = "No file" } });
+            if (!string.IsNullOrEmpty(oldVideo))
+            {
+                var oldPath = Path.Combine("wwwroot", oldVideo.TrimStart('/'));
+                if (System.IO.File.Exists(oldPath))
+                {
+                    System.IO.File.Delete(oldPath);
+                }
+            }
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(),
+                                  "wwwroot",
+                                  "uploads",
+                                  "compose",
+                                  "Vides");
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            var filePath = Path.Combine(folderPath, fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await upload.CopyToAsync(stream);
+            }
+            var fileUrl = $"/uploads/compose/Vides/{fileName}";
+            return Json(new
+            {
+                uploaded = 1,
+                fileName = fileName,
+                path = fileUrl
             });
         }
     }

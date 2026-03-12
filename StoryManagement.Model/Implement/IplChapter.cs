@@ -69,10 +69,10 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public List<string> CreateOrUpdate(Chapters chapters, int OrderTo, string Images)
+        public int CreateOrUpdate(Chapters chapters, int OrderTo)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            List<string> list = new List<string>();
+            int list = 0;
             try
             {
                 using (var u = unitOfWork.Create(true))
@@ -84,9 +84,8 @@ namespace StoryManagement.Model.Implement
                     p.Add("@content", chapters.Content);
                     p.Add("@belong", chapters.Belong);
                     p.Add("@order", OrderTo);
-                    p.Add("@chapterImages", Images);
 
-                    list = u.GetIEnumerable<string>("CreateOrUpdate_Chapter", p).ToList();
+                    list = u.ProcedureExecute("CreateOrUpdate_Chapter", p);
                 }
                 return list;
             }

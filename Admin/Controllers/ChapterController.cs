@@ -49,37 +49,69 @@ namespace Admin.Controllers
         }
 
         [HttpPost]
-        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo, List<string> Images)
+        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo, string Images, string deleteImage)
         {
             try
             {
                 if (chapters == null)
                     return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
-                List<string> ImagesDelete = _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, JsonConvert.SerializeObject(Images));
-                if (ImagesDelete != null && ImagesDelete.Count > 0)
+                var imageList = JsonConvert.DeserializeObject<List<string>>(Images);
+
+                foreach (var img in imageList)
                 {
-                    foreach (var img in ImagesDelete)
+                    var fileName = Path.GetFileName(img);
+
+                    var relativePath = img.TrimStart('/');
+                    var tempPath = Path.Combine(_env.WebRootPath, relativePath);
+                    var destFolder = Path.Combine(
+                        _env.WebRootPath,
+                        "uploads",
+                        "chapter",
+                        chapters.StoryId.ToString()
+                    );
+                    //var destPath = Path.Combine(_env.WebRootPath, "uploads/chapter", chapters.StoryId.ToString(), fileName);
+
+                    if (System.IO.File.Exists(tempPath))
+                    {
+                        if (!Directory.Exists(destFolder))
+                        {
+                            Directory.CreateDirectory(destFolder);
+                        }
+                        var destPath = Path.Combine(destFolder, fileName);
+                        System.IO.File.Move(tempPath, destPath);
+                    }
+                }
+
+                // replace đường dẫn trong content
+                chapters.Content = chapters.Content.Replace("/uploads/temp/", "/uploads/chapter/");
+
+                // xóa temp
+                var tempFolder = Path.Combine(_env.WebRootPath, "uploads/temp");
+
+                if (Directory.Exists(tempFolder))
+                {
+                    Directory.Delete(tempFolder, true);
+                }
+                Directory.CreateDirectory(tempFolder);
+                var deleteImageList = JsonConvert.DeserializeObject<List<string>>(deleteImage);
+                if (deleteImageList != null && deleteImageList.Count > 0)
+                {
+                    foreach (var img in deleteImageList)
                     {
                         var path = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot",
+                            _env.WebRootPath,
                             "uploads",
                             "chapter",
                             chapters.StoryId.ToString(),
                             img
                         );
-
                         if (System.IO.File.Exists(path))
                         {
                             System.IO.File.Delete(path);
                         }
-                        else
-                        {
-                            ImagesDelete.Remove(img);
-                        }
                     }
                 }
-                _ibase.chapterRespository.DeleteImageChapter(chapters.StoryId, JsonConvert.SerializeObject(ImagesDelete));
+                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
                 return new JsonResult(new
                 {
                     status = true,
@@ -372,7 +404,7 @@ namespace Admin.Controllers
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(),
                                   "wwwroot",
                                   "uploads",
-                                  "chapter",
+                                  "temp",
                                   storyId.ToString());
             if (!Directory.Exists(folderPath))
             {
@@ -383,7 +415,7 @@ namespace Admin.Controllers
             {
                 await upload.CopyToAsync(stream);
             }
-            var fileUrl = $"/uploads/chapter/{storyId}/{fileName}";
+            var fileUrl = $"/uploads/temp/{storyId}/{fileName}";
             return Json(new
             {
                 uploaded = 1,
@@ -443,25 +475,19 @@ namespace Admin.Controllers
             return Json(new { status = true, data = chapters[index] });
         }
         [HttpPost]
-        public IActionResult DeleteTempImages([FromBody] List<string> images)
+        public IActionResult DeleteTempImages()
         {
-            foreach (var img in images)
+            var folder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "uploads",
+                "temp"
+            );
+
+            if (Directory.Exists(folder))
             {
-                if (string.IsNullOrWhiteSpace(img))
-                    continue;
-
-                string ig = Path.GetFileName(img);
-
-                var path = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "uploads",
-                    "chapter",
-                    ig
-                );
-
-                if (System.IO.File.Exists(path))
-                    System.IO.File.Delete(path);
+                Directory.Delete(folder, true);
+                Directory.CreateDirectory(folder);
             }
 
             return Ok();
