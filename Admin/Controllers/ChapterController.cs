@@ -36,7 +36,12 @@ namespace Admin.Controllers
             var data = _ibase.chapterRespository.GetAll(offset, limit, idStory, ref total);
             return Json(new { rows = data, total = total });
         }
-
+        [HttpPost]
+        public JsonResult GetDetailChapter(int idChapter)
+        {
+            var data = _ibase.chapterRespository.GetDetail(idChapter);
+            return Json(new { rows = data });
+        }
         public IActionResult CreateOrUpdate(int idStory, long idChapter)
         {
             var ChapterCount = 0;
@@ -93,29 +98,24 @@ namespace Admin.Controllers
                     Directory.Delete(tempFolder, true);
                 }
                 Directory.CreateDirectory(tempFolder);
-                var deleteImageList = JsonConvert.DeserializeObject<List<string>>(deleteImage);
-                if (deleteImageList != null && deleteImageList.Count > 0)
+                var deleteImages = JsonConvert.DeserializeObject<List<string>>(deleteImage);
+
+                foreach (var img in deleteImages)
                 {
-                    foreach (var img in deleteImageList)
+                    var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
+
+                    if (System.IO.File.Exists(path))
                     {
-                        var path = Path.Combine(
-                            _env.WebRootPath,
-                            "uploads",
-                            "chapter",
-                            chapters.StoryId.ToString(),
-                            img
-                        );
-                        if (System.IO.File.Exists(path))
-                        {
-                            System.IO.File.Delete(path);
-                        }
+                        System.IO.File.Delete(path);
                     }
                 }
-                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo);
+                int NumberChapter = 0;
+                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, ref NumberChapter);
                 return new JsonResult(new
                 {
                     status = true,
-                    message = "Thao tác thành công"
+                    message = "Thao tác thành công",
+                    numberChapter = NumberChapter
                 });
             }
             catch (Exception ex)
@@ -184,7 +184,7 @@ namespace Admin.Controllers
             }
         }
         [HttpPost]
-        public JsonResult Delete(int id)
+        public JsonResult Delete(int id, string images)
         {
             try
             {
@@ -196,33 +196,18 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                Chapters chapters = _ibase.chapterRespository.GetDetail(id);
-                List<string> ImagesDelete = _ibase.chapterRespository.DeleteChapter(id);
-                if (ImagesDelete != null && ImagesDelete.Count > 0)
-                {
-                    foreach (var img in ImagesDelete)
-                    {
-                        var path = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot",
-                            "uploads",
-                            "chapter",
-                            chapters.StoryId.ToString(),
-                            img
-                        );
+                var deleteImages = JsonConvert.DeserializeObject<List<string>>(images);
 
-                        if (System.IO.File.Exists(path))
-                        {
-                            System.IO.File.Delete(path);
-                        }
-                        else
-                        {
-                            ImagesDelete.Remove(img);
-                        }
+                foreach (var img in deleteImages)
+                {
+                    var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
+
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
                     }
                 }
-                _ibase.chapterRespository.DeleteImageChapter(chapters.StoryId, JsonConvert.SerializeObject(ImagesDelete));
-                //_ibase.Commit();
+                _ibase.chapterRespository.DeleteChapter(id);
                 return new JsonResult(new
                 {
                     status = true,

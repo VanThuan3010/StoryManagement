@@ -128,7 +128,7 @@
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
                 formData.append("Images", JSON.stringify(Chapter.getImagesFromEditor()));
-                formData.append("deleteImage", JSON.stringify(savedImages.filter(x => !ImgNow.includes(x))));
+                formData.append("deleteImage", JSON.stringify(Chapter.savedImages.filter(x => !ImgNow.includes(x))));
                 $.ajax({
                     url: '/Chapter/CreateOrUpdate',
                     type: 'POST',
@@ -214,20 +214,37 @@
                                             text: 'Xác nhận',
                                             btnClass: 'btn btn-primary',
                                             action: function () {
+                                                let ImagesDelet = [];
                                                 $.ajax({
-                                                    url: '/Chapter/Delete',
+                                                    url: '/Chapter/GetDetailChapter',
                                                     type: 'post',
                                                     data: {
-                                                        id: row.chapterId,
+                                                        idChapter: row.chapterId,
                                                     },
                                                     success: function (res) {
-                                                        if (res.status) {
-                                                            base.notification('success', res.message);
-                                                            $("#tblChapter").bootstrapTable('refresh', { silent: true });
-                                                        }
-                                                        else {
-                                                            base.notification('error', res.message);
-                                                        }
+                                                        const div = document.createElement("div");
+                                                        div.innerHTML = res.rows.content;
+                                                        ImagesDelet = Array.from(div.querySelectorAll("img"))
+                                                            .map(img => img.getAttribute("src"))
+                                                            .filter(src => src && src.includes("/uploads/chapter/"));
+                                                        debugger
+                                                        $.ajax({
+                                                            url: '/Chapter/Delete',
+                                                            type: 'post',
+                                                            data: {
+                                                                id: row.chapterId,
+                                                                images: JSON.stringify(ImagesDelet)
+                                                            },
+                                                            success: function (res) {
+                                                                if (res.status) {
+                                                                    base.notification('success', res.message);
+                                                                    $("#tblChapter").bootstrapTable('refresh', { silent: true });
+                                                                }
+                                                                else {
+                                                                    base.notification('error', res.message);
+                                                                }
+                                                            }
+                                                        });
                                                     }
                                                 });
                                             }
@@ -310,11 +327,6 @@
             });
         },
         Save: function () {
-            //const newHtml = CKEDITOR.instances.importEditor.getData();
-            //const currentImages = extractChapterImagePaths(newHtml);
-            //const deletedImages = originalImages.filter(
-            //    x => !currentImages.includes(x)
-            //);
             $.post('/Chapter/CreateOrUpdate', {
                 Id: 0,
                 StoryId: $('#saveStoryId').val(),
@@ -322,11 +334,13 @@
                 Belong: $('#BelongPart').val(),
                 Content: base.convertToHTML(CKEDITOR.instances.importEditor.getData()),
                 OrderTo: $('#orderChapter').val() || 1,
-                deletedImages: []
+                Images: JSON.stringify([]),
+                deleteImage: JSON.stringify([])
             }, function (res) {
                 if (res.status) {
                     base.notification('success', res.message);
                     if ($('#isLastChapter').val() == 0) {
+                        $('#orderChapter').val(res.numberChapter + 1);
                         ImportTxt.nextIndex();
                     } else {
                         $('#importModal').modal('hide');

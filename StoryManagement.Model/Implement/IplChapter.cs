@@ -69,7 +69,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Chapters chapters, int OrderTo)
+        public int CreateOrUpdate(Chapters chapters, int OrderTo, ref int Total)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -84,8 +84,9 @@ namespace StoryManagement.Model.Implement
                     p.Add("@content", chapters.Content);
                     p.Add("@belong", chapters.Belong);
                     p.Add("@order", OrderTo);
-
+                    p.Add("@numberChapter", Total, DbType.Int32, ParameterDirection.Output);
                     list = u.ProcedureExecute("CreateOrUpdate_Chapter", p);
+                    Total = p.Get<int>("@numberChapter");
                 }
                 return list;
             }
@@ -169,28 +170,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public List<string> DeleteChapter(long id)
-        {
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            List<string> list = new List<string>();
-            try
-            {
-                using (var u = unitOfWork.Create(true))
-                {
-                    var p = new DynamicParameters();
-                    p.Add("@id", id);
-
-                    list = u.GetIEnumerable<string>("Delete_Chapter", p).ToList();
-                }
-                return list;
-            }
-            catch (Exception ex)
-            {
-                return list;
-            }
-
-        }
-        public int DeleteImageChapter(int id, string lstImages)
+        public int DeleteChapter(long id)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -199,10 +179,9 @@ namespace StoryManagement.Model.Implement
                 using (var u = unitOfWork.Create(true))
                 {
                     var p = new DynamicParameters();
-                    p.Add("@idStory", id);
-                    p.Add("@images", lstImages);
+                    p.Add("@id", id);
 
-                    u.ProcedureExecute("Delete_ChapterImages", p);
+                    list = u.ProcedureExecute("Delete_Chapter", p);
                 }
                 return list;
             }
