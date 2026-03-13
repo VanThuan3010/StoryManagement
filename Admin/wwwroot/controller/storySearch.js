@@ -6,48 +6,33 @@
         },
         action: function () {
             $('#btnCreate').on('click', function () {
-                $.ajax({
-                    url: '/StorySearch/GetDetail',
-                    data: {
-                        id: 0
-                    },
-                    success: function (res) {
-                        // reset checkbox trước
-                        $('#ilChkTag').prop('checked', false);
-                        $('#ilChkContent').prop('checked', false);
+                // reset checkbox trước
+                $('#ilChkTag').prop('checked', false);
+                $('#ilChkContent').prop('checked', false);
 
-                        // fill textarea
-                        $('#txtSearch').val("");
-                        $('#txtResult').val("");
-                    }
-                });
+                // fill textarea
+                $('#txtSearchStory').val("");
+                $('#txtResult').val("");
                 $('#labelAction').text('Thêm mới');
                 $('#modalCreateOrEdit').modal('show');
             });
             $('#btnSubmit').on('click', function () {
-                var obj = [{
-                    Id: $('#txtIdModal').val() || 0,
-                    Request: $('#txtSearch').val(),
-                    Result: JSON.stringify($('#txtResult').val().split(/\r?\n/).filter(line => line.trim() !== '')),
-                    SearchBy: getSearchBy()
-                }];
                 $.ajax({
                     url: '/StorySearch/CreateOrUpdate',
+                    method: 'POST',
                     data: {
-                        content: JSON.stringify(obj)
+                        Id: $('#txtIdModal').val() || 0,
+                        Request: $('#txtSearchStory').val(),
+                        Result: JSON.stringify($('#txtResult').val().split(/\r?\n/).filter(line => line.trim() !== '')),
+                        SearchBy: storySearch.getSearchBy()
                     },
                     success: function (res) {
                         if (res.status === "Success") {
-
                             $('#modalCreateOrEdit').modal('hide');
-
                             $('#tblSearch').bootstrapTable('refresh');
-
                         }
                     }
                 });
-                $('#labelAction').text('Thêm mới');
-                $('#modalCreateOrEdit').modal('show');
             });
             $('#btnDelete').click(function () {
                 var rows = $('#tblSearch').bootstrapTable('getSelections');
@@ -159,7 +144,7 @@
                                         $('#ilChkContent').prop('checked', false);
 
                                         // fill textarea
-                                        $('#txtSearch').val(data.request);
+                                        $('#txtSearchStory').val(data.request);
                                         try {
                                             let resu = JSON.parse(row.numberChapter);
                                             if (Array.isArray(resu))

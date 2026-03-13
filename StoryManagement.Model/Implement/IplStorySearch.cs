@@ -41,16 +41,28 @@ namespace StoryManagement.Model.Implement
                     // CREATE / UPDATE / DELETE
                     if (type == "CreateOrUpdate" || type == "Delete")
                     {
-                        var affected = u.ProcedureExecute("CRUD_Search", p);
+                        int affected = 0;
+                        affected = u.ProcedureExecute("CRUD_Search", p);
                         Total = p.Get<int>("@totalRow");
                         return affected;
                     }
-
-                    // READ
-                    var list = u.GetIEnumerable<Story_Search>("CRUD_Search", p).ToList();
-                    Total = p.Get<int>("@totalRow");
-
-                    return list;
+                    else
+                    {
+                        if(type == "Edit")
+                        {
+                            Story_Search list = new Story_Search();
+                            list = u.GetIEnumerable<Story_Search>("CRUD_Search", p).FirstOrDefault();
+                            Total = p.Get<int>("@totalRow");
+                            return list;
+                        }
+                        else
+                        {
+                            List<Story_Search> list = new List<Story_Search>();
+                            list = u.GetIEnumerable<Story_Search>("CRUD_Search", p).ToList();
+                            Total = p.Get<int>("@totalRow");
+                            return list;
+                        }
+                    }
                 }
             }
             catch (Exception)
