@@ -14,6 +14,8 @@ namespace StoryManagement.Model
         IAuthors authorRespository { get; }
         IChapters chapterRespository { get; }
         IComic comicRespository { get; }
+        IComic_Episode comicEpisodeRespository { get; }
+        IComic_Images comicImagesRespository { get; }
         IGroupTag groupTagRespository { get; }
         IMy_Compose my_ComposeRepository { get; }
         IPart_Chapter part_ChapterRespository { get; }

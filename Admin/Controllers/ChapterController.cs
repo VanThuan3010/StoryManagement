@@ -61,29 +61,31 @@ namespace Admin.Controllers
                 if (chapters == null)
                     return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
                 var imageList = JsonConvert.DeserializeObject<List<string>>(Images);
-
-                foreach (var img in imageList)
+                if(imageList?.Count > 0)
                 {
-                    var fileName = Path.GetFileName(img);
-
-                    var relativePath = img.TrimStart('/');
-                    var tempPath = Path.Combine(_env.WebRootPath, relativePath);
-                    var destFolder = Path.Combine(
-                        _env.WebRootPath,
-                        "uploads",
-                        "chapter",
-                        chapters.StoryId.ToString()
-                    );
-                    //var destPath = Path.Combine(_env.WebRootPath, "uploads/chapter", chapters.StoryId.ToString(), fileName);
-
-                    if (System.IO.File.Exists(tempPath))
+                    foreach (var img in imageList)
                     {
-                        if (!Directory.Exists(destFolder))
+                        var fileName = Path.GetFileName(img);
+
+                        var relativePath = img.TrimStart('/');
+                        var tempPath = Path.Combine(_env.WebRootPath, relativePath);
+                        var destFolder = Path.Combine(
+                            _env.WebRootPath,
+                            "uploads",
+                            "chapter",
+                            chapters.StoryId.ToString()
+                        );
+                        //var destPath = Path.Combine(_env.WebRootPath, "uploads/chapter", chapters.StoryId.ToString(), fileName);
+
+                        if (System.IO.File.Exists(tempPath))
                         {
-                            Directory.CreateDirectory(destFolder);
+                            if (!Directory.Exists(destFolder))
+                            {
+                                Directory.CreateDirectory(destFolder);
+                            }
+                            var destPath = Path.Combine(destFolder, fileName);
+                            System.IO.File.Move(tempPath, destPath);
                         }
-                        var destPath = Path.Combine(destFolder, fileName);
-                        System.IO.File.Move(tempPath, destPath);
                     }
                 }
 
@@ -98,15 +100,17 @@ namespace Admin.Controllers
                     Directory.Delete(tempFolder, true);
                 }
                 Directory.CreateDirectory(tempFolder);
-                var deleteImages = JsonConvert.DeserializeObject<List<string>>(deleteImage);
-
-                foreach (var img in deleteImages)
+                var deleteImages = string.IsNullOrEmpty(deleteImage) ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(deleteImage);
+                if (deleteImages?.Count > 0)
                 {
-                    var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
-
-                    if (System.IO.File.Exists(path))
+                    foreach (var img in deleteImages)
                     {
-                        System.IO.File.Delete(path);
+                        var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
+
+                        if (System.IO.File.Exists(path))
+                        {
+                            System.IO.File.Delete(path);
+                        }
                     }
                 }
                 int NumberChapter = 0;
@@ -196,15 +200,17 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                var deleteImages = JsonConvert.DeserializeObject<List<string>>(images);
-
-                foreach (var img in deleteImages)
+                var deleteImages = string.IsNullOrEmpty(images) ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(images);
+                if (deleteImages?.Count > 0)
                 {
-                    var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
-
-                    if (System.IO.File.Exists(path))
+                    foreach (var img in deleteImages)
                     {
-                        System.IO.File.Delete(path);
+                        var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
+
+                        if (System.IO.File.Exists(path))
+                        {
+                            System.IO.File.Delete(path);
+                        }
                     }
                 }
                 _ibase.chapterRespository.DeleteChapter(id);

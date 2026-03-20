@@ -24,9 +24,9 @@ namespace StoryManagement.Model.Implement
             _configuration = configuration;
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
-        public List<Story_Comic> GetEpisode(int pageIndex, int pageSize, string search, int Id, ref int Total)
+        public List<Comic> GetAll(int pageIndex, int pageSize, string search, ref int Total)
         {
-            List<Story_Comic> List = new List<Story_Comic>();
+            List<Comic> List = new List<Comic>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             try
             {
@@ -37,10 +37,28 @@ namespace StoryManagement.Model.Implement
                     p.Add("@pageIndex", pageIndex);
                     p.Add("@pageSize", pageSize);
                     p.Add("@search", search);
-                    p.Add("@id", Id);
                     p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
-                    List = u.GetIEnumerable<Story_Comic>("Get_Episode", p).ToList();
+                    List = u.GetIEnumerable<Comic>("Get_Comic", p).ToList();
                     Total = p.Get<int>("@totalRow");
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Story> SearchStory(string search)
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@search", search);
+                    List = u.GetIEnumerable<Story>("SearchTop10Story", p).ToList();
                 }
             }
             catch (Exception ex)

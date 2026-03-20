@@ -19,6 +19,8 @@ namespace MFTech.Model.Entity
         public virtual DbSet<Authors> Authors { get; set; } = null!;
         public virtual DbSet<Chapters> Chapters { get; set; } = null!;
         public virtual DbSet<Comic> Comics { get; set; } = null!;
+        public virtual DbSet<Comic_Episode> Comic_Episodes { get; set; } = null!;
+        public virtual DbSet<Comic_Images> Comic_Images { get; set; } = null!;
         public virtual DbSet<GroupTag> GroupTags { get; set; } = null!;
         public virtual DbSet<My_Compose> My_Composes { get; set; } = null!;
         public virtual DbSet<Part_Chapter> Part_Chapters { get; set; } = null!;
@@ -40,7 +42,6 @@ namespace MFTech.Model.Entity
                 entity.ToTable("Authors");
 
                 entity.Property(e => e.Name).HasMaxLength(2000);
-
                 entity.Property(e => e.Style).HasMaxLength(4000);
             });
             modelBuilder.Entity<Chapters>(entity =>
@@ -49,6 +50,7 @@ namespace MFTech.Model.Entity
 
                 entity.Property(e => e.StoryId);
                 entity.Property(e => e.Title);
+                entity.Property(e => e.RawContent);
                 entity.Property(e => e.Content);
                 entity.Property(e => e.Belong);
                 entity.Property(e => e.Orders);
@@ -57,9 +59,26 @@ namespace MFTech.Model.Entity
             {
                 entity.ToTable("Comics");
 
-                entity.Property(e => e.IdChapter);
-                entity.Property(e => e.Name);
-                entity.Property(e => e.Images);
+                entity.Property(e => e.IdStory);
+                entity.Property(e => e.Name).HasMaxLength(4000);
+            });
+            modelBuilder.Entity<Comic_Episode>(entity =>
+            {
+                entity.ToTable("Comic_Episode");
+
+                entity.Property(e => e.IdComic);
+                entity.Property(e => e.Name).HasMaxLength(1000);
+                entity.Property(e => e.Orders);
+            });
+            modelBuilder.Entity<Comic_Images>(entity =>
+            {
+                entity.ToTable("Comic_Images");
+
+                entity.Property(e => e.EpisodeId);
+                entity.Property(e => e.Name).HasMaxLength(1000);
+                entity.Property(e => e.Episode_Order);
+                entity.Property(e => e.ChapterId);
+                entity.Property(e => e.ChapterOrder);
             });
             modelBuilder.Entity<GroupTag>(entity =>
             {

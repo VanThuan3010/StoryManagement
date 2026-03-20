@@ -4,18 +4,16 @@
 
 @{
     ViewData["Title"] = "Truyện tranh";
-    Story story = (Story)ViewBag.getStory;
-    var list = JsonConvert.DeserializeObject<List<string>>(story.Name);
 }
 <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-    <div class="breadcrumb-title pe-3">Truyện</div>
+    <div class="breadcrumb-title pe-3">Truyện Tranh</div>
     <div class="ps-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 p-0">
                 <li class="breadcrumb-item">
                     <a href="/"><i class="bx bx-home-alt"></i></a>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">@list?[0]</li>
+                <li class="breadcrumb-item active" aria-current="page">Danh sách truyện Tranh</li>
             </ol>
         </nav>
     </div>
@@ -29,10 +27,14 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
+                <div class="col-lg-3 mb-3">
+                    <input type="text" class="form-control" id="txtSearch" placeholder="Từ khóa tìm kiếm" />
+                </div>
+                <div class="col-lg-1">
+                    <button type="button" id="btnSearch" class="btn btn-primary btn-xs mr-5"><i class="fas fa-search"></i></button>
+                </div>
                 <div class="col-lg-12 table-responsive">
-                    <input type="hidden" value="@ViewBag.StoryId" id="saveStoryId" />
-                    <input type="hidden" value="@ViewBag.NumberEpisode" id="svNumberOrder" />
-                    <table class="table table-bordered" id="tblEpisode"></table>
+                    <table class="table table-bordered" id="tblComic"></table>
                 </div>
             </div>
         </div>
@@ -45,19 +47,16 @@
                 <h5 class="modal-title" id="labelAction"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Nguồn truyện chữ</label>
+                <select class="form-select" id="sources" name="sources">
+                </select>
+            </div>
             <div class="modal-body">
                 <input type="text" hidden id="txtIdModal" name="Id" />
                 <div class="form-group mb-3">
-                    <label class="form-label required">Tên tập</label>
+                    <label class="form-label required">Tên</label>
                     <textarea rows="3" class="form-control" name="txtName" id="txtName"></textarea>
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label">Mô tả</label>
-                    <textarea rows="6" class="form-control" name="txtDescription" id="txtDescription"></textarea>
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label">Thứ tự</label>
-                    <input type="number" class="form-control" name="txtOrder" id="txtOrder" />
                 </div>
             </div>
             <div class="modal-footer">

@@ -126,6 +126,7 @@
                 formData.append("Title", $('#txtTitle').val());
                 formData.append("Belong", $('#Belong').val());
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
+                formData.append("RawContent", base.convertToHTML(CKEDITOR.instances.txtRawContent.getData()));
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
                 formData.append("Images", JSON.stringify(Chapter.getImagesFromEditor()));
                 formData.append("deleteImage", JSON.stringify(Chapter.savedImages.filter(x => !ImgNow.includes(x))));
@@ -333,6 +334,7 @@
                 Title: $('#txtTitleChapter').text(),
                 Belong: $('#BelongPart').val(),
                 Content: base.convertToHTML(CKEDITOR.instances.importEditor.getData()),
+                RawContent: null,
                 OrderTo: $('#orderChapter').val() || 1,
                 Images: JSON.stringify([]),
                 deleteImage: JSON.stringify([])

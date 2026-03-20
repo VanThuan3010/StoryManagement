@@ -19,56 +19,26 @@ namespace Admin.Controllers
         public JsonResult GetSearch(int offset, int limit, string search)
         {
             int total = 0;
-            var obj = new[]
-            {
-                new {
-                    Limit = limit,
-                    Offset = offset,
-                    Search = search
-                }
-            };
-            string content = JsonConvert.SerializeObject(obj);
-            var data = (List<Story_Search>)_ibase.storySearchRepository.GetAll("Read", content, ref total);
+            var data = (List<Story_Search>)_ibase.storySearchRepository.GetAll(offset, limit, search, ref total);
             return Json(new { rows = data, total = total });
         }
         public JsonResult GetDetail(int id)
         {
             int total = 0;
-            var obj = new[]
-            {
-                new {
-                    Id = id
-                }
-            };
-            string content = JsonConvert.SerializeObject(obj);
-            var data = _ibase.storySearchRepository.GetAll("Edit", content, ref total);
+            var data = _ibase.storySearchRepository.GetDetail(id);
             return Json(new { rows = data, total = total });
         }
         [HttpPost]
-        public JsonResult Delete(string content)
+        public JsonResult Delete(string ids)
         {
-            int total = 0;
-
-            _ibase.storySearchRepository.GetAll("Delete", content, ref total);
-
+            _ibase.storySearchRepository.Delete(ids);
             return Json(new { status = "Success" });
         }
         [HttpPost]
         public JsonResult CreateOrUpdate(Story_Search story_Search)
         {
             int total = 0;
-            var obj = new[]
-            {
-                new {
-                    Id = story_Search.Id,
-                    Request = story_Search.Request,
-                    Result = story_Search.Result,
-                    SearchBy = story_Search.SearchBy
-                }
-            };
-            string content = JsonConvert.SerializeObject(obj);
-            _ibase.storySearchRepository.GetAll("CreateOrUpdate", content, ref total);
-
+            _ibase.storySearchRepository.CreateOrUpdate(story_Search);
             return Json(new { status = "Success" });
         }
     }

@@ -2,7 +2,7 @@
     window.Comic = {
         init: function () {
             Comic.action();
-            Comic.tblEpisode();
+            Comic.tblComic();
             $('#btnCreate').on('click', function () {
                 $('#txtIdModal').val(0);
                 $('#txtName').val('');
@@ -14,6 +14,29 @@
             });
         },
         action: function () {
+            $('#modalCreateOrEdit').on('hidden.bs.modal', function () {
+                $('#sources').val(null).trigger('change');
+            });
+            $('#sources').select2({
+                dropdownParent: $('#modalCreateOrEdit'),
+                placeholder: "Nhập tên truyện...",
+                minimumInputLength: 2,
+                ajax: {
+                    url: '/Comic/SearchStory',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return {
+                            keyword: params.term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
             $('#btnSubmit').click(function () {
                 var datas = new FormData();
                 datas.append('Id', $('#txtIdModal').val());
@@ -44,18 +67,21 @@
                 })
             });
         },
-        tblEpisode: function () {
-            var objTable = $("#tblEpisode");
+        toggleDeleteButton: function () {
+            var rows = $('#tblComic').bootstrapTable('getSelections');
+            $('#btnDelete').prop('disabled', rows.length === 0);
+        },
+        tblComic: function () {
+            var objTable = $("#tblComic");
             objTable.bootstrapTable('destroy');
             objTable.bootstrapTable({
                 method: 'get',
-                url: '/Comic/GetEpisode',
+                url: '/Comic/GetComic',
                 queryParams: function (p) {
                     var param = $.extend(true, {
                         search: "",
                         limit: p.limit,
-                        offset: p.offset,
-                        idStory: $('#saveStoryId').val()
+                        offset: p.offset
                     }, p);
                     return param;
                 },
@@ -74,23 +100,10 @@
                 pageList: [50, 100],
                 reorderableRows: true,
                 useRowAttrFunc: true,
-
                 columns: [
                     {
                         field: "chapterName",
                         title: "Tên",
-                        align: 'left',
-                        valign: 'left',
-                    },
-                    {
-                        field: "description",
-                        title: "Mô tả",
-                        align: 'left',
-                        valign: 'left',
-                    },
-                    {
-                        field: "part_Name",
-                        title: "Số ảnh",
                         align: 'left',
                         valign: 'left',
                     },
@@ -101,7 +114,7 @@
                         class: 'CssAction',
                         formatter: function (value, row, index) {
                             var action = "<div style='width: 200px;'>";
-                            action += '<a href="/Chapter/CreateOrUpdate?idStory=' + row.storyId + '&idChapter=' + row.chapterId + '" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
+                            action += '<a href="javascript:void(0)" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
                             action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
                             action += '</div>';
                             return action;

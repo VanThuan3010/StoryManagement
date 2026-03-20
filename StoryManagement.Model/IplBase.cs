@@ -18,6 +18,8 @@ namespace StoryManagement.Model
         private IAuthors _authorRespository;
         private IChapters _chapterRespository;
         private IComic _comicRespository;
+        private IComic_Episode _comicEpisodeRespository;
+        private IComic_Images _comicImagesRespository;
         private IGroupTag _groupTagRespository;
         private IMy_Compose _myComposeRespository;
         private IPart_Chapter _partRespository ;
@@ -59,6 +61,20 @@ namespace StoryManagement.Model
             get
             {
                 return _comicRespository ?? (_comicRespository = new IplComic(_dbContext, _Configuration));
+            }
+        }
+        public IComic_Episode comicEpisodeRespository
+        {
+            get
+            {
+                return _comicEpisodeRespository ?? (_comicEpisodeRespository = new IplComic_Episode(_dbContext, _Configuration));
+            }
+        }
+        public IComic_Images comicImagesRespository
+        {
+            get
+            {
+                return _comicImagesRespository ?? (_comicImagesRespository = new IplComic_Images(_dbContext, _Configuration));
             }
         }
         public IGroupTag groupTagRespository

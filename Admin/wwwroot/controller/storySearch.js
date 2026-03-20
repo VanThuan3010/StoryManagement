@@ -11,6 +11,7 @@
                 $('#ilChkContent').prop('checked', false);
 
                 // fill textarea
+                $('#txtIdModal').val(0);
                 $('#txtSearchStory').val("");
                 $('#txtResult').val("");
                 $('#labelAction').text('Thêm mới');
@@ -21,7 +22,7 @@
                     url: '/StorySearch/CreateOrUpdate',
                     method: 'POST',
                     data: {
-                        Id: $('#txtIdModal').val() || 0,
+                        Id: $('#txtIdModal').val(),
                         Request: $('#txtSearchStory').val(),
                         Result: JSON.stringify($('#txtResult').val().split(/\r?\n/).filter(line => line.trim() !== '')),
                         SearchBy: storySearch.getSearchBy()
@@ -43,9 +44,9 @@
                 var ids = rows.map(x => ({ Id: x.id }));
                 $.ajax({
                     url: '/StorySearch/Delete',
-                    type: 'POST',
+                    method: 'POST',
                     data: {
-                        content: JSON.stringify(ids)
+                        ids: JSON.stringify(ids)
                     },
                     success: function (res) {
                         if (res.status === "Success") {
@@ -63,13 +64,10 @@
         },
         getSearchBy: function () {
             var arr = [];
-
             if ($('#ilChkTag').is(':checked'))
                 arr.push('Tag');
-
             if ($('#ilChkContent').is(':checked'))
                 arr.push('Content');
-
             return arr.join(',');
         },
         tblStorySearch: function () {
@@ -114,6 +112,7 @@
                         title: "Yêu cầu",
                         align: 'center',
                         valign: 'left',
+                        width: 1000
                     },
                     {
                         title: "Chức năng",
@@ -137,34 +136,27 @@
                                     success: function (res) {
                                         if (!res || !res.rows || res.rows.length === 0) return;
 
-                                        var data = res.rows[0];
-
+                                        var data = res.rows;
                                         // reset checkbox trước
                                         $('#ilChkTag').prop('checked', false);
                                         $('#ilChkContent').prop('checked', false);
-
                                         // fill textarea
                                         $('#txtSearchStory').val(data.request);
                                         try {
-                                            let resu = JSON.parse(row.numberChapter);
+                                            let resu = JSON.parse(data.result);
                                             if (Array.isArray(resu))
                                                 $('#txtResult').val(resu.join("\n"));
                                             else
-                                                $('#txtResult').val(row.numberChapter);
+                                                $('#txtResult').val(data.result);
                                         } catch {
-                                            $('#txtResult').val(row.numberChapter);
+                                            $('#txtResult').val(data.result);
                                         }
 
                                         // xử lý SearchBy
                                         if (data.searchBy) {
-
                                             var arr = data.searchBy.split(',');
-
-                                            if (arr.includes('Tag'))
-                                                $('#ilChkTag').prop('checked', true);
-
-                                            if (arr.includes('Content'))
-                                                $('#ilChkContent').prop('checked', true);
+                                            $('#ilChkTag').prop('checked', arr.includes('Tag'));
+                                            $('#ilChkContent').prop('checked', arr.includes('Content'));
                                         }
                                     }
                                 });
@@ -177,7 +169,7 @@
                                 }];
                                 $.confirm({
                                     title: 'Cảnh báo!',
-                                    content: 'Bạn chắc chắn muốn xóa truyện?',
+                                    content: 'Bạn chắc chắn muốn xóa tìm kiếm?',
                                     buttons: {
                                         formSubmit: {
                                             text: 'Xác nhận',
@@ -185,8 +177,9 @@
                                             action: function () {
                                                 $.ajax({
                                                     url: '/StorySearch/Delete',
+                                                    method: 'POST',
                                                     data: {
-                                                        id: JSON.stringify(ids)
+                                                        ids: JSON.stringify(ids)
                                                     },
                                                     success: function (res) {
                                                         $('#tblSearch').bootstrapTable('refresh');

@@ -16,22 +16,31 @@ namespace Admin.Controllers
         }
         public IActionResult Index(int idStory)
         {
-            ViewBag.StoryId = idStory;
-            ViewBag.getStory = _ibase.storyRespository.GetDetail(idStory);
             return View();
         }
         public IActionResult Detail(int idEpisode)
         {
             return View();
         }
-        public JsonResult GetEpisode(string search, int offset, int limit, int idStory)
+        public JsonResult GetComic(string search, int offset, int limit)
         {
             int total = 0;
-            var data = _ibase.comicRespository.GetEpisode(offset, limit, search, idStory, ref total);
+            var data = _ibase.comicRespository.GetAll(offset, limit, search, ref total);
             return Json(new { rows = data, total = total });
         }
-        public IActionResult CreateOrUpdateEpisode(int idStory, string des, string order) {
+        public IActionResult CreateOrUpdateEpisode(int idStory, string des, string order)
+        {
             return View();
+        }
+        public IActionResult CreateOrUpdateComic(string search)
+        {
+            var data = _ibase.comicRespository.SearchStory(search);
+            var result = data.Select(x => new
+            {
+                id = x.Id,
+                text = x.Name
+            });
+            return Ok(result);
         }
     }
 }

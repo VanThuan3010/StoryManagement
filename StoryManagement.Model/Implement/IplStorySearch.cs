@@ -24,51 +24,91 @@ namespace StoryManagement.Model.Implement
             _configuration = configuration;
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
-        public object GetAll(string type, string content, ref int Total)
+        public List<Story_Search> GetAll(int pageIndex, int pageSize, string search, ref int Total)
         {
+            List<Story_Search> List = new List<Story_Search>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
-
             try
             {
-                using (var u = unitOfWork.Create(type != "Read" && type != "Edit"))
+                using (var u = unitOfWork.Create(false))
                 {
                     var p = new DynamicParameters();
 
-                    p.Add("@type", type);
-                    p.Add("@content", content);
-                    p.Add("@totalRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-                    // CREATE / UPDATE / DELETE
-                    if (type == "CreateOrUpdate" || type == "Delete")
-                    {
-                        int affected = 0;
-                        affected = u.ProcedureExecute("CRUD_Search", p);
-                        Total = p.Get<int>("@totalRow");
-                        return affected;
-                    }
-                    else
-                    {
-                        if(type == "Edit")
-                        {
-                            Story_Search list = new Story_Search();
-                            list = u.GetIEnumerable<Story_Search>("CRUD_Search", p).FirstOrDefault();
-                            Total = p.Get<int>("@totalRow");
-                            return list;
-                        }
-                        else
-                        {
-                            List<Story_Search> list = new List<Story_Search>();
-                            list = u.GetIEnumerable<Story_Search>("CRUD_Search", p).ToList();
-                            Total = p.Get<int>("@totalRow");
-                            return list;
-                        }
-                    }
+                    p.Add("@pageIndex", pageIndex);
+                    p.Add("@pageSize", pageSize);
+                    p.Add("@search", search);
+                    p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
+                    List = u.GetIEnumerable<Story_Search>("Get_Search", p).ToList();
+                    Total = p.Get<int>("@totalRow");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Total = 0;
-                return new List<Story_Search>();
+                return List;
+            }
+            return List;
+        }
+        public Story_Search GetDetail(int id)
+        {
+            Story_Search List = new Story_Search();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@id", id);
+                    List = u.GetIEnumerable<Story_Search>("Get_SearchDetail", p).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public int CreateOrUpdate(Story_Search story_Search)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@id", story_Search.Id);
+                    p.Add("@request", story_Search.Request);
+                    p.Add("@result", story_Search.Result);
+                    p.Add("@searchBy", story_Search.SearchBy);
+
+                    list = u.ProcedureExecute("CreateOrUpdate_Search", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+        }
+        public int Delete(string ids)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@Ids", ids);
+
+                    list = u.ProcedureExecute("Delete_Search", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
             }
         }
     }

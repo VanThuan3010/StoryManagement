@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 
 namespace StoryManagement.Model.Interface
 {
-    public interface IComic : IRepository<Comic>
+    public interface IComic_Episode : IRepository<Comic_Episode>
     {
-        List<Comic> GetAll(int pageIndex, int pageSize, string search, ref int Total);
-        List<Story> SearchStory(string search);
     }
 }

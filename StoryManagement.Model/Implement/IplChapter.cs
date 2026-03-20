@@ -82,6 +82,7 @@ namespace StoryManagement.Model.Implement
                     p.Add("@idStory", chapters.StoryId);
                     p.Add("@title", chapters.Title);
                     p.Add("@content", chapters.Content);
+                    p.Add("@raw", chapters.RawContent);
                     p.Add("@belong", chapters.Belong);
                     p.Add("@order", OrderTo);
                     p.Add("@numberChapter", Total, DbType.Int32, ParameterDirection.Output);
