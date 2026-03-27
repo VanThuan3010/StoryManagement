@@ -43,11 +43,13 @@
 <div class="modal fade" id="modalCreateOrEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            <input type="hidden" name="name" value="" id="txtIdComic" />
             <div class="modal-header">
                 <h5 class="modal-title" id="labelAction"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="form-group mb-3">
+                <input type="hidden" name="name" value="" id="txtIdStory" />
                 <label class="form-label">Nguồn truyện chữ</label>
                 <select class="form-select" id="sources" name="sources">
                 </select>

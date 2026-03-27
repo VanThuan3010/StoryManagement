@@ -49,7 +49,28 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public List<Authors> SearchAuthorForStory(string search)
+        public int DeleteAuthor(int id)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@id", id);
+
+                    list = u.ProcedureExecute("Delete_Author", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
+        public List<Authors> SearchAuthorForStory(string search, string selected)
         {
             List<Authors> List = new List<Authors>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -58,8 +79,8 @@ namespace StoryManagement.Model.Implement
                 using (var u = unitOfWork.Create(false))
                 {
                     var p = new DynamicParameters();
-
                     p.Add("@search", search);
+                    p.Add("@selected", selected);
                     List = u.GetIEnumerable<Authors>("Get_SearchAuthor", p).ToList();
                 }
             }
@@ -69,7 +90,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Authors authors, string pseu)
+        public int CreateOrUpdate(Authors authors)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -79,8 +100,7 @@ namespace StoryManagement.Model.Implement
                 {
                     var p = new DynamicParameters();
                     p.Add("@Id", authors.Id);
-                    p.Add("@name", authors.Name);
-                    p.Add("@pseudonym", pseu);
+                    p.Add("@pseudonym", authors.Pseudonym);
                     p.Add("@style", authors.Style);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Author", p);

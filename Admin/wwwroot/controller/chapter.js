@@ -55,27 +55,17 @@
                     }
                 })
             })
-            $('#savePosition').click(function () {
-                let chapterIdsString = $('#tblChapter').bootstrapTable('getData').map(function (row) {
-                    return row.chapterId;
-                }).join(',');
+            $('#resetPosition').click(function () {
                 $.ajax({
-                    url: '/Chapter/UpdatePosition',
+                    url: '/Chapter/ResetPosition',
                     type: 'post',
-                    data: { ids: chapterIdsString },
+                    data: { idStory: $('#StoryId').val() },
                     beforeSend: function () {
-                        $('#savePosition').prop('disabled', true);
-                        $('#savePosition').html(base.loadButton("Lưu"));
+                        $('#resetPosition').prop('disabled', true);
                     },
                     success: function (res) {
-                        $('#savePosition').prop('disabled', false);
-                        $('#savePosition').html("Lưu vị trí");
+                        $('#resetPosition').prop('disabled', false);
                         $("#tblChapter").bootstrapTable('refresh');
-                        if (res.status) {
-                            base.notification('success', res.message);
-                        } else {
-                            base.notification('error', res.message);
-                        }
                     }
                 })
             })
@@ -119,6 +109,22 @@
             })
             $('#SaveChap').on('click', function(e){
                 e.preventDefault();
+                var ImagesDeletes = [];
+                $.ajax({
+                    url: '/Chapter/GetDetailChapter',
+                    type: 'post',
+                    async: false,
+                    data: {
+                        idChapter: $('#Id').val(),
+                    },
+                    success: function (res) {
+                        const div = document.createElement("div");
+                        div.innerHTML = res.rows.content;
+                        ImagesDeletes = Array.from(div.querySelectorAll("img"))
+                            .map(img => img.getAttribute("src"))
+                            .filter(src => src && src.includes("/uploads/chapter/"));
+                    }
+                });
                 var ImgNow = Chapter.getEditorImages();
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
@@ -128,8 +134,10 @@
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
                 formData.append("RawContent", base.convertToHTML(CKEDITOR.instances.txtRawContent.getData()));
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
+                // Lấy Img ở CKEditor để chuyển từ temp sang chapter
                 formData.append("Images", JSON.stringify(Chapter.getImagesFromEditor()));
-                formData.append("deleteImage", JSON.stringify(Chapter.savedImages.filter(x => !ImgNow.includes(x))));
+                // Lấy Img đã lưu để xóa nếu có
+                formData.append("deleteImage", JSON.stringify(ImagesDeletes));
                 $.ajax({
                     url: '/Chapter/CreateOrUpdate',
                     type: 'POST',
@@ -228,7 +236,6 @@
                                                         ImagesDelet = Array.from(div.querySelectorAll("img"))
                                                             .map(img => img.getAttribute("src"))
                                                             .filter(src => src && src.includes("/uploads/chapter/"));
-                                                        debugger
                                                         $.ajax({
                                                             url: '/Chapter/Delete',
                                                             type: 'post',

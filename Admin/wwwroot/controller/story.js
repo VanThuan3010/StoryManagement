@@ -7,8 +7,8 @@
                 $('#txtIdModal').val(0);
                 $('#txtName').val('');
                 $('#txtNumberChapter').val('');
-                story.init_Tag(0);
-                story.init_SubTag(0);
+                //story.init_Tag(0);
+                //story.init_SubTag(0);
                 story.init_Author(0);
                 $('#txtTagName').val('');
                 $('#sources').val('SacHiepVien');
@@ -16,8 +16,8 @@
 
                 $('#modalCreateOrEdit').modal('show');
             });
-            story.init_searchTag();
-            story.init_searchSubTag();
+            //story.init_searchTag();
+            //story.init_searchSubTag();
             story.init_searchAuthor();
             //$("#txtImage").on("change", function () {
             //    const file = this.files[0];
@@ -68,9 +68,9 @@
                 datas.append('Source', $('#sources').val());
                 datas.append('IsRead', 0);
                 datas.append('TagsName', $('#txtTagName').val());
-                datas.append('AuthorId', $('#sltFormAuthor').val().join(','));
-                datas.append('TagId', $('#sltFormTag').val().join(','));
-                datas.append('SubTagId', $('#sltFormAuthor').val().join(','));
+                datas.append('AuthorId', JSON.stringify($('#sltFormAuthor').val() || []));
+                //datas.append('TagId', $('#sltFormTag').val().join(','));
+                //datas.append('SubTagId', $('#sltFormAuthor').val().join(','));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
                     type: 'post',
@@ -395,15 +395,32 @@
                     data: function (params) {
                         return {
                             searchString: params.term,
-                            selected: $("#sltFormAuthor").val().join(',')
+                            selected: ($("#sltFormAuthor").val() || []).join(',')
                         };
                     },
-                    processResults: function (data) {
+                    processResults: function (data, params) {
+                        const term = (params.term || '').toLowerCase();
                         return {
                             results: $.map(data, function (item) {
+                                let text = item.pseudonym;
+
+                                try {
+                                    let arr = JSON.parse(item.pseudonym);
+
+                                    if (Array.isArray(arr) && arr.length > 0) {
+                                        // 👉 tìm phần tử match keyword
+                                        let match = arr.find(x =>
+                                            x && x.toLowerCase().includes(term)
+                                        );
+                                        // 👉 nếu có thì dùng, không thì fallback phần tử đầu
+                                        text = match || arr[0];
+                                    }
+                                } catch (e) {
+                                    // giữ nguyên nếu không phải JSON
+                                }
                                 return {
                                     id: item.id,
-                                    text: item.name
+                                    text: text
                                 }
                             })
                         };
@@ -420,7 +437,17 @@
                 success: function (data) {
                     $("#sltFormAuthor").empty().trigger("change");
                     (data.rows || []).forEach(function (item) {
-                        var option = new Option(item.pseudonym, item.id, true, true);
+                        let text = item.pseudonym;
+
+                        try {
+                            let arr = JSON.parse(item.pseudonym);
+                            if (Array.isArray(arr) && arr.length > 0) {
+                                text = arr[0]; // 👉 lấy phần tử đầu tiên
+                            }
+                        } catch (e) {
+                            // nếu không phải JSON thì giữ nguyên
+                        }
+                        var option = new Option(text, item.id, true, true);
                         $("#sltFormAuthor").append(option);
                     });
                     $("#sltFormAuthor").trigger("change");
@@ -437,16 +464,16 @@
                     var param = $.extend(true, {
                         limit: p.limit,
                         offset: p.offset,
-                        search: $.trim($('#txtSearch').val()),
-                        tags: $("#tagSelected .lst-tag li a.li-tag").map(function () {
-                                    return $(this).data("id");
-                        }).get().join(','),
-                        subTags: $("#subTagSelected .lst-subTag li a.li-subTag").map(function () {
-                                    return $(this).data("id");
-                        }).get().join(','),
-                        authors: $("#authorSelected .lst-author li a.li-author").map(function () {
-                            return $(this).data("id");
-                        }).get().join(','),
+                        search: $('#txtSearch').val(),
+                        //tags: $("#tagSelected .lst-tag li a.li-tag").map(function () {
+                        //            return $(this).data("id");
+                        //}).get().join(','),
+                        //subTags: $("#subTagSelected .lst-subTag li a.li-subTag").map(function () {
+                        //            return $(this).data("id");
+                        //}).get().join(','),
+                        //authors: $("#authorSelected .lst-author li a.li-author").map(function () {
+                        //    return $(this).data("id");
+                        //}).get().join(','),
                         status: $('#chk').val()
                     }, p);
                     return param;
@@ -500,18 +527,6 @@
                             }
                         }
                     },
-                    //{
-                    //    field: "chapterUploaded",
-                    //    title: "Số chương trên hệ thống",
-                    //    align: 'left',
-                    //    valign: 'left',
-                    //    width: 400,
-                    //    formatter: function (value) {
-                    //        if (!value) return '';
-
-                    //        return value.replace(/\n/g, '<br>');
-                    //    }
-                    //},
                     {
                         field: "isRead",
                         title: "Đọc",
@@ -624,8 +639,8 @@
                                     $('#txtNumberChapter').val(row.numberChapter);
                                 }
                                 $('#sources').val(row.source.trim());
-                                story.init_Tag(row.id);
-                                story.init_SubTag(row.id);
+                                //story.init_Tag(row.id);
+                                //story.init_SubTag(row.id);
                                 story.init_Author(row.id);
                                 $('#labelAction').text('Sửa truyện');
 

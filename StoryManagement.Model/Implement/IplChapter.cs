@@ -119,7 +119,7 @@ namespace StoryManagement.Model.Implement
             }
 
         }
-        public int UpdatePosition(string listId)
+        public int ResetPosition(string idStory)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -128,9 +128,9 @@ namespace StoryManagement.Model.Implement
                 using (var u = unitOfWork.Create(true))
                 {
                     var p = new DynamicParameters();
-                    p.Add("@Ids", listId);
+                    p.Add("@idStory", idStory);
 
-                    list = u.ProcedureExecute("UpdatePositions", p);
+                    list = u.ProcedureExecute("Reset_ChapterPosition", p);
                 }
                 return list;
             }

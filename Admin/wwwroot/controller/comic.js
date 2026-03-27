@@ -4,11 +4,11 @@
             Comic.action();
             Comic.tblComic();
             $('#btnCreate').on('click', function () {
-                $('#txtIdModal').val(0);
+                $('#txtIdComic').val(0);
+                $('#txtIdStory').val(0);
                 $('#txtName').val('');
-                $('#txtDescription').val('');
-                $('#txtOrder').val($('#svNumberOrder').val() + 1);
-                $('#labelAction').text('Thêm mới tập');
+                $('#sources').select2().val(null).trigger('change');
+                $('#labelAction').text('Thêm mới truyện tranh');
 
                 $('#modalCreateOrEdit').modal('show');
             });

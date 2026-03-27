@@ -17,10 +17,10 @@ namespace Admin.Controllers
         {
             return View();
         }
-        public JsonResult GetStory(string search, int offset, int limit, string status, string tags, string subTags, string authors)
+        public JsonResult GetStory(string search, int offset, int limit, string status)
         {
             int total = 0;
-            var data = _ibase.storyRespository.GetAll(offset, limit, search, tags, subTags, authors, status, ref total);
+            var data = _ibase.storyRespository.GetAll(offset, limit, search, status, ref total);
             return Json(new { rows = data, total = total });
         }
         public JsonResult SearchTag(string searchString, string listId)
@@ -34,7 +34,7 @@ namespace Admin.Controllers
             return Json(data);
         }
         [HttpPost]
-        public JsonResult CreateOrUpdate(Story storyModel, string AuthorId, string TagId, string SubTagId)
+        public JsonResult CreateOrUpdate(Story storyModel, string AuthorId)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.storyRespository.CreateOrUpdate(storyModel, TagId, SubTagId, AuthorId);
+                _ibase.storyRespository.CreateOrUpdate(storyModel, "", "", AuthorId);
                 return new JsonResult(new
                 {
                     status = true,

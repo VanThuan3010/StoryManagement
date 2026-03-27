@@ -100,6 +100,7 @@ namespace Admin.Controllers
                     Directory.Delete(tempFolder, true);
                 }
                 Directory.CreateDirectory(tempFolder);
+                // xóa ảnh không còn so với trước đó
                 var deleteImages = string.IsNullOrEmpty(deleteImage) ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(deleteImage);
                 if (deleteImages?.Count > 0)
                 {
@@ -127,8 +128,6 @@ namespace Admin.Controllers
                 return new JsonResult(new { status = false, message = "Lỗi server: " + ex.Message });
             }
         }
-
-        // --- Helpers ---
         private string GetFileNameFromSrc(string src, string requestPath)
         {
             if (string.IsNullOrWhiteSpace(src)) return null;
@@ -154,7 +153,6 @@ namespace Admin.Controllers
             // 4) còn lại coi như path local
             return Path.GetFileName(clean);
         }
-
         private string MakeSafeFileName(string name)
         {
             if (string.IsNullOrEmpty(name)) return name;
@@ -231,11 +229,11 @@ namespace Admin.Controllers
 
         }
         [HttpPost]
-        public JsonResult UpdatePosition(string ids)
+        public JsonResult ResetPosition(string idStory)
         {
             try
             {
-                if (string.IsNullOrEmpty(ids))
+                if (string.IsNullOrEmpty(idStory))
                 {
                     return new JsonResult(new
                     {
@@ -243,8 +241,7 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.chapterRespository.UpdatePosition(ids);
-                _ibase.Commit();
+                _ibase.chapterRespository.ResetPosition(idStory);
                 return new JsonResult(new
                 {
                     status = true,

@@ -20,7 +20,7 @@ namespace StoryManagement.Model.Implement
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public List<Story> GetAll(int pageIndex, int pageSize, string search,string tags, string subTags, string authors, string status, ref int Total)
+        public List<Story> GetAll(int pageIndex, int pageSize, string search, string status, ref int Total)
         {
             List<Story> List = new List<Story>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -33,12 +33,9 @@ namespace StoryManagement.Model.Implement
                     p.Add("@pageIndex", pageIndex);
                     p.Add("@pageSize", pageSize);
                     p.Add("@search", search);
-                    p.Add("@tags", tags);
-                    p.Add("@subTags", subTags);
-                    p.Add("@authors", authors);
                     p.Add("@stt", status);
                     p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
-                    List = u.GetIEnumerable<Story>("Get_Story3", p).ToList();
+                    List = u.GetIEnumerable<Story>("Get_Story4", p).ToList();
                     Total = p.Get<int>("@totalRow");
                 }
             }
@@ -127,9 +124,9 @@ namespace StoryManagement.Model.Implement
                     p.Add("@name", storyModel.Name);
                     p.Add("@numberChapter", storyModel.NumberChapter);
                     p.Add("@read", storyModel.IsRead);
-                    p.Add("@tagId", tagId);
+                    //p.Add("@tagId", tagId);
                     p.Add("@tags", storyModel.TagsName);
-                    p.Add("@subTagId", subTagId);
+                    //p.Add("@subTagId", subTagId);
                     p.Add("@authors", authorId);
                     p.Add("@source", storyModel.Source);
 

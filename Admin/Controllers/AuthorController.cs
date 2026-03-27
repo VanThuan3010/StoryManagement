@@ -25,9 +25,9 @@ namespace Admin.Controllers
             var data = _ibase.authorRespository.GetAll(offset, limit, search, ref total);
             return Json(new { rows = data, total = total });
         }
-        public JsonResult SearchAuthorForStory(string search)
+        public JsonResult SearchAuthorForStory(string search, string selected)
         {
-            var data = _ibase.authorRespository.SearchAuthorForStory(search);
+            var data = _ibase.authorRespository.SearchAuthorForStory(search, selected);
             return Json(data);
         }
         public JsonResult GetAuthorForStory(int id)
@@ -49,7 +49,6 @@ namespace Admin.Controllers
                     });
                 }
                 _ibase.authorRespository.Delete(id);
-                _ibase.Commit();
                 return new JsonResult(new
                 {
                     status = true,
@@ -66,13 +65,12 @@ namespace Admin.Controllers
             }
 
         }
-
         [HttpPost]
-        public JsonResult CreateOrUpdate(Authors authors, string Pseudonym)
+        public JsonResult CreateOrUpdate(Authors authors)
         {
             try
             {
-                _ibase.authorRespository.CreateOrUpdate(authors, Pseudonym);
+                _ibase.authorRespository.CreateOrUpdate(authors);
                 return new JsonResult(new
                 {
                     status = true,

@@ -11,7 +11,7 @@ namespace StoryManagement.Model.Interface
 {
     public interface IStory : IRepository<Story>
     {
-        List<Story> GetAll(int pageIndex, int pageSize, string search, string tags, string subTags, string authors, string status, ref int Total);
+        List<Story> GetAll(int pageIndex, int pageSize, string search, string status, ref int Total);
         List<Tags> SearchTag(string searchStr, string listId);
         List<Sub_Tag> SearchSubTag(string searchStr, string listId);
         int CreateOrUpdate(Story storyModel, string tagId, string subTagId, string authorId);

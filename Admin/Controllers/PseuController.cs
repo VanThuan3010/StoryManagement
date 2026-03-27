@@ -14,10 +14,5 @@ namespace Admin.Controllers
         {
             return View();
         }
-        public JsonResult GetPseu(int id, string type)
-        {
-            var data = _ibase.pseuRespository.GetPseu(id, type);
-            return Json(data);
-        }
     }
 }

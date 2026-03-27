@@ -5,38 +5,11 @@
             author.tblAuthor();
             $('#btnCreate').on('click', function () {
                 $('#txtIdModal').val(0);
-                $('#txtName').val('');
                 $('#txtPseudonym').val('');
                 $('#txtStyle').val('');
-                $('#pseudonymList ul.tags').empty();
                 $('#labelAction').text('Thêm mới tác giả');
 
                 $('#modalCreateOrEdit').modal('show');
-            });
-            $('#btnAddPseudonym').on('click', function () {
-                if ($.trim($('#txtPseudonym').val()) === '') {
-                    base.notification('error', 'Vui lòng nhập bút danh!');
-                    return;
-                }
-                author.addPseudonym();
-                $('#txtPseudonym').val("");
-                $('#txtPseudonym').focus();
-            });
-            $('#txtPseudonym').on('keypress', function (e) {
-                if (e.which === 13) {
-                    e.preventDefault();
-                    if ($.trim($('#txtPseudonym').val()) === '') {
-                        base.notification('error', 'Vui lòng nhập bút danh!');
-                        return;
-                    }
-                    author.addPseudonym();
-                    $('#txtPseudonym').val("");
-                    $('#txtPseudonym').focus();
-                }
-            });
-            $('#pseudonymList').on('click', '.remove-tag', function (e) {
-                e.preventDefault();
-                $(this).closest('li').remove();
             });
         },
         action: function () {
@@ -44,25 +17,9 @@
                 author.tblAuthor();
             });
             $('#btnSubmit').click(function () {
-                var pseus = [];
-
-                $('#pseudonymList .tag').each(function () {
-                    var id = $(this).data('id');
-                    var pseudonym = $(this).data('pseudonym');
-                    pseus.push({
-                        id: id,
-                        pseudonym: pseudonym
-                    });
-                });
-                if (pseus.length <= 0) {
-                    base.notification('error', 'Vui lòng nhập ít nhất một bút danh của tác giả!');
-                    $('#txtPseudonym').focus();
-                    return;
-                }
                 var datas = new FormData();
                 datas.append('Id', $('#txtIdModal').val());
-                datas.append('Name', $('#txtName').val());
-                datas.append('Pseudonym', JSON.stringify(pseus));
+                datas.append('Pseudonym', JSON.stringify($('#txtPseudonym').val().split(/\r?\n/).filter(line => line.trim() !== '')));
                 datas.append('Style', $('#txtStyle').val());
                 $.ajax({
                     url: '/Author/CreateOrUpdate',
@@ -81,23 +38,12 @@
                             base.notification('success', res.message);
                             $("#tblAuthor").bootstrapTable('refresh');
                             $('#modalCreateOrEdit').modal('hide');
-
-                            $('#txtName').val('');
-                            $('#txtPseudonym').val('');
                         } else {
                             base.notification('error', res.message);
                         }
                     }
                 })
             });
-        },
-        addPseudonym: function() {
-            var value = $.trim($('#txtPseudonym').val());
-            if (value !== '') {
-                var li = '<li><a href="#" data-id="0" data-pseudonym="' + value + '" class="tag">' + value + '<span class="remove-tag">&times;</span></a></li>';
-                $('#pseudonymList ul.tags').append(li);
-                $('#txtPseudonym').val('');
-            }
         },
         tblAuthor: function () {
             var objTable = $("#tblAuthor");
@@ -126,13 +72,24 @@
                 search: false,
                 pageSize: 100,
                 pageList: [100],
-
                 columns: [
                     {
-                        field: "name",
-                        title: "Tên",
+                        field: "pseudonym",
+                        title: "Bút danh",
                         align: 'center',
                         valign: 'left',
+                        formatter: function (value) {
+                            try {
+                                let arr = JSON.parse(value);
+                                if (Array.isArray(arr)) {
+                                    // Ghép từng dòng, mỗi dòng xuống dòng HTML
+                                    return arr.join("<br>");
+                                }
+                                return value;
+                            } catch {
+                                return value;
+                            }
+                        }
                     },
                     {
                         field: "style",
@@ -149,6 +106,7 @@
                             var action = "<div style='width: 100px;'>";
                             action += '<a href="javascript:void(0)" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
                             action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
+                            action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnBook ms-1"><i class="fas fa-book"></i></a>';
                             return action;
                         },
                         events: {
@@ -188,26 +146,15 @@
                             },
                             'click .btnEdit': function (e, value, row, index) {
                                 $('#txtIdModal').val(row.id);
-                                $('#txtName').val(row.name);
-                                $('#txtPseudonym').val("");
-                                $('#pseudonymList ul.tags').empty();
-                                $.ajax({
-                                    url: '/Pseu/GetPseu',
-                                    data: {
-                                        id: row.id,
-                                        type: 'Author'
-                                    },
-                                    success: function (res) {
-                                        if (res && res.length > 0) {
-                                            $.each(res, function (i, item) {
-                                                var li = '<li><a href="#" class="tag" data-id="' + item.id + '" data-pseudonym="' + item.pseudonym + '">'
-                                                    + item.pseudonym
-                                                    + '<span class="remove-tag">&times;</span></a></li>';
-                                                $('#pseudonymList ul.tags').append(li);
-                                            });
-                                        }
-                                    }
-                                });
+                                try {
+                                    let pseudonyms = JSON.parse(row.pseudonym);
+                                    if (Array.isArray(pseudonyms))
+                                        $('#txtPseudonym').val(pseudonyms.join("\n"));
+                                    else
+                                        $('#txtPseudonym').val(row.pseudonym);
+                                } catch {
+                                    $('#txtPseudonym').val(row.pseudonym);
+                                }
                                 $('#labelAction').text('Sửa thông tin tác giả');
 
                                 $('#modalCreateOrEdit').modal('show');

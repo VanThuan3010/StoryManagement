@@ -10,6 +10,5 @@ namespace StoryManagement.Model.Interface
 {
     public interface IPseu : IRepository<Pseu>
     {
-        List<Pseu> GetPseu(int id, string type);
     }
 }

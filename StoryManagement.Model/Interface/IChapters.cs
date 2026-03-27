@@ -13,7 +13,7 @@ namespace StoryManagement.Model.Interface
         List<Chapters> GetAll(int pageIndex, int pageSize, int idStory, ref int Total);
         int CreateOrUpdate(Chapters chapters, int OrderTo, ref int Total);
         Chapters GetDetail(long idChapter);
-        int UpdatePosition(string listId);
+        int ResetPosition(string idStory);
         Chapters GetChapterToRead(long ChapterId, int StoryId, ref long CurrentChaterId, ref long PrevChaterId, ref string PrevChaterTitle, ref long NextChaterId, ref string NextChaterTitle);
         Chapters SearchByOrder(int Id, int Order);
         int DeleteChapter(long id);

@@ -41,7 +41,7 @@ namespace MFTech.Model.Entity
             {
                 entity.ToTable("Authors");
 
-                entity.Property(e => e.Name).HasMaxLength(2000);
+                entity.Property(e => e.Pseudonym).HasMaxLength(4000);
                 entity.Property(e => e.Style).HasMaxLength(4000);
             });
             modelBuilder.Entity<Chapters>(entity =>

@@ -25,26 +25,5 @@ namespace StoryManagement.Model.Implement
             _configuration = configuration;
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
-        public List<Pseu> GetPseu(int id, string type)
-        {
-            List<Pseu> List = new List<Pseu>();
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            try
-            {
-                using (var u = unitOfWork.Create(false))
-                {
-                    var p = new DynamicParameters();
-
-                    p.Add("@id", id);
-                    p.Add("@type", type);
-                    List = u.GetIEnumerable<Pseu>("Get_Pseu", p).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                return List;
-            }
-            return List;
-        }
     }
 }
