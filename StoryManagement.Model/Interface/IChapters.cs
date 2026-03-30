@@ -10,7 +10,7 @@ namespace StoryManagement.Model.Interface
 {
     public interface IChapters : IRepository<Chapters>
     {
-        List<Chapters> GetAll(int pageIndex, int pageSize, int idStory, ref int Total);
+        List<Chapters> GetAll(int pageIndex, int pageSize, int idStory, string searchStr, ref int Total);
         int CreateOrUpdate(Chapters chapters, int OrderTo, ref int Total);
         Chapters GetDetail(long idChapter);
         int ResetPosition(string idStory);

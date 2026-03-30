@@ -30,10 +30,10 @@ namespace Admin.Controllers
             ViewBag.ChapterCount = ChapterCount;
             return View();
         }
-        public JsonResult GetChapter(int offset, int limit, int idStory)
+        public JsonResult GetChapter(int offset, int limit, int idStory, string search = "")
         {
             int total = 0;
-            var data = _ibase.chapterRespository.GetAll(offset, limit, idStory, ref total);
+            var data = _ibase.chapterRespository.GetAll(offset, limit, idStory, search, ref total);
             return Json(new { rows = data, total = total });
         }
         [HttpPost]

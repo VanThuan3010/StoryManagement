@@ -79,6 +79,7 @@
         </div>
     </div>
 </div>
+<input type="hidden" id="saveIdStory" />
 <div class="modal fade" id="modalCreateOrEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -88,13 +89,12 @@
             </div>
             <div class="modal-body">
                 <form id="frmStory" method="post">
-                    <input type="text" hidden id="txtIdModal" name="Id" />
                     <div class="form-group mb-3">
                         <label class="form-label required">Tên truyện</label>
                         <textarea rows="3" class="form-control" name="txtName" id="txtName"></textarea>
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label">Chương truyện</label>
+                        <label class="form-label">Chương truyện ✅</label>
                         <textarea rows="6" class="form-control" name="NumberChapter" id="txtNumberChapter"></textarea>
                     </div>
                     <div class="form-group mb-3">
@@ -133,6 +133,23 @@
                 <h5 class="modal-title">Chương đã lưu hệ thống</h5>
             </div>
             <div class="modal-body" id="savedChapters">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalChapterRead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn chương hiện tại đọc tới</h5>
+            </div>
+            <div class="modal-body">
+                <select id="slChapterNow" name="slChapterNow" class="form-select">
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnSaveRead">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>

@@ -25,7 +25,7 @@ namespace StoryManagement.Model.Implement
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public List<Chapters> GetAll(int pageIndex, int pageSize, int idStory, ref int Total)
+        public List<Chapters> GetAll(int pageIndex, int pageSize, int idStory, string searchStr, ref int Total)
         {
             List<Chapters> List = new List<Chapters>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -38,6 +38,7 @@ namespace StoryManagement.Model.Implement
                     p.Add("@pageIndex", pageIndex);
                     p.Add("@pageSize", pageSize);
                     p.Add("@idStory", idStory);
+                    p.Add("@search", searchStr);
                     p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
                     List = u.GetIEnumerable<Chapters>("Get_Chapter", p).ToList();
                     Total = p.Get<int>("@totalRow");

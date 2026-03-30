@@ -218,7 +218,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int ReadChangeStory(int id)
+        public int ReadChangeStory(int id, long idChapter)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -228,6 +228,7 @@ namespace StoryManagement.Model.Implement
                 {
                     var p = new DynamicParameters();
                     p.Add("@id", id);
+                    p.Add("@idChapter", idChapter);
 
                     list = u.ProcedureExecute("Read_Change", p);
                 }

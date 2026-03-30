@@ -3,8 +3,9 @@
         init: function () {
             story.action();
             story.tblStory();
+            $("#slChapterNow").select2();
             $('#btnCreate').on('click', function () {
-                $('#txtIdModal').val(0);
+                $('#saveIdStory').val(0);
                 $('#txtName').val('');
                 $('#txtNumberChapter').val('');
                 //story.init_Tag(0);
@@ -62,7 +63,7 @@
             });
             $('#btnSubmit').click(function () {
                 var datas = new FormData();
-                datas.append('Id', $('#txtIdModal').val());
+                datas.append('Id', $('#saveIdStory').val());
                 datas.append('Name', JSON.stringify($('#txtName').val().split(/\r?\n/).filter(line => line.trim() !== '')));
                 datas.append('NumberChapter', JSON.stringify($('#txtNumberChapter').val().split(/\r?\n/).filter(line => line.trim() !== '')));
                 datas.append('Source', $('#sources').val());
@@ -94,6 +95,25 @@
                     }
                 })
             });
+            $('#btnSaveRead').on('click', function () {
+                $.ajax({
+                    url: '/Story/CheckRead',
+                    type: 'post',
+                    data: {
+                        id: $('#saveIdStory').val(),
+                        idChapter: $('#slChapterNow').val()
+                    },
+                    success: function (res) {
+                        if (res.status) {
+                            base.notification('success', res.message);
+                            $("#tblStory").bootstrapTable('refresh', { silent: true });
+                        }
+                        else {
+                            base.notification('error', res.message);
+                        }
+                    }
+                });
+            })
         },
         init_searchTag: function () {
             let timer;
@@ -535,31 +555,84 @@
                         formatter: function (value, row, index) {
                             var html = '';
                             if (row.isRead == true) {
-                                html = '<input class="form-check-input btnRead" type="checkbox" checked title="Đánh dấu là chưa đọc" />';
+                                html = '<input class="form-check-input btnRead" type="checkbox" checked title="Đánh dấu là chưa đọc" /><br/>';
+                                html += '<span class="chapRead" style="font-size: 11px; color: #888; display:inline-block; max-width:150px;" title="' + (row.readChapter ? row.readChapter : "") + '">' + (row.readChapter ? row.readChapter : "") + '</span>';
                             } else {
-                                html = '<input class="form-check-input btnRead" type="checkbox" title="Đánh dấu là đã đọc" />';
+                                html = '<input class="form-check-input btnRead" type="checkbox" title="Đánh dấu là đã đọc" /><br/>';
                             }
                             return html;
 
                         },
                         events: {
                             'click .btnRead': function (e, value, row, index) {
-                                $.ajax({
-                                    url: '/Story/CheckRead',
-                                    type: 'post',
-                                    data: {
-                                        id: row.id
-                                    },
-                                    success: function (res) {
-                                        if (res.status) {
-                                            base.notification('success', res.message);
-                                            $("#tblStory").bootstrapTable('refresh', { silent: true });
+                                if (row.isRead == true) {
+                                    $.confirm({
+                                        title: 'Cảnh báo!',
+                                        content: 'Đánh dấu là chưa đọc?',
+                                        buttons: {
+                                            formSubmit: {
+                                                text: 'Xác nhận',
+                                                btnClass: 'btn btn-primary',
+                                                action: function () {
+                                                    $.ajax({
+                                                        url: '/Story/CheckRead',
+                                                        type: 'post',
+                                                        data: {
+                                                            id: row.id,
+                                                            idChapter: 0
+                                                        },
+                                                        success: function (res) {
+                                                            if (res.status) {
+                                                                base.notification('success', res.message);
+                                                                $("#tblStory").bootstrapTable('refresh', { silent: true });
+                                                            }
+                                                            else {
+                                                                base.notification('error', res.message);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            },
+                                            cancel: {
+                                                text: 'Đóng',
+                                                btnClass: 'btn btn-danger'
+                                            },
                                         }
-                                        else {
-                                            base.notification('error', res.message);
+                                    });
+                                } else {
+                                    $("#slChapterNow").select2('destroy');
+                                    $("#slChapterNow").select2({
+                                        dropdownParent: $('#modalChapterRead'),
+                                        placeholder: "Tìm kiếm rồi chọn chương...",
+                                        minimumInputLength: 2,
+                                        ajax: {
+                                            url: "/Chapter/GetChapter",
+                                            dataType: "json",
+                                            delay: 250,
+                                            data: function (params) {
+                                                return {
+                                                    search: params.term,
+                                                    offset: 0,
+                                                    limit: 10,
+                                                    idStory: row.id
+                                                };
+                                            },
+                                            processResults: function (data, params) {
+                                                return {
+                                                    results: $.map(data.rows, function (item) {
+                                                        return {
+                                                            id: item.chapterId,
+                                                            text: item.title
+                                                        };
+                                                    })
+                                                };
+                                            },
+                                            cache: true
                                         }
-                                    }
-                                });
+                                    });
+                                    $('#saveIdStory').val(row.id);
+                                    $('#modalChapterRead').modal('show');
+                                }
                             },
                         }
                     },
@@ -615,7 +688,7 @@
                                 });
                             },
                             'click .btnEdit': function (e, value, row, index) {
-                                $('#txtIdModal').val(row.id);
+                                $('#saveIdStory').val(row.id);
                                 $('#txtTagName').val(row.tagsName);
                                 //$('#txtNumberChapter').val(row.numberChapter);
                                 try {

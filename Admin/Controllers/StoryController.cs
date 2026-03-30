@@ -94,7 +94,7 @@ namespace Admin.Controllers
 
         }
         [HttpPost]
-        public JsonResult CheckRead(int id)
+        public JsonResult CheckRead(int id, long idChapter)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.storyRespository.ReadChangeStory(id);
+                _ibase.storyRespository.ReadChangeStory(id, idChapter);
                 return new JsonResult(new
                 {
                     status = true,

@@ -26,5 +26,7 @@ namespace StoryManagement.Model.Entity
         public int NumberEpisode { get; set; }
         [NotMapped]
         public string? ChapterUploaded { get; set; }
+        [NotMapped]
+        public string? ReadChapter { get; set; }
     }
 }

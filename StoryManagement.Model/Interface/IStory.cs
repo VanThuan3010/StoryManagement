@@ -20,10 +20,10 @@ namespace StoryManagement.Model.Interface
         List<Story> GetStoryCanRead();
         List<Story> GetStoryNewest();
         List<Story> GetStoryLastUpdate();
-        int ReadChangeStory(int id);
         List<Authors> GetAuthorByStory(int id);
         List<Tags> GetTagSearchFilter(string searchStr, string selectedId);
         List<Sub_Tag> GetSubTagSearchFilter(string searchStr, string selectedId);
         List<Authors> GetAuthorSearchFilter(string searchStr, string selectedId);
+        int ReadChangeStory(int id, long idChapter);
     }
 }
