@@ -17,7 +17,7 @@
                         },
                         success: function (res) {
                             const div = document.createElement("div");
-                            div.innerHTML = (res.rows.review || '') + (res.rows.opening || '');
+                            div.innerHTML = (res.review || '') + (res.opening || '');
 
                             ImagesDeletes = Array.from(div.querySelectorAll("img"))
                                 .map(img => img.getAttribute("src"))
