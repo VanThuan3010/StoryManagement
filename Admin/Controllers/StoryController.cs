@@ -123,11 +123,6 @@ namespace Admin.Controllers
             }
 
         }
-        public JsonResult GetAuthorByStory(int id)
-        {
-            var data = _ibase.storyRespository.GetAuthorByStory(id);
-            return Json(new { rows = data });
-        }
         public IActionResult Chapter(int idStory)
         {
             return View();
@@ -149,6 +144,11 @@ namespace Admin.Controllers
                 var data = _ibase.storyRespository.GetAuthorSearchFilter(searchStr, idSelected);
                 return Json(data);
             }
+        }
+        public JsonResult GetStorySearchForAuthor(string search, string selected)
+        {
+            var data = _ibase.storyRespository.GetStorySearchInAuthor(search, selected);
+            return Json(data);
         }
     }
 }

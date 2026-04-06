@@ -70,6 +70,29 @@ namespace StoryManagement.Model.Implement
             }
 
         }
+        // Lưu tác phẩm
+        public int SaveLiterary(int id, string storyIds)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@id", id);
+                    p.Add("@storyIds", id);
+
+                    list = u.ProcedureExecute("Save_Literary", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
         public List<Authors> SearchAuthorForStory(string search, string selected)
         {
             List<Authors> List = new List<Authors>();
@@ -113,9 +136,9 @@ namespace StoryManagement.Model.Implement
             }
 
         }
-        public List<Pseu> GetStoryAuthor(int id)
+        public List<Authors> GetStoryAuthor(int id)
         {
-            List<Pseu> List = new List<Pseu>();
+            List<Authors> List = new List<Authors>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             try
             {
@@ -124,7 +147,28 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
 
                     p.Add("@Id", id);
-                    List = u.GetIEnumerable<Pseu>("Get_StoryAuthor", p).ToList();
+                    p.Add("@for", "Author");
+                    List = u.GetIEnumerable<Authors>("Get_StoryAuthor", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public Authors GetDetail(int id)
+        {
+            Authors List = new Authors();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@id", id);
+                    List = u.GetIEnumerable<Authors>("Get_AuthorDetail", p).FirstOrDefault();
                 }
             }
             catch (Exception ex)

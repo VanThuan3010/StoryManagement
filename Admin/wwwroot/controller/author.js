@@ -3,6 +3,95 @@
         init: function () {
             author.action();
             author.tblAuthor();
+            $("#slStoryForAuthor").select2({
+                placeholder: "Chọn tác phẩm...",
+                minimumInputLength: 2,
+                ajax: {
+                    url: "/Story/GetStorySearchForAuthor",
+                    dataType: "json",
+                    delay: 500,
+                    data: function (params) {
+                        return {
+                            searchString: params.term,
+                            selected: author.getStory()
+                        };
+                    },
+                    processResults: function (data, params) {
+                        const term = (params.term || '').toLowerCase();
+                        return {
+                            results: $.map(data, function (item) {
+                                let text = item.name;
+
+                                try {
+                                    let arr = JSON.parse(item.pseudonym);
+
+                                    if (Array.isArray(arr) && arr.length > 0) {
+                                        // 👉 tìm phần tử match keyword
+                                        let match = arr.find(x =>
+                                            x && x.toLowerCase().includes(term)
+                                        );
+                                        // 👉 nếu có thì dùng, không thì fallback phần tử đầu
+                                        text = match || arr[0];
+                                    }
+                                } catch (e) {
+                                    // giữ nguyên nếu không phải JSON
+                                }
+                                return {
+                                    id: item.id,
+                                    text: text
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+            $(document).on("click", ".btnDeleteStory", function () {
+                // tìm card cha gần nhất
+                const $card = $(this).closest(".card");
+
+                // xóa luôn khỏi UI
+                $card.remove();
+            });
+            $(document).on("click", ".btnReviewStory", function () {
+                // lấy id từ button
+                const storyId = $(this).data("id");
+                // gọi ajax
+                $.ajax({
+                    url: '/Author/GetStoryReview', // bạn sửa lại đúng action sau
+                    type: 'GET',
+                    data: {
+                        idStory: storyId
+                    },
+                    success: function (res) {
+                        /* ===== 1. Render StoryName ===== */
+                        let htmlNames = "";
+                        try {
+                            let names = JSON.parse(res.storyName || res.StoryName || "[]");
+
+                            if (Array.isArray(names)) {
+                                names.forEach(n => {
+                                    htmlNames += `<li>${n}</li>`;
+                                });
+                            }
+                        } catch {
+                            // nếu không phải JSON → coi như string
+                            if (res.StoryName) {
+                                htmlNames = `<li>${res.storyName}</li>`;
+                            }
+                        }
+                        $("#listStoryNames").html(htmlNames);
+                        /* ===== 2. Render Review ===== */
+                        let reviewContent = res.review || res.Review || "Chưa có Review";
+
+                        $("#divReview").html(reviewContent);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+
+            });
             $('#btnCreate').on('click', function () {
                 $('#txtIdModal').val(0);
                 $('#txtPseudonym').val('');
@@ -12,7 +101,31 @@
                 $('#modalCreateOrEdit').modal('show');
             });
         },
+        getStory: function () {
+            let selectedIds = [];
+
+            // lấy tất cả data-id từ nút Review (hoặc card cũng được)
+            $("#divLstStory .btnReviewStory").each(function () {
+                let id = $(this).data("id");
+                if (id) selectedIds.push(id);
+            });
+
+            return selectedIds.join(',');
+        },
         action: function () {
+            $('#btnSaveStory').on('click', function () {
+                $.ajax({
+                    url: '/Author/SaveLiterary',
+                    type: 'post',
+                    data: {
+                        Id: $('#authorId').val(),
+                        StoryList: author.getStory()
+                    },
+                    success: function (res) {
+                        window.location.href = '/Author';
+                    }
+                });
+            })
             $('#btnSearch').on('click', function () {
                 author.tblAuthor();
             });
@@ -43,6 +156,44 @@
                         }
                     }
                 })
+            });
+            $("#slStoryForAuthor").on("select2:select", function (e) {
+                const item = e.params.data;
+
+                const id = item.id;
+                const name = item.text;
+
+                // ❌ tránh thêm trùng
+                if ($("#divLstStory .btnReviewStory[data-id='" + id + "']").length > 0) {
+                    return;
+                }
+
+                // ✅ HTML card
+                const html = `
+                    <div class="card col-3">
+                        <div class="bg-image hover-overlay">
+                            <img src="https://bookcover.yuewen.com/qdbimg/349573/1040874138/300"
+                                 class="img-fluid"
+                                 title="${name}" />
+                            <a href="#!">
+                                <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                            </a>
+                        </div>
+                        <div class="card-body" style="padding: 0.25rem;">
+                            <h6 class="card-title">${name}</h6><br />
+                            <div class="d-flex gap-2 ps-1">
+                                <button class="btn btn-xs btn-primary btnReviewStory" data-id="${id}">Review</button>
+                                <button class="btn btn-xs btn-danger btnDeleteStory">Xóa</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // 👉 append vào list
+                $("#divLstStory").append(html);
+
+                // 👉 clear select2
+                $("#slStoryForAuthor").val(null).trigger("change");
             });
         },
         tblAuthor: function () {
@@ -106,7 +257,7 @@
                             var action = "<div style='width: 100px;'>";
                             action += '<a href="javascript:void(0)" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
                             action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
-                            action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnBook ms-1"><i class="fas fa-book"></i></a>';
+                            action += '<a href="/Author/Literary?idAuthor=' + row.id + '" title="Sáng tác" class="btn btn-secondary btn-sm ms-1 btnShowBook"><i class="fas fa-book"></i></a>';
                             return action;
                         },
                         events: {

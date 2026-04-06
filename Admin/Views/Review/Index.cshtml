@@ -18,6 +18,7 @@
         </nav>
     </div>
 </div>
+<input type="hidden" value="@Model.Id" id="saveReviewId" />
 <div class="container">
     <form asp-action="CreateOrUpdate" enctype="multipart/form-data" id="form" method="post">
         <input asp-for="@Model.IdStory" hidden />
@@ -38,14 +39,28 @@
             </div>
         </div>
         <div class="mt-4">
-            <button class="btn btn-success" style="width:100px;" type="submit" id="Save">Lưu</button>
+            <button class="btn btn-success" style="width:100px;" type="button" id="btnSave">Lưu</button>
             <a href="/Story/index" class="btn w-md btn-outline-info waves-effect waves-light">Quay lại</a>
         </div>
     </form>
 </div>
 @section Scripts {
     <script type="text/javascript">
-        CKEDITOR.replace('txtReview');
-        CKEDITOR.replace('txtOpening');
+        CKEDITOR.replace('txtReview', {
+            extraPlugins: 'uploadimage,image2',
+            uploadUrl: '/Review/UploadImage,
+            pasteFromWordRemoveFontStyles: true,
+            pasteFromWordRemoveStyles: true
+            // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
+            // filebrowserUploadMethod: 'form'
+        });
+        CKEDITOR.replace('txtOpening', {
+            extraPlugins: 'uploadimage,image2',
+            uploadUrl: '/Review/UploadImage,
+            pasteFromWordRemoveFontStyles: true,
+            pasteFromWordRemoveStyles: true
+            // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
+            // filebrowserUploadMethod: 'form'
+        });
     </script>
 }

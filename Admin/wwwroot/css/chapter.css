@@ -1,5 +1,2 @@
 ﻿.chapRead {
-    white-space: nowrap; /* Không xuống dòng */
-    overflow: hidden; /* Ẩn phần dư */
-    text-overflow: ellipsis; /* Hiện ... */
 }

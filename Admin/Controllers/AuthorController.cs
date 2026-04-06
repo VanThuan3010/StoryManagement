@@ -19,11 +19,22 @@ namespace Admin.Controllers
         {
             return View();
         }
+        public IActionResult Literary(int idAuthor)
+        {
+            ViewBag.ListLiterary = _ibase.storyRespository.GetStoryByAuthor(idAuthor);
+            ViewBag.Author = _ibase.authorRespository.GetDetail(idAuthor);
+            return View();
+        }
         public JsonResult GetAuthor(int offset, int limit, string search)
         {
             int total = 0;
             var data = _ibase.authorRespository.GetAll(offset, limit, search, ref total);
             return Json(new { rows = data, total = total });
+        }
+        public JsonResult GetStoryReview(int idStory)
+        {
+            var data = _ibase.reviewRespository.GetStoryReview(idStory) ?? new Reviews { IdStory = idStory };
+            return Json(data);
         }
         public JsonResult SearchAuthorForStory(string search, string selected)
         {
@@ -33,6 +44,11 @@ namespace Admin.Controllers
         public JsonResult GetAuthorForStory(int id)
         {
             var data = _ibase.authorRespository.GetStoryAuthor(id);
+            return Json(new { rows = data });
+        }
+        public JsonResult GetStoryForAuthor(int id)
+        {
+            var data = _ibase.storyRespository.GetStoryByAuthor(id);
             return Json(new { rows = data });
         }
         [HttpPost]
@@ -48,11 +64,41 @@ namespace Admin.Controllers
                         message = "Có lỗi xảy ra"
                     });
                 }
-                _ibase.authorRespository.Delete(id);
+                _ibase.authorRespository.DeleteAuthor(id);
                 return new JsonResult(new
                 {
                     status = true,
                     message = "Xóa tác giả thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    status = false,
+                    message = ex.Message,
+                });
+            }
+
+        }
+        [HttpPost]
+        public JsonResult SaveLiterary(int Id, string StoryList)
+        {
+            try
+            {
+                if (Id <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
+                }
+                _ibase.authorRespository.SaveLiterary(Id, StoryList);
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Lưu tác phẩm thành công"
                 });
             }
             catch (Exception ex)

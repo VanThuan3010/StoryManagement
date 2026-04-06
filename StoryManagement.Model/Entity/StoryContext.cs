@@ -24,7 +24,6 @@ namespace MFTech.Model.Entity
         public virtual DbSet<GroupTag> GroupTags { get; set; } = null!;
         public virtual DbSet<My_Compose> My_Composes { get; set; } = null!;
         public virtual DbSet<Part_Chapter> Part_Chapters { get; set; } = null!;
-        public virtual DbSet<Pseu> Pseus { get; set; } = null!;
         public virtual DbSet<Reviews> Reviews { get; set; } = null!;
         public virtual DbSet<Scenes> Scenes { get; set; } = null!;
         public virtual DbSet<Seri_Story> Seri_Stories { get; set; } = null!;
@@ -104,12 +103,6 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.Name).HasMaxLength(1000);
 
                 entity.Property(e => e.IdStory);
-            });
-            modelBuilder.Entity<Pseu>(entity =>
-            {
-                entity.ToTable("Pseu");
-
-                entity.Property(e => e.Pseudonym).HasMaxLength(2000);
             });
             modelBuilder.Entity<Reviews>(entity =>
             {

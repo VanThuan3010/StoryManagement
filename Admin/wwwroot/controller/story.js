@@ -552,11 +552,12 @@
                         title: "Đọc",
                         align: 'center',
                         valign: 'center',
+                        width: 150,
                         formatter: function (value, row, index) {
                             var html = '';
                             if (row.isRead == true) {
                                 html = '<input class="form-check-input btnRead" type="checkbox" checked title="Đánh dấu là chưa đọc" /><br/>';
-                                html += '<span class="chapRead" style="font-size: 11px; color: #888; display:inline-block; max-width:150px;" title="' + (row.readChapter ? row.readChapter : "") + '">' + (row.readChapter ? row.readChapter : "") + '</span>';
+                                html += '<div class="chapRead" style="display: -webkit-box;-webkit-line-clamp: 1;-webkit-box-orient: vertical;overflow: hidden;font-size: 11px; color: #888; max-width:100%;" title="' + (row.readChapter ? row.readChapter : "") + '">' + (row.readChapter ? row.readChapter : "") + '</div>';
                             } else {
                                 html = '<input class="form-check-input btnRead" type="checkbox" title="Đánh dấu là đã đọc" /><br/>';
                             }

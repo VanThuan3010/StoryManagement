@@ -19,7 +19,6 @@ namespace StoryManagement.Model
         IGroupTag groupTagRespository { get; }
         IMy_Compose my_ComposeRepository { get; }
         IPart_Chapter part_ChapterRespository { get; }
-        IPseu pseuRespository { get; }
         IReviews reviewRespository { get; }
         IScene sceneRespository { get; }
         ISeri_Story seri_StoryRespository { get; }

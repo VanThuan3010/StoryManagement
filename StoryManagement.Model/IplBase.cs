@@ -23,7 +23,6 @@ namespace StoryManagement.Model
         private IGroupTag _groupTagRespository;
         private IMy_Compose _myComposeRespository;
         private IPart_Chapter _partRespository ;
-        private IPseu _pseuRespository;
         private IReviews _reviewRespository;
         private IScene _sceneRespository;
         private ISeri_Story _seriStoryRespository;
@@ -96,13 +95,6 @@ namespace StoryManagement.Model
             get
             {
                 return _partRespository ?? (_partRespository = new IplPart_Chapter(_dbContext, _Configuration));
-            }
-        }
-        public IPseu pseuRespository
-        {
-            get
-            {
-                return _pseuRespository ?? (_pseuRespository = new IplPseu(_dbContext, _Configuration));
             }
         }
         public IReviews reviewRespository

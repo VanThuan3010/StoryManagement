@@ -19,7 +19,7 @@ namespace StoryManagement.Model.Implement
             _configuration = configuration;
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
-
+        // Lấy ds truyện, có phân trang, tìm kiếm và lọc theo trạng thái
         public List<Story> GetAll(int pageIndex, int pageSize, string search, string status, ref int Total)
         {
             List<Story> List = new List<Story>();
@@ -45,6 +45,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        // Tìm kiếm tag, subtag cho story
         public List<Tags> SearchTag(string searchStr, string listId)
         {
             List<Tags> List = new List<Tags>();
@@ -91,6 +92,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        // Lấy thông tin truyện
         public Story GetDetail(int id)
         {
             Story List = new Story();
@@ -111,6 +113,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        // Thêm/Sửa thông tin truyện
         public int CreateOrUpdate(Story storyModel, string tagId, string subTagId, string authorId)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -140,6 +143,7 @@ namespace StoryManagement.Model.Implement
             }
 
         }
+        // Xóa truyện cùng các dữ liệu liên quan (Chương, Review, Liên kết với tác giả,...)
         public int DeleteStory(int id)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -218,6 +222,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        // Thay đổi trạng thái đã đọc của truyện và cập nhật chương mới nhất đã đọc
         public int ReadChangeStory(int id, long idChapter)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -240,18 +245,40 @@ namespace StoryManagement.Model.Implement
             }
 
         }
-        public List<Authors> GetAuthorByStory(int id)
+        // Lấy ds truyện theo tác giả
+        public List<Story> GetStoryByAuthor(int id)
         {
-            List<Authors> List = new List<Authors>();
+            List<Story> List = new List<Story>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             try
             {
                 using (var u = unitOfWork.Create(false))
                 {
                     var p = new DynamicParameters();
-                    p.Add("@id", id);
-                    p.Add("@typeId", "Story");
-                    List = u.GetIEnumerable<Authors>("StoryAuthor_GetByOther", p).ToList();
+                    p.Add("@Id", id);
+                    p.Add("@for", "Story");
+                    List = u.GetIEnumerable<Story>("Get_StoryAuthor", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        // Lấy ds truyện khi tìm kiếm để gắn với tác giả
+        public List<Story> GetStorySearchInAuthor(string search, string idSelected)
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@search", search);
+                    p.Add("@idSelected", idSelected);
+                    List = u.GetIEnumerable<Story>("Get_SearchStoryForAuthor", p).ToList();
                 }
             }
             catch (Exception ex)
