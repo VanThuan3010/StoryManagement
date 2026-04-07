@@ -131,7 +131,7 @@ namespace MFTech.Model.Entity
             {
                 entity.ToTable("Series");
 
-                entity.Property(e => e.SeriesName).HasMaxLength(2000).HasColumnName("SeriName");
+                entity.Property(e => e.SeriName).HasMaxLength(2000).HasColumnName("SeriName");
             });
             modelBuilder.Entity<Story>(entity =>
             {

@@ -12,7 +12,7 @@
                     delay: 500,
                     data: function (params) {
                         return {
-                            searchString: params.term,
+                            search: params.term,
                             selected: author.getStory()
                         };
                     },
@@ -23,16 +23,8 @@
                                 let text = item.name;
 
                                 try {
-                                    let arr = JSON.parse(item.pseudonym);
-
-                                    if (Array.isArray(arr) && arr.length > 0) {
-                                        // 👉 tìm phần tử match keyword
-                                        let match = arr.find(x =>
-                                            x && x.toLowerCase().includes(term)
-                                        );
-                                        // 👉 nếu có thì dùng, không thì fallback phần tử đầu
-                                        text = match || arr[0];
-                                    }
+                                    let arr = JSON.parse(item.name);
+                                    text = arr[0];
                                 } catch (e) {
                                     // giữ nguyên nếu không phải JSON
                                 }
@@ -122,7 +114,11 @@
                         StoryList: author.getStory()
                     },
                     success: function (res) {
-                        window.location.href = '/Author';
+                        if (res.status) {
+                            window.location.reload();
+                        } else {
+                            base.notification('error', res.message);
+                        }
                     }
                 });
             })

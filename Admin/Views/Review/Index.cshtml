@@ -21,12 +21,12 @@
 <input type="hidden" value="@Model.Id" id="saveReviewId" />
 <div class="container">
     <form asp-action="CreateOrUpdate" enctype="multipart/form-data" id="form" method="post">
-        <input asp-for="@Model.IdStory" hidden />
+        <input type="hidden" id="IdStory" value="@Model.IdStory" />
         <div class="col">
             <label>Review</label>
             <div class="form-group">
                 <div class="col-md-12">
-                    @Html.TextAreaFor(m => m.Review, new { @class = "form-control", id = "txtReview" })
+                    <textarea class="form-control" id="txtReview" name="txtReview">@(Model?.Review != null ? Model.Review : null)</textarea>
                 </div>
             </div>
         </div>
@@ -34,7 +34,7 @@
             <label>Giới thiệu</label>
             <div class="form-group">
                 <div class="col-md-12">
-                    @Html.TextAreaFor(m => m.Opening, new { @class = "form-control", id = "txtOpening" })
+                    <textarea class="form-control" id="txtOpening" name="txtOpening">@(Model?.Opening != null ? Model.Opening : null)</textarea>
                 </div>
             </div>
         </div>
@@ -48,19 +48,15 @@
     <script type="text/javascript">
         CKEDITOR.replace('txtReview', {
             extraPlugins: 'uploadimage,image2',
-            uploadUrl: '/Review/UploadImage,
+            uploadUrl: '/Review/UploadImage',
             pasteFromWordRemoveFontStyles: true,
             pasteFromWordRemoveStyles: true
-            // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
-            // filebrowserUploadMethod: 'form'
         });
         CKEDITOR.replace('txtOpening', {
             extraPlugins: 'uploadimage,image2',
-            uploadUrl: '/Review/UploadImage,
+            uploadUrl: '/Review/UploadImage',
             pasteFromWordRemoveFontStyles: true,
             pasteFromWordRemoveStyles: true
-            // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
-            // filebrowserUploadMethod: 'form'
         });
     </script>
 }

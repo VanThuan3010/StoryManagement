@@ -81,7 +81,7 @@ namespace StoryManagement.Model.Implement
                 {
                     var p = new DynamicParameters();
                     p.Add("@id", id);
-                    p.Add("@storyIds", id);
+                    p.Add("@storyIds", storyIds);
 
                     list = u.ProcedureExecute("Save_Literary", p);
                 }

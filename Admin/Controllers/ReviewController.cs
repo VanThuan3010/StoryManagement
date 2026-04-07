@@ -30,7 +30,7 @@ namespace Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateOrUpdate(Reviews reviews, string Images, string deleteImage)
+        public JsonResult CreateOrUpdate(Reviews reviews, string Images, string deleteImage)
         {
             try
             {
@@ -64,8 +64,8 @@ namespace Admin.Controllers
                 }
 
                 // replace đường dẫn
-                reviews.Review = reviews.Review.Replace("/uploads/temp/", "/uploads/review/");
-                reviews.Opening = reviews.Opening.Replace("/uploads/temp/", "/uploads/review/");
+                reviews.Review = reviews.Review?.Replace("/uploads/temp/", "/uploads/review/");
+                reviews.Opening = reviews.Opening?.Replace("/uploads/temp/", "/uploads/review/");
 
                 // xóa temp
                 var tempFolder = Path.Combine(_env.WebRootPath, "uploads/temp");
@@ -90,11 +90,15 @@ namespace Admin.Controllers
                     }
                 }
                 _ibase.reviewRespository.CreateOrUpdate(reviews);
-                return RedirectToAction("Index", "Story");
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Thao tác thành công"
+                });
             }
             catch (Exception ex)
             {
-                throw(ex);
+                return new JsonResult(new { status = false, message = "Lỗi server: " + ex.Message });
             }
         }
         [HttpPost]

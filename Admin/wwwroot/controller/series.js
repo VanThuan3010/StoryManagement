@@ -126,9 +126,10 @@
                     },
                     success: function (res) {
                         if (res.status) {
-                            notification('success', res.message);
+                            base.notification('success', res.message);
+                            $("#tblSeries").bootstrapTable('refresh');
                         } else {
-                            notification('error', res.message);
+                            base.notification('error', res.message);
                         }
                     },
                     error: function () {
@@ -166,7 +167,7 @@
                 pageList: [100],
                 columns: [
                     {
-                        field: "seriesName",
+                        field: "seriName",
                         title: "Tên",
                         align: 'center',
                         valign: 'left',

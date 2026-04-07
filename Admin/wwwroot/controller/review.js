@@ -9,7 +9,7 @@
                 var ImagesDeletes = [];
                 if ($('#saveReviewId').val() > 0) {
                     $.ajax({
-                        url: '/Review/GetStoryReview',
+                        url: '/Review/GetDetailReview',
                         type: 'post',
                         async: false,
                         data: {
@@ -25,10 +25,9 @@
                         }
                     });
                 }
-                var ImgNow = Chapter.getEditorImages();
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
-                formData.append("IdStory", $('#StoryId').val());
+                formData.append("IdStory", $('#IdStory').val());
                 formData.append("Review", base.convertToHTML(CKEDITOR.instances.txtReview.getData()));
                 formData.append("Opening", base.convertToHTML(CKEDITOR.instances.txtOpening.getData()));
                 // Lấy Img ở CKEditor để chuyển từ temp sang chapter
@@ -40,6 +39,11 @@
                     type: 'POST',
                     data: formData,
                     success: function (res) {
+                        if (res.status) {
+                            location.href = '/Story';
+                        } else {
+                            base.notification('error', res.message)
+                        }
                     },
                     error: function (xhr, status, error) {
                         console.error('Error:', status, error);

@@ -100,7 +100,7 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
 
                     p.Add("@id", series.Id);
-                    p.Add("@name", series.SeriesName);
+                    p.Add("@name", series.SeriName);
                     p.Add("@lstStory", lstStory);
                     list = u.ProcedureExecute("CreateOrUpdate_Series", p);
                 }

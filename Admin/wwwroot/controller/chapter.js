@@ -125,7 +125,6 @@
                             .filter(src => src && src.includes("/uploads/chapter/"));
                     }
                 });
-                var ImgNow = Chapter.getEditorImages();
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
                 formData.append("StoryId", $('#StoryId').val());
