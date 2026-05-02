@@ -24,3 +24,5 @@
 /Website/Website.cspro.user
 /StoryManagement.sln
 /Admin/wwwroot/uploads
+/run-admin.bat
+/Admin/appsettings.json
