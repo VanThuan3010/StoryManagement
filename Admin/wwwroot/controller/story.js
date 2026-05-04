@@ -484,7 +484,7 @@
                     var param = $.extend(true, {
                         limit: p.limit,
                         offset: p.offset,
-                        search: $('#txtSearch').val(),
+                        search: $('#txtSearch').val().trim(),
                         //tags: $("#tagSelected .lst-tag li a.li-tag").map(function () {
                         //            return $(this).data("id");
                         //}).get().join(','),

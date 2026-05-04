@@ -120,7 +120,8 @@ namespace Admin.Controllers
                 {
                     status = true,
                     message = "Thao tác thành công",
-                    numberChapter = NumberChapter
+                    numberChapter = NumberChapter,
+                    belong = chapters.Belong
                 });
             }
             catch (Exception ex)

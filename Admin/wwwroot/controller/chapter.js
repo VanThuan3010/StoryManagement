@@ -349,6 +349,7 @@
                     base.notification('success', res.message);
                     if ($('#isLastChapter').val() == 0) {
                         $('#orderChapter').val(res.numberChapter + 1);
+                        $('#BelongPart').val(res.belong);
                         ImportTxt.nextIndex();
                     } else {
                         $('#importModal').modal('hide');
