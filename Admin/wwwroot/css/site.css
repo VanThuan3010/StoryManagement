@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -77,3 +77,13 @@ body {
 .tag:hover::after {
     border-left-color: crimson;
 }
+
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+}
+
+/*<div class="line-clamp" style="--line-clamp: 5;" >
+</div >*/

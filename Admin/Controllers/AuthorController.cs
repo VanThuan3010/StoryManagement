@@ -19,21 +19,15 @@ namespace Admin.Controllers
         {
             return View();
         }
-        public IActionResult Literary(int idAuthor)
-        {
-            ViewBag.ListLiterary = _ibase.storyRespository.GetStoryByAuthor(idAuthor);
-            ViewBag.Author = _ibase.authorRespository.GetDetail(idAuthor);
-            return View();
-        }
         public JsonResult GetAuthor(int offset, int limit, string search)
         {
             int total = 0;
             var data = _ibase.authorRespository.GetAll(offset, limit, search, ref total);
             return Json(new { rows = data, total = total });
         }
-        public JsonResult GetStoryReview(int idStory)
+        public JsonResult GetAuthorDetail(int id)
         {
-            var data = _ibase.reviewRespository.GetStoryReview(idStory) ?? new Reviews { IdStory = idStory };
+            var data = _ibase.authorRespository.GetDetail(id);
             return Json(data);
         }
         public JsonResult SearchAuthorForStory(string search, string selected)
@@ -41,15 +35,10 @@ namespace Admin.Controllers
             var data = _ibase.authorRespository.SearchAuthorForStory(search, selected);
             return Json(data);
         }
-        public JsonResult GetAuthorForStory(int id)
-        {
-            var data = _ibase.authorRespository.GetStoryAuthor(id);
-            return Json(new { rows = data });
-        }
         public JsonResult GetStoryForAuthor(int id)
         {
-            var data = _ibase.storyRespository.GetStoryByAuthor(id);
-            return Json(new { rows = data });
+            var data = _ibase.authorRespository.GetStoryByAuthor(id);
+            return Json(data);
         }
         [HttpPost]
         public JsonResult Delete(int id)
@@ -82,23 +71,15 @@ namespace Admin.Controllers
 
         }
         [HttpPost]
-        public JsonResult SaveLiterary(int Id, string StoryList)
+        public JsonResult CreateOrUpdate(Authors authors, string ActionFor, string lstStory = "")
         {
             try
             {
-                if (Id <= 0)
-                {
-                    return new JsonResult(new
-                    {
-                        status = false,
-                        message = "Có lỗi xảy ra"
-                    });
-                }
-                _ibase.authorRespository.SaveLiterary(Id, StoryList);
+                _ibase.authorRespository.CreateOrUpdate(authors, lstStory, ActionFor);
                 return new JsonResult(new
                 {
                     status = true,
-                    message = "Lưu tác phẩm thành công"
+                    message = "Lưu thành công"
                 });
             }
             catch (Exception ex)
@@ -109,28 +90,11 @@ namespace Admin.Controllers
                     message = ex.Message,
                 });
             }
-
         }
-        [HttpPost]
-        public JsonResult CreateOrUpdate(Authors authors)
+        public JsonResult SearchStory(string search, string idSelected)
         {
-            try
-            {
-                _ibase.authorRespository.CreateOrUpdate(authors);
-                return new JsonResult(new
-                {
-                    status = true,
-                    message = "Thêm mới thành công"
-                });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new
-                {
-                    status = false,
-                    message = ex.Message,
-                });
-            }
+            var data = _ibase.authorRespository.SearchStory(search, idSelected);
+            return Json(data);
         }
     }
 }

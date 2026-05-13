@@ -23,16 +23,6 @@ namespace Admin.Controllers
             var data = _ibase.storyRespository.GetAll(offset, limit, search, status, ref total);
             return Json(new { rows = data, total = total });
         }
-        public JsonResult SearchTag(string searchString, string listId)
-        {
-            var data = _ibase.storyRespository.SearchTag(searchString, listId);
-            return Json(data);
-        }
-        public JsonResult SearchSubTag(string searchString, string listId)
-        {
-            var data = _ibase.storyRespository.SearchSubTag(searchString, listId);
-            return Json(data);
-        }
         [HttpPost]
         public JsonResult CreateOrUpdate(Story storyModel, string AuthorId)
         {
@@ -127,27 +117,19 @@ namespace Admin.Controllers
         {
             return View();
         }
-        public JsonResult GetTagSearch(string searchStr, string idSelected, string type)
-        {
-            if(type == "Tag")
-            {
-                var data = _ibase.storyRespository.GetTagSearchFilter(searchStr, idSelected);
-                return Json(data);
-            }
-            else if(type == "SubTag")
-            {
-                var data = _ibase.storyRespository.GetSubTagSearchFilter(searchStr, idSelected);
-                return Json(data);
-            }
-            else
-            {
-                var data = _ibase.storyRespository.GetAuthorSearchFilter(searchStr, idSelected);
-                return Json(data);
-            }
-        }
         public JsonResult GetStorySearchForAuthor(string search, string selected)
         {
             var data = _ibase.storyRespository.GetStorySearchInAuthor(search, selected);
+            return Json(data);
+        }
+        public JsonResult SearchStory(string search, string idSelected)
+        {
+            var data = _ibase.authorRespository.SearchStory(search, idSelected);
+            return Json(data);
+        }
+        public JsonResult SearchAuthor(string search, string idSelected)
+        {
+            var data = _ibase.storyRespository.SearhAuthor(search, idSelected);
             return Json(data);
         }
     }

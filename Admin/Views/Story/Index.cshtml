@@ -114,8 +114,17 @@
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">Tác giả</label>
-                        <select class="form-select" id="sltFormAuthor" multiple name="ListAuthor">
-                        </select>
+                        <table class="table table-sm align-middle" id="tblAuthors">
+                            <thead>
+                                <tr>
+                                    <th>Tác giả</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="btnAddAuthorRow">+ Thêm tác giả</button>
+                        @* <select class="form-select" id="sltFormAuthor" multiple name="ListAuthor">
+                        </select> *@
                     </div>
                 </form>
             </div>

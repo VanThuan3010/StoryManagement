@@ -31,28 +31,39 @@
             $(document).on("keyup", ".story-search-input", function () {
                 let query = $(this).val().trim();
                 let resultDiv = $(this).closest(".story-search-wrapper").find(".search-result-list");
-
+                if (query.length < 2) {
+                    resultDiv.hide();
+                    return;
+                }
                 const idSelected = $("#tblStories .selected-story .story-name")
                     .map(function () {
                         return $(this).data("id");
                     })
                     .get();
 
-                if (query.length < 2) {
-                    resultDiv.hide();
-                    return;
-                }
-
                 $.get("/Series/SearchStory", { search: query, idSelected: idSelected.join(",") }, function (res) {
                     resultDiv.empty();
 
                     if (res && res.length > 0) {
                         res.forEach(story => {
-                            let sName = JSON.parse(story.name)[0];
+                            let sName = "";
+                            let fname = "";
+                            try {
+                                let parsed = JSON.parse(story.name);
+
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    sName = parsed[0];
+                                    fname = parsed.join('\n');
+                                }
+                            } catch (e) {
+                                sName = story.name;
+                                fname = sName;
+                            }
                             resultDiv.append(`
                             <div class="p-2 search-item" 
                                  data-id="${story.id}" 
-                                 data-name="${sName}" 
+                                 data-name="${sName}"
+                                 title="${fname}"
                                  style="cursor:pointer;">
                                 ${sName}
                             </div>`);
@@ -66,7 +77,19 @@
             });
             $(document).on("click", ".search-item", function () {
                 let id = $(this).data("id");
-                let name = $(this).data("name");
+                let name = "";
+                let titleText = "";
+                try {
+                    let parsed = JSON.parse($(this).data("name"));
+
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        name = parsed[0];
+                        titleText = parsed.join('\n');
+                    }
+                } catch (e) {
+                    name = $(this).data("name");
+                    titleText = name;
+                }
                 let wrapper = $(this).closest(".story-search-wrapper");
                 let resultDiv = wrapper.find(".search-result-list");
                 let inputContainer = wrapper.find(".search-input-container");
@@ -75,7 +98,7 @@
 
                 inputContainer.html(`
                     <div class="selected-story d-inline-flex align-items-center gap-2 border rounded px-2 py-1 bg-light">
-                        <span data-id="${id}" class="story-name">${name}</span>
+                        <span data-id="${id}" class="story-name line-clamp-1" title="${titleText}">${name}</span>
                         <button type="button" class="btn btn-sm btn-outline-danger btn-clear-story">×</button>
                     </div>
                 `);
@@ -101,7 +124,10 @@
             });
             $("#btnSubmit").click(function (e) {
                 e.preventDefault();
-
+                if (!$('#SeriName').val()) {
+                    base.notification('error', "Hãy nhập tên Series");
+                    return;
+                }
                 let storiesData = [];
 
                 $("#tblStories tbody tr").each(function () {
@@ -115,18 +141,22 @@
                         });
                     }
                 });
-
+                if (!storiesData.length) {
+                    base.notification('error',"Chưa có truyện nào trong Series");
+                    return;
+                }
                 $.ajax({
                     url: "/Series/SaveSeries",
                     type: "POST",
                     data: {
                         Id: $("#SeriesId").val(),
-                        SeriesName: $("#SeriName").val(),
+                        SeriName: $("#SeriName").val(),
                         lstStory: JSON.stringify(storiesData)
                     },
                     success: function (res) {
                         if (res.status) {
                             base.notification('success', res.message);
+                            $("#seriesModal").modal("hide");
                             $("#tblSeries").bootstrapTable('refresh');
                         } else {
                             base.notification('error', res.message);
@@ -195,7 +225,7 @@
                                             btnClass: 'btn btn-primary',
                                             action: function () {
                                                 $.ajax({
-                                                    url: '/Author/Delete',
+                                                    url: '/Series/Delete',
                                                     type: 'post',
                                                     data: {
                                                         id: row.id,

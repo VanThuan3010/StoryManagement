@@ -35,55 +35,8 @@ namespace StoryManagement.Model.Implement
                     p.Add("@search", search);
                     p.Add("@stt", status);
                     p.Add("@totalRow", Total, DbType.Int32, ParameterDirection.Output);
-                    List = u.GetIEnumerable<Story>("Get_Story4", p).ToList();
+                    List = u.GetIEnumerable<Story>("Get_Story", p).ToList();
                     Total = p.Get<int>("@totalRow");
-                }
-            }
-            catch (Exception ex)
-            {
-                return List;
-            }
-            return List;
-        }
-        // Tìm kiếm tag, subtag cho story
-        public List<Tags> SearchTag(string searchStr, string listId)
-        {
-            List<Tags> List = new List<Tags>();
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            try
-            {
-                using (var u = unitOfWork.Create(false))
-                {
-                    var p = new DynamicParameters();
-
-                    p.Add("@search", searchStr);
-                    p.Add("@idSelected", listId);
-                    p.Add("@type", "Tag");
-                    p.Add("@for", "ForStory");
-                    List = u.GetIEnumerable<Tags>("Get_SearchTag", p).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                return List;
-            }
-            return List;
-        }
-        public List<Sub_Tag> SearchSubTag(string searchStr, string listId)
-        {
-            List<Sub_Tag> List = new List<Sub_Tag>();
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            try
-            {
-                using (var u = unitOfWork.Create(false))
-                {
-                    var p = new DynamicParameters();
-
-                    p.Add("@search", searchStr);
-                    p.Add("@idSelected", listId);
-                    p.Add("@type", "SubTag");
-                    p.Add("@for", "ForStory");
-                    List = u.GetIEnumerable<Sub_Tag>("Get_SearchTag", p).ToList();
                 }
             }
             catch (Exception ex)
@@ -287,49 +240,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public List<Tags> GetTagSearchFilter(string searchStr, string selectedId)
-        {
-            List<Tags> List = new List<Tags>();
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            try
-            {
-                using (var u = unitOfWork.Create(false))
-                {
-                    var p = new DynamicParameters();
-                    p.Add("@search", searchStr);
-                    p.Add("@idSelected", selectedId);
-                    p.Add("@type", "Tag");
-                    List = u.GetIEnumerable<Tags>("Get_SearchToFilter", p).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                return List;
-            }
-            return List;
-        }
-        public List<Sub_Tag> GetSubTagSearchFilter(string searchStr, string selectedId)
-        {
-            List<Sub_Tag> List = new List<Sub_Tag>();
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            try
-            {
-                using (var u = unitOfWork.Create(false))
-                {
-                    var p = new DynamicParameters();
-                    p.Add("@search", searchStr);
-                    p.Add("@idSelected", selectedId);
-                    p.Add("@type", "SubTag");
-                    List = u.GetIEnumerable<Sub_Tag>("Get_SearchToFilter", p).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                return List;
-            }
-            return List;
-        }
-        public List<Authors> GetAuthorSearchFilter(string searchStr, string selectedId)
+        public List<Authors> SearhAuthor(string searchStr, string selectedId)
         {
             List<Authors> List = new List<Authors>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -340,8 +251,7 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
                     p.Add("@search", searchStr);
                     p.Add("@idSelected", selectedId);
-                    p.Add("@type", "Author");
-                    List = u.GetIEnumerable<Authors>("Get_SearchToFilter", p).ToList();
+                    List = u.GetIEnumerable<Authors>("Get_SearchAuthorForStory", p).ToList();
                 }
             }
             catch (Exception ex)

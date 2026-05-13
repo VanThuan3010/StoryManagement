@@ -70,29 +70,6 @@ namespace StoryManagement.Model.Implement
             }
 
         }
-        // Lưu tác phẩm
-        public int SaveLiterary(int id, string storyIds)
-        {
-            var unitOfWork = new UnitOfWorkFactory(_cnnString);
-            int list = 0;
-            try
-            {
-                using (var u = unitOfWork.Create(true))
-                {
-                    var p = new DynamicParameters();
-                    p.Add("@id", id);
-                    p.Add("@storyIds", storyIds);
-
-                    list = u.ProcedureExecute("Save_Literary", p);
-                }
-                return list;
-            }
-            catch (Exception ex)
-            {
-                return list;
-            }
-
-        }
         public List<Authors> SearchAuthorForStory(string search, string selected)
         {
             List<Authors> List = new List<Authors>();
@@ -113,7 +90,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Authors authors)
+        public int CreateOrUpdate(Authors authors, string lstStory, string actionFor)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -125,6 +102,8 @@ namespace StoryManagement.Model.Implement
                     p.Add("@Id", authors.Id);
                     p.Add("@pseudonym", authors.Pseudonym);
                     p.Add("@style", authors.Style);
+                    p.Add("@lstStory", lstStory);
+                    p.Add("@action", actionFor);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Author", p);
                 }
@@ -136,9 +115,9 @@ namespace StoryManagement.Model.Implement
             }
 
         }
-        public List<Authors> GetStoryAuthor(int id)
+        public List<Story> GetStoryByAuthor(int id)
         {
-            List<Authors> List = new List<Authors>();
+            List<Story> List = new List<Story>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             try
             {
@@ -147,8 +126,28 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
 
                     p.Add("@Id", id);
-                    p.Add("@for", "Author");
-                    List = u.GetIEnumerable<Authors>("Get_StoryAuthor", p).ToList();
+                    List = u.GetIEnumerable<Story>("Get_StoryByAuthor", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Story> SearchStory(string search, string idSelected)
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@search", search);
+                    p.Add("@idSelected", idSelected);
+                    List = u.GetIEnumerable<Story>("Get_SearchStoryForAuthor", p).ToList();
                 }
             }
             catch (Exception ex)

@@ -11,11 +11,11 @@ namespace StoryManagement.Model.Interface
     public interface IAuthors : IRepository<Authors>
     {
         List<Authors> GetAll(int pageIndex, int pageSize, string search, ref int Total);
-        int CreateOrUpdate(Authors authors);
-        List<Authors> GetStoryAuthor(int id);
+        int CreateOrUpdate(Authors authors, string lstStory, string actionFor);
+        List<Story> GetStoryByAuthor(int id);
         List<Authors> SearchAuthorForStory(string search, string selected);
         Authors GetDetail(int id);
         int DeleteAuthor(int id);
-        int SaveLiterary(int id, string storyIds);
+        List<Story> SearchStory(string search, string idSelected);
     }
 }

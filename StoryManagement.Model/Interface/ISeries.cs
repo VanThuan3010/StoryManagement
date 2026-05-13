@@ -14,5 +14,6 @@ namespace StoryManagement.Model.Interface
         List<Story> SearchStory(string search, string idSelected);
         List<Story> GetStory(int Id);
         int SaveSeries(Series series, string lstStory);
+        int DeleteSeries(int id);
     }
 }

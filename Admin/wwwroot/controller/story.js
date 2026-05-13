@@ -8,18 +8,13 @@
                 $('#saveIdStory').val(0);
                 $('#txtName').val('');
                 $('#txtNumberChapter').val('');
-                //story.init_Tag(0);
-                //story.init_SubTag(0);
-                story.init_Author(0);
                 $('#txtTagName').val('');
+                $("#tblAuthors tbody").empty();
                 $('#sources').val('SacHiepVien');
                 $('#labelAction').text('Thêm mới truyện');
 
                 $('#modalCreateOrEdit').modal('show');
             });
-            //story.init_searchTag();
-            //story.init_searchSubTag();
-            story.init_searchAuthor();
             //$("#txtImage").on("change", function () {
             //    const file = this.files[0];
             //    if (file) {
@@ -34,6 +29,95 @@
             //});
         },
         action: function () {
+            $("#btnAddAuthorRow").click(function () {
+                let row = `
+                <tr>
+                    <td style="width: 100%">
+                        <div class="story-search-wrapper">
+                            <div class="search-input-container">
+                                <input type="text" class="form-control story-search-input" placeholder="Nhập tên tác giả..." autocomplete="off" />
+                            </div>
+                            <div class="search-result-list border rounded bg-white mt-1" style="display:none; position:absolute; z-index:1000; overflow:auto;"></div>
+                        </div>
+                    </td>
+                </tr>`;
+                $("#tblAuthors tbody").append(row);
+            });
+            $(document).on("keyup", ".story-search-input", function () {
+                let query = $(this).val().trim();
+                let resultDiv = $(this).closest(".story-search-wrapper").find(".search-result-list");
+                if (query.length < 2) {
+                    resultDiv.hide();
+                    return;
+                }
+                const idSelected = $("#tblAuthors .selected-story .story-name")
+                    .map(function () {
+                        return $(this).data("id");
+                    })
+                    .get();
+
+                $.get("/Story/SearchAuthor", { search: query, idSelected: idSelected.join(",") }, function (res) {
+                    resultDiv.empty();
+
+                    if (res && res.length > 0) {
+                        res.forEach(author => {
+                            let pseu = "";
+                            let titleText = "";
+                            try {
+                                let parsed = JSON.parse(author.pseudonym);
+
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    pseu = parsed[0];
+                                    titleText = parsed.join('\n');
+                                }
+                            } catch (e) {
+                                pseu = story.name;
+                                titleText = pseu;
+                            }
+                            resultDiv.append(`
+                            <div class="p-2 search-item" 
+                                 data-id="${story.id}" 
+                                 data-name="${pseu}" 
+                                 title="${titleText}"
+                                 style="cursor:pointer;">
+                                ${pseu}
+                            </div>`);
+                        });
+                        resultDiv.show();
+                    } else {
+                        resultDiv.append(`<div class="p-2 text-muted fst-italic">Không tìm thấy truyện</div>`);
+                        resultDiv.show();
+                    }
+                });
+            });
+            $(document).on("click", ".search-item", function () {
+                let id = $(this).data("id");
+                let pseu = "";
+                let titleText = "";
+                try {
+                    let parsed = JSON.parse($(this).data("name"));
+
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        pseu = parsed[0];
+                        titleText = parsed.join('\n');
+                    }
+                } catch (e) {
+                    pseu = $(this).data("name");
+                    titleText = pseu;
+                }
+                let wrapper = $(this).closest(".story-search-wrapper");
+                let resultDiv = wrapper.find(".search-result-list");
+                let inputContainer = wrapper.find(".search-input-container");
+
+                resultDiv.hide();
+
+                inputContainer.html(`
+                    <div class="selected-story d-inline-flex align-items-center gap-2 border rounded px-2 py-1 bg-light">
+                        <span data-id="${id}" class="story-name line-clamp-1" title="${titleText}">${pseu}</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-clear-story">×</button>
+                    </div>
+                `);
+            });
             $('#chk').data('checked', 2).click(function (e) {
                 el = $(this);
                 switch (el.data('checked')) {
@@ -62,6 +146,15 @@
                 story.tblStory();
             });
             $('#btnSubmit').click(function () {
+                let storiesData = [];
+                $("#tblAuthors tbody tr").each(function () {
+                    const storyId = $(this).find(".selected-story .story-name").data("id");
+                    if (storyId) {
+                        storiesData.push({
+                            storyId: storyId
+                        });
+                    }
+                });
                 var datas = new FormData();
                 datas.append('Id', $('#saveIdStory').val());
                 datas.append('Name', JSON.stringify($('#txtName').val().split(/\r?\n/).filter(line => line.trim() !== '')));
@@ -69,9 +162,7 @@
                 datas.append('Source', $('#sources').val());
                 datas.append('IsRead', 0);
                 datas.append('TagsName', $('#txtTagName').val());
-                datas.append('AuthorId', JSON.stringify($('#sltFormAuthor').val() || []));
-                //datas.append('TagId', $('#sltFormTag').val().join(','));
-                //datas.append('SubTagId', $('#sltFormAuthor').val().join(','));
+                datas.append('AuthorId', JSON.stringify(storiesData));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
                     type: 'post',
@@ -115,365 +206,6 @@
                 });
             })
         },
-        init_searchTag: function () {
-            let timer;
-            $("#searchTag").on("keyup", function () {
-                const keyword = $(this).val().trim();
-                clearTimeout(timer);
-
-                if (keyword.length < 2) {
-                    $("#sTagRes").empty();
-                    return;
-                }
-
-                timer = setTimeout(function () {
-                    const idSelected = $("#tagSelected .lst-tag li a.li-tag")
-                        .map(function () {
-                            return $(this).data("id");
-                        })
-                        .get();
-                    $.ajax({
-                        url: "/Story/GetTagSearch",
-                        type: "GET",
-                        data: {
-                            searchStr: keyword,
-                            idSelected: idSelected.join(','),
-                            type: "Tag"
-                        },
-                        success: function (res) {
-                            $("#sTagRes").empty();
-                            if (res && res.length > 0) {
-                                let html = `<div class="tag-result-list" 
-                            style="border:1px solid #ccc; border-radius:6px; padding:4px;">`;
-                                res.forEach(tag => {
-                                    html += `
-                                    <div class="tag-item" data-id="${tag.id}" 
-                                        style="padding:4px; cursor:pointer; border-bottom:1px solid #eee;">
-                                        ${tag.name}
-                                    </div>`;
-                                });
-                                html += `</div>`;
-                                $("#sTagRes").html(html);
-                            } else {
-                                $("#sTagRes").html(`<div style="color:red;">Không tìm thấy kết quả</div>`);
-                            }
-                        },
-                        error: function () {
-                            $("#sTagRes").html(`<div style="color:red;">Lỗi tải dữ liệu</div>`);
-                        }
-                    });
-                }, 1000);
-            });
-
-            $(document).on("click", ".tag-item", function () {
-                const selectedId = $(this).data("id");
-                const selectedText = $(this).text();
-                const exists = $("#tagSelected .tags li[data-id='" + selectedId + "']").length > 0;
-                if (!exists) {
-                    $("#tagSelected .lst-tag").append(`
-                        <li><a href="#" data-id="${selectedId}" data-value="${selectedText}" class="li-tag">${selectedText}<span class="remove-searchTag">&times;</span></a></li>
-                    `);
-                }
-                $("#searchTag").val('');
-                $("#sTagRes").empty();
-            });
-
-            $(document).on("click", ".remove-searchTag", function () {
-                $(this).closest("li").remove();
-            });
-        },
-        init_searchSubTag: function () {
-            let timer;
-            $("#searchSubTag").on("keyup", function () {
-                const keyword = $(this).val().trim();
-                clearTimeout(timer);
-
-                if (keyword.length < 2) {
-                    $("#sTagRes").empty();
-                    return;
-                }
-
-                timer = setTimeout(function () {
-                    const idSelected = $("#subTagSelected .lst-subTag li a.li-subTag")
-                        .map(function () {
-                            return $(this).data("id");
-                        })
-                        .get();
-                    $.ajax({
-                        url: "/Story/GetTagSearch",
-                        type: "GET",
-                        data: {
-                            searchStr: keyword,
-                            idSelected: idSelected.join(','),
-                            type: "SubTag"
-                        },
-                        success: function (res) {
-                            $("#sSubTagRes").empty();
-                            if (res && res.length > 0) {
-                                let html = `<div class="subTag-result-list" 
-                            style="border:1px solid #ccc; border-radius:6px; padding:4px;">`;
-                                res.forEach(tag => {
-                                    html += `
-                                    <div class="subTag-item" data-id="${tag.id}" 
-                                        style="padding:4px; cursor:pointer; border-bottom:1px solid #eee;">
-                                        ${tag.name}
-                                    </div>`;
-                                });
-                                html += `</div>`;
-                                $("#sSubTagRes").html(html);
-                            } else {
-                                $("#sSubTagRes").html(`<div style="color:red;">Không tìm thấy kết quả</div>`);
-                            }
-                        },
-                        error: function () {
-                            $("#sSubTagRes").html(`<div style="color:red;">Lỗi tải dữ liệu</div>`);
-                        }
-                    });
-                }, 1000);
-            });
-
-            $(document).on("click", ".subTag-item", function () {
-                const selectedId = $(this).data("id");
-                const selectedText = $(this).text();
-                const exists = $("#subTagSelected .tags li[data-id='" + selectedId + "']").length > 0;
-                if (!exists) {
-                    $("#subTagSelected .lst-subTag").append(`
-                        <li><a href="#" data-id="${selectedId}" data-value="${selectedText}" class="li-subTag">${selectedText}<span class="remove-searchSubTag">&times;</span></a></li>
-                    `);
-                }
-                $("#searchSubTag").val('');
-                $("#sSubTagRes").empty();
-            });
-
-            $(document).on("click", ".remove-searchSubTag", function () {
-                $(this).closest("li").remove();
-            });
-        },
-        init_searchAuthor: function () {
-            let timer;
-            $("#searchAuthor").on("keyup", function () {
-                const keyword = $(this).val().trim();
-                clearTimeout(timer);
-
-                if (keyword.length < 2) {
-                    $("#sAuthorRes").empty();
-                    return;
-                }
-
-                timer = setTimeout(function () {
-                    const idSelected = $("#authorSelected .lst-author li a.li-author")
-                        .map(function () {
-                            return $(this).data("id");
-                        })
-                        .get();
-                    $.ajax({
-                        url: "/Story/GetTagSearch",
-                        type: "GET",
-                        data: {
-                            searchStr: keyword,
-                            idSelected: idSelected.join(','),
-                            type: "Author"
-                        },
-                        success: function (res) {
-                            $("#sAuthorRes").empty();
-                            if (res && res.length > 0) {
-                                let html = `<div class="author-result-list" 
-                            style="border:1px solid #ccc; border-radius:6px; padding:4px;">`;
-                                res.forEach(tag => {
-                                    html += `
-                                    <div class="author-item" data-id="${tag.id}"
-                                        style="padding:4px; cursor:pointer; border-bottom:1px solid #eee;">
-                                        ${tag.name}
-                                    </div>`;
-                                });
-                                html += `</div>`;
-                                $("#sAuthorRes").html(html);
-                            } else {
-                                $("#sAuthorRes").html(`<div style="color:red;">Không tìm thấy kết quả</div>`);
-                            }
-                        },
-                        error: function () {
-                            $("#sAuthorRes").html(`<div style="color:red;">Lỗi tải dữ liệu</div>`);
-                        }
-                    });
-                }, 1000);
-            });
-
-            $(document).on("click", ".author-item", function () {
-                const selectedId = $(this).data("id");
-                const selectedText = $(this).text();
-                const exists = $("#authorSelected .tags li[data-id='" + selectedId + "']").length > 0;
-                if (!exists) {
-                    $("#authorSelected .lst-author").append(`
-                        <li><a href="#" data-id="${selectedId}" data-value="${selectedText}" class="li-author">${selectedText}<span class="remove-searchAuthor">&times;</span></a></li>
-                    `);
-                }
-                $("#searchAuthor").val('');
-                $("#sAuthorRes").empty();
-            });
-
-            $(document).on("click", ".remove-searchAuthor", function () {
-                $(this).closest("li").remove();
-            });
-        },
-        init_Tag: function (Id) {
-            $("#sltFormTag").select2({
-                placeholder: "Chọn thẻ...",
-                minimumInputLength: 2,
-                ajax: {
-                    url: "/Story/SearchTag",
-                    dataType: "json",
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            searchString: params.term,
-                            selected: $("#sltFormTag").val().join(',')
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: $.map(data, function (item) {
-                                return {
-                                    id: item.id,
-                                    text: item.name
-                                }
-                            })
-                        };
-                    },
-                    cache: true
-                }
-            });
-
-            $.ajax({
-                url: "/Tag/GetTagToCRUD",
-                data: {
-                    id: Id,
-                    forType: 'Story'
-                },
-                success: function (data) {
-                    $("#sltFormTag").empty().trigger("change");
-                    (data.rows || []).forEach(function (item) {
-                        var option = new Option(item.name, item.id, true, true);
-                        $("#sltFormTag").append(option);
-                    });
-                    $("#sltFormTag").trigger("change");
-                }
-            });
-        },
-        init_SubTag: function (Id) {
-            $("#sltFormSubTag").select2({
-                placeholder: "Chọn thẻ phụ...",
-                minimumInputLength: 2,
-                ajax: {
-                    url: "/Story/SearchSubTag",
-                    dataType: "json",
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            searchString: params.term,
-                            selected: $("#sltFormSubTag").val().join(',')
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: $.map(data, function (item) {
-                                return {
-                                    id: item.id,
-                                    text: item.name
-                                }
-                            })
-                        };
-                    },
-                    cache: true
-                }
-            });
-
-            $.ajax({
-                url: "/SubTag/GetSubTagToCRUD",
-                data: {
-                    id: Id,
-                    forType: 'Story'
-                },
-                success: function (data) {
-                    $("#sltFormSubTag").empty().trigger("change");
-                    (data.rows || []).forEach(function (item) {
-                        var option = new Option(item.name, item.id, true, true);
-                        $("#sltFormSubTag").append(option);
-                    });
-                    $("#sltFormSubTag").trigger("change");
-                }
-            });
-        },
-        init_Author: function (Id) {
-            $("#sltFormAuthor").select2({
-                placeholder: "Chọn tác giả...",
-                minimumInputLength: 2,
-                ajax: {
-                    url: "/Author/SearchAuthorForStory",
-                    dataType: "json",
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            searchString: params.term,
-                            selected: ($("#sltFormAuthor").val() || []).join(',')
-                        };
-                    },
-                    processResults: function (data, params) {
-                        const term = (params.term || '').toLowerCase();
-                        return {
-                            results: $.map(data, function (item) {
-                                let text = item.pseudonym;
-
-                                try {
-                                    let arr = JSON.parse(item.pseudonym);
-
-                                    if (Array.isArray(arr) && arr.length > 0) {
-                                        // 👉 tìm phần tử match keyword
-                                        let match = arr.find(x =>
-                                            x && x.toLowerCase().includes(term)
-                                        );
-                                        // 👉 nếu có thì dùng, không thì fallback phần tử đầu
-                                        text = match || arr[0];
-                                    }
-                                } catch (e) {
-                                    // giữ nguyên nếu không phải JSON
-                                }
-                                return {
-                                    id: item.id,
-                                    text: text
-                                }
-                            })
-                        };
-                    },
-                    cache: true
-                }
-            });
-
-            $.ajax({
-                url: "/Author/GetAuthorForStory",
-                data: {
-                    id: Id
-                },
-                success: function (data) {
-                    $("#sltFormAuthor").empty().trigger("change");
-                    (data.rows || []).forEach(function (item) {
-                        let text = item.pseudonym;
-
-                        try {
-                            let arr = JSON.parse(item.pseudonym);
-                            if (Array.isArray(arr) && arr.length > 0) {
-                                text = arr[0]; // 👉 lấy phần tử đầu tiên
-                            }
-                        } catch (e) {
-                            // nếu không phải JSON thì giữ nguyên
-                        }
-                        var option = new Option(text, item.id, true, true);
-                        $("#sltFormAuthor").append(option);
-                    });
-                    $("#sltFormAuthor").trigger("change");
-                }
-            });
-        },
         tblStory: function () {
             var objTable = $("#tblStory");
             objTable.bootstrapTable('destroy');
@@ -485,15 +217,6 @@
                         limit: p.limit,
                         offset: p.offset,
                         search: $('#txtSearch').val().trim(),
-                        //tags: $("#tagSelected .lst-tag li a.li-tag").map(function () {
-                        //            return $(this).data("id");
-                        //}).get().join(','),
-                        //subTags: $("#subTagSelected .lst-subTag li a.li-subTag").map(function () {
-                        //            return $(this).data("id");
-                        //}).get().join(','),
-                        //authors: $("#authorSelected .lst-author li a.li-author").map(function () {
-                        //    return $(this).data("id");
-                        //}).get().join(','),
                         status: $('#chk').val()
                     }, p);
                     return param;
@@ -713,9 +436,6 @@
                                     $('#txtNumberChapter').val(row.numberChapter);
                                 }
                                 $('#sources').val(row.source.trim());
-                                //story.init_Tag(row.id);
-                                //story.init_SubTag(row.id);
-                                story.init_Author(row.id);
                                 $('#labelAction').text('Sửa truyện');
 
                                 $('#modalCreateOrEdit').modal('show');
