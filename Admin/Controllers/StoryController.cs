@@ -132,5 +132,10 @@ namespace Admin.Controllers
             var data = _ibase.storyRespository.SearhAuthor(search, idSelected);
             return Json(data);
         }
+        public JsonResult GetAuthorForStory(int id)
+        {
+            var data = _ibase.storyRespository.GetAuthor(id);
+            return Json(data);
+        }
     }
 }

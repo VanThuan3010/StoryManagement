@@ -76,7 +76,7 @@
                             }
                             resultDiv.append(`
                             <div class="p-2 search-item" 
-                                 data-id="${story.id}" 
+                                 data-id="${author.id}" 
                                  data-name="${pseu}" 
                                  title="${titleText}"
                                  style="cursor:pointer;">
@@ -146,12 +146,12 @@
                 story.tblStory();
             });
             $('#btnSubmit').click(function () {
-                let storiesData = [];
+                let authorsData = [];
                 $("#tblAuthors tbody tr").each(function () {
-                    const storyId = $(this).find(".selected-story .story-name").data("id");
-                    if (storyId) {
-                        storiesData.push({
-                            storyId: storyId
+                    const authorId = $(this).find(".selected-story .story-name").data("id");
+                    if (authorId) {
+                        authorsData.push({
+                            authorId: authorId
                         });
                     }
                 });
@@ -162,7 +162,7 @@
                 datas.append('Source', $('#sources').val());
                 datas.append('IsRead', 0);
                 datas.append('TagsName', $('#txtTagName').val());
-                datas.append('AuthorId', JSON.stringify(storiesData));
+                datas.append('AuthorId', JSON.stringify(authorsData));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
                     type: 'post',
@@ -436,6 +436,66 @@
                                     $('#txtNumberChapter').val(row.numberChapter);
                                 }
                                 $('#sources').val(row.source.trim());
+                                $.ajax({
+                                    url: "/Story/GetAuthorForStory",
+                                    data: {
+                                        id: row.id
+                                    },
+                                    success: function (res) {
+                                        $("#tblAuthors tbody").empty();
+                                        if (res && res.length > 0) {
+                                            res.forEach(function (author) {
+                                                let pseu = "";
+                                                let titleText = "";
+                                                try {
+                                                    let parsed = JSON.parse(author.pseudonym);
+
+                                                    if (Array.isArray(parsed) && parsed.length > 0) {
+                                                        pseu = parsed[0];
+                                                        titleText = parsed.join('\n');
+                                                    }
+                                                } catch (e) {
+                                                    pseu = author.pseudonym;
+                                                    titleText = pseu;
+                                                }
+
+                                                let rowHtml = `
+                                                <tr>
+                                                    <td style="width: 100%">
+                                                        <div class="story-search-wrapper">
+                                                            <div class="search-input-container">
+                                                                <div class="selected-story d-inline-flex align-items-center gap-2 border rounded px-2 py-1 bg-light">
+                                                                    <span data-id="${story.id}" class="story-name line-clamp-1" title="${titleText}">${pseu}</span>
+                                                                    <button type="button" class="btn btn-sm btn-outline-danger btn-clear-story">×</button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="search-result-list border rounded bg-white mt-1"
+                                                                 style="display:none; position:absolute; z-index:1000; max-height:200px; overflow:auto;"></div>
+                                                        </div>
+                                                    </td>
+                                                </tr>`;
+                                                $("#tblAuthors tbody").append(rowHtml);
+                                            });
+                                        } else {
+                                            let emptyRow = `
+                                            <tr>
+                                                <td style="width: 100%">
+                                                    <div class="story-search-wrapper">
+                                                        <div class="search-input-container">
+                                                            <input type="text" class="form-control story-search-input" placeholder="Nhập tên truyện..." autocomplete="off" />
+                                                        </div>
+                                                        <div class="search-result-list border rounded bg-white mt-1" 
+                                                             style="display:none; position:absolute; z-index:1000; max-height:200px; overflow:auto;"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>`;
+                                            $("#tblAuthors tbody").append(emptyRow);
+                                        }
+                                    },
+                                    error: function () {
+                                        alert("Lỗi kết nối!");
+                                    }
+                                });
                                 $('#labelAction').text('Sửa truyện');
 
                                 $('#modalCreateOrEdit').modal('show');

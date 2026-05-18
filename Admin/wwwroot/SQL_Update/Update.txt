@@ -1,0 +1,12 @@
+Thêm: 
+	bảng: Story_Tags
+	thủ tục: Get_StoryByAuthor, Delete_Series, Get_AuthorByStory
+	Index cho bảng Chapter (IdStory, Belong)
+Sửa:
+	Cấu trúc bảng: Tags, Author
+	Thủ tục: Get_SearchStoryForSeries, Get_SearchStoryForAuthor, CreateOrUpdate_Author, CreateOrUpdate_Story, Get_Story (từ Get_Story4), 			CreateOrUpdate_Series
+Xóa:
+	Thủ tục: Save_Literary, Get_Story, Get_Story3, Get_SearchTag
+	Function: GetChaptersSave
+Đổi tên:
+	Get_SearchToFilter thành Get_SearchAuthorForStory

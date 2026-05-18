@@ -22,5 +22,6 @@ namespace StoryManagement.Model.Interface
         int ReadChangeStory(int id, long idChapter);
         List<Story> GetStoryByAuthor(int id);
         List<Story> GetStorySearchInAuthor(string search, string idSelected);
+        List<Authors> GetAuthor(int Id);
     }
 }

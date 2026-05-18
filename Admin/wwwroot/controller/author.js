@@ -318,7 +318,7 @@
                                                         <div class="story-search-wrapper">
                                                             <div class="search-input-container">
                                                                 <div class="selected-story d-inline-flex align-items-center gap-2 border rounded px-2 py-1 bg-light">
-                                                                    <span data-id="${story.id}" class="story-name">${sName}</span>
+                                                                    <span data-id="${story.id}" class="story-name line-clamp-1">${sName}</span>
                                                                     <button type="button" class="btn btn-sm btn-outline-danger btn-clear-story">×</button>
                                                                 </div>
                                                             </div>
