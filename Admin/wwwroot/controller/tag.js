@@ -20,7 +20,7 @@
             $('#btnSubmit').click(function () {
                 var datas = new FormData();
                 datas.append('Id', $('#txtIdModal').val());
-                datas.append('Name', $('#txtName').val());
+                datas.append('Name', JSON.stringify($('#txtName').val().split(/\r?\n/).filter(line => line.trim() !== '')));
                 datas.append('Definition', $('#txtDefinition').val());
                 debugger
                 $.ajax({
@@ -60,7 +60,7 @@
                     var param = $.extend(true, {
                         limit: p.limit,
                         offset: p.offset,
-                        search: $('#txtSearch').val(),
+                        search: $('#txtSearch').val().trim(),
                     }, p);
                     return param;
                 },
@@ -75,8 +75,8 @@
                 pagination: true,
                 paginationVAlign: 'bottom',
                 search: false,
-                pageSize: 10,
-                pageList: [10, 50, 100],
+                pageSize: 50,
+                pageList: [50, 100],
 
                 columns: [
                     {
@@ -84,6 +84,17 @@
                         title: "Tên",
                         align: 'left',
                         valign: 'left',
+                        formatter: function (value) {
+                            try {
+                                let arr = JSON.parse(value);
+                                if (Array.isArray(arr)) {
+                                    return arr.join("<br>");
+                                }
+                                return value;
+                            } catch {
+                                return value;
+                            }
+                        }
                     },
                     {
                         field: "definition",
@@ -113,7 +124,7 @@
                                             btnClass: 'btn btn-primary',
                                             action: function () {
                                                 $.ajax({
-                                                    url: '/GroupTag/Delete',
+                                                    url: '/Tag/Delete',
                                                     type: 'post',
                                                     data: {
                                                         id: row.id,

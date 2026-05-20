@@ -16,7 +16,6 @@ namespace StoryManagement.Model
         IComic comicRespository { get; }
         IComic_Episode comicEpisodeRespository { get; }
         IComic_Images comicImagesRespository { get; }
-        IGroupTag groupTagRespository { get; }
         IMy_Compose my_ComposeRepository { get; }
         IPart_Chapter part_ChapterRespository { get; }
         IReviews reviewRespository { get; }
@@ -26,7 +25,6 @@ namespace StoryManagement.Model
         IStory storyRespository { get; }
         IStory_Comic storyComicRepository { get; }
         IStorySearch storySearchRepository { get; }
-        ISub_Tag sub_TagRespository { get; }
         ITag tagRespository { get; }
         ITbl_Relationship relationshipRespository { get; }
         void Commit();

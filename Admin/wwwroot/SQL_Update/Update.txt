@@ -10,3 +10,8 @@ Xóa:
 	Function: GetChaptersSave
 Đổi tên:
 	Get_SearchToFilter thành Get_SearchAuthorForStory
+
+*********************************************************************
+20/05/2026
+Xóa: Get_TagOrSubTag_ById, Get_GroupTag, CreateOrUpdate_GroupTag, Get_SearchTag, Tbl_Relationship, UpdateRelationship, Get_TagOrSubTag_ById, 
+Sửa: CreateOrUpdate_TagOrSubTag (đổi tên lại thành CreateOrUpdate_Tag), Delete_TagOrSubTag (đổi tên lại thành Delete_Tag)

@@ -23,17 +23,15 @@ namespace Admin.Controllers
             return Json(new { rows = data, total = total });
         }
         [HttpPost]
-        public JsonResult CreateOrUpdate(int Id, string Name, string Definition)
+        public JsonResult CreateOrUpdate(Tags tags)
         {
             try
             {
-                bool Status = false;
-                string Mess = "";
-                _ibase.groupTagRespository.CreateOrUpdateTag_SubTag(Id, "Tag", Name, Definition, ref Status, ref Mess);
+                _ibase.tagRespository.CreateOrUpdateTag(tags);
                 return new JsonResult(new
                 {
-                    status = Status,
-                    message = Mess
+                    status = true,
+                    message = "Thao tác thành công"
                 });
             }
             catch (Exception ex)
@@ -45,11 +43,15 @@ namespace Admin.Controllers
                 });
             }
         }
-        public JsonResult GetTagToCRUD(int id, string forType)
+        [HttpPost]
+        public JsonResult Delete(int id)
         {
-            int total = 0;
-            var data = _ibase.tagRespository.GetTag(id, forType);
-            return Json(new { rows = data, total = total });
+            var data = _ibase.tagRespository.Delete(id);
+            return new JsonResult(new
+            {
+                status = true,
+                message = "Xóa thành công"
+            });
         }
     }
 }

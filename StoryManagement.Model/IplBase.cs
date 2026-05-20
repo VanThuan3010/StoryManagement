@@ -20,7 +20,6 @@ namespace StoryManagement.Model
         private IComic _comicRespository;
         private IComic_Episode _comicEpisodeRespository;
         private IComic_Images _comicImagesRespository;
-        private IGroupTag _groupTagRespository;
         private IMy_Compose _myComposeRespository;
         private IPart_Chapter _partRespository ;
         private IReviews _reviewRespository;
@@ -30,7 +29,6 @@ namespace StoryManagement.Model
         private IStory _storyRespository;
         private IStory_Comic _storyComicRespository;
         private IStorySearch _storySearchRespository;
-        private ISub_Tag _subTagRespository;
         private ITag _tagRespository;
         private ITbl_Relationship _relationshipRespository;
 
@@ -74,13 +72,6 @@ namespace StoryManagement.Model
             get
             {
                 return _comicImagesRespository ?? (_comicImagesRespository = new IplComic_Images(_dbContext, _Configuration));
-            }
-        }
-        public IGroupTag groupTagRespository
-        {
-            get
-            {
-                return _groupTagRespository ?? (_groupTagRespository = new IplGroupTag(_dbContext, _Configuration));
             }
         }
         public IMy_Compose my_ComposeRepository
@@ -144,13 +135,6 @@ namespace StoryManagement.Model
             get
             {
                 return _storySearchRespository ?? (_storySearchRespository = new IplStorySearch(_dbContext, _Configuration));
-            }
-        }
-        public ISub_Tag sub_TagRespository
-        {
-            get
-            {
-                return _subTagRespository ?? (_subTagRespository = new IplSub_Tag(_dbContext, _Configuration));
             }
         }
         public ITag tagRespository

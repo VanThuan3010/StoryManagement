@@ -48,20 +48,40 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public List<Tags> GetTag(int id, string forModule)
+        public int CreateOrUpdateTag(Tags tags)
         {
-            List<Tags> List = new List<Tags>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@id", tags.Id);
+                    p.Add("@name", tags.Name);
+                    p.Add("@definition", tags.Definition);
+                    list = u.ProcedureExecute("CreateOrUpdate_Tag", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+        }
+        public int Delete(int id)
+        {
+            int List = 0;
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             try
             {
-                using (var u = unitOfWork.Create(false))
+                using (var u = unitOfWork.Create(true))
                 {
                     var p = new DynamicParameters();
 
                     p.Add("@id", id);
-                    p.Add("@getFrom", "Tag");
-                    p.Add("@getFor", forModule);
-                    List = u.GetIEnumerable<Tags>("Get_TagOrSubTag_ById", p).ToList();
+                    List = u.ProcedureExecute("Delete_Tag", p);
                 }
             }
             catch (Exception ex)
