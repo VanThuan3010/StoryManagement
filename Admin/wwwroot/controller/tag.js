@@ -151,7 +151,15 @@
                             },
                             'click .btnEdit': function (e, value, row, index) {
                                 $('#txtIdModal').val(row.id);
-                                $('#txtName').val(row.name);
+                                try {
+                                    let pseudonyms = JSON.parse(row.name);
+                                    if (Array.isArray(pseudonyms))
+                                        $('#txtName').val(pseudonyms.join("\n"));
+                                    else
+                                        $('#txtName').val(row.name);
+                                } catch {
+                                    $('#txtName').val(row.name);
+                                }
                                 $('#txtDefinition').val(row.definition);
                                 $('#labelAction').text('Sửa thẻ');
 

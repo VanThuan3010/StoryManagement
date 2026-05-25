@@ -21,7 +21,6 @@ namespace MFTech.Model.Entity
         public virtual DbSet<Comic> Comics { get; set; } = null!;
         public virtual DbSet<Comic_Episode> Comic_Episodes { get; set; } = null!;
         public virtual DbSet<Comic_Images> Comic_Images { get; set; } = null!;
-        public virtual DbSet<GroupTag> GroupTags { get; set; } = null!;
         public virtual DbSet<My_Compose> My_Composes { get; set; } = null!;
         public virtual DbSet<Part_Chapter> Part_Chapters { get; set; } = null!;
         public virtual DbSet<Reviews> Reviews { get; set; } = null!;
@@ -31,7 +30,6 @@ namespace MFTech.Model.Entity
         public virtual DbSet<Story> Stories { get; set; } = null!;
         public virtual DbSet<Story_Comic> Story_Comics { get; set; } = null!;
         public virtual DbSet<Story_Search> Story_Searches { get; set; } = null!;
-        public virtual DbSet<Sub_Tag> Sub_Tags { get; set; } = null!;
         public virtual DbSet<Tags> Tags { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -78,14 +76,6 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.Episode_Order);
                 entity.Property(e => e.ChapterId);
                 entity.Property(e => e.ChapterOrder);
-            });
-            modelBuilder.Entity<GroupTag>(entity =>
-            {
-                entity.ToTable("GroupTag");
-
-                entity.Property(e => e.Name);
-                entity.Property(e => e.Definition);
-                entity.Property(e => e.MultiSelect);
             });
             modelBuilder.Entity<My_Compose>(entity =>
             {
@@ -159,13 +149,6 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.Request);
                 entity.Property(e => e.Result);
                 entity.Property(e => e.SearchBy);
-            });
-            modelBuilder.Entity<Sub_Tag>(entity =>
-            {
-                entity.ToTable("Sub_Tag");
-
-                entity.Property(e => e.Name).HasMaxLength(500);
-                entity.Property(e => e.Definition).HasMaxLength(4000);
             });
             modelBuilder.Entity<Tags>(entity =>
             {

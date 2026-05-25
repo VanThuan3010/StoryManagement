@@ -7,6 +7,7 @@
                 $('#saveAuthorId').val(0);
                 $('#txtPseudonym').val('');
                 $('#txtStyle').val('');
+                CKEDITOR.instances.txtStyle.setData(null);
                 //$("#tblStories tbody").empty();
                 $('#labelAction').text('Thêm mới tác giả');
                 $('#modalCreateOrEdit').modal('show');

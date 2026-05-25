@@ -144,13 +144,6 @@ namespace StoryManagement.Model
                 return _tagRespository ?? (_tagRespository = new IplTag(_dbContext, _Configuration));
             }
         }
-        public ITbl_Relationship relationshipRespository
-        {
-            get
-            {
-                return _relationshipRespository ?? (_relationshipRespository = new IplTbl_Relationship(_dbContext, _Configuration));
-            }
-        }
         public void Commit()
         {
             _dbContext.SaveChanges();

@@ -26,7 +26,6 @@ namespace StoryManagement.Model
         IStory_Comic storyComicRepository { get; }
         IStorySearch storySearchRepository { get; }
         ITag tagRespository { get; }
-        ITbl_Relationship relationshipRespository { get; }
         void Commit();
     }
 }
