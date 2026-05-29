@@ -19,7 +19,7 @@ namespace Website.Controllers
         public IActionResult Details(int idStory)
         {
             Story str = _ibase.storyRespository.GetDetail(idStory);
-            ViewBag.listAuthors = _ibase.authorRespository.GetStoryAuthor(idStory);
+            //ViewBag.listAuthors = _ibase.authorRespository.GetStoryAuthor(idStory);
             ViewBag.review = _ibase.reviewRespository.GetStoryReview(idStory);
             //int id = GetStoryIdBySlug(slug);
             //if (id == 0)
@@ -47,7 +47,7 @@ namespace Website.Controllers
         public JsonResult GetChapterStory(int offset, int limit, int idStory)
         {
             int total = 0;
-            var data = _ibase.chapterRespository.GetAll(offset, limit, idStory, ref total);
+            var data = _ibase.chapterRespository.GetAll(offset, limit, idStory, "" , ref total);
             return Json(new { rows = data, total = total });
         }
     }
