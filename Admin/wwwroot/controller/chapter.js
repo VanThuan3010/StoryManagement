@@ -3,7 +3,7 @@
         savedImages : [],
         init: function () {
             if ($('#Id').val() > 0) {
-                savedImages = Chapter.getEditorImages();
+                Chapter.savedImages = Chapter.getEditorImages();
             }
             Chapter.action();
             Chapter.tblChapter();
@@ -12,11 +12,11 @@
             });
             $('#btnBack').on('click', function (e) {
                 e.preventDefault();
-                Chapter.deleteTempImages();
+                base.deleteNotSavedImages();
                 window.location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
             });
             window.addEventListener("beforeunload", function () {
-                Chapter.deleteTempImages();
+                base.deleteNotSavedImages();
                 window.location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
             });
         },
@@ -109,22 +109,23 @@
             })
             $('#SaveChap').on('click', function(e){
                 e.preventDefault();
-                var ImagesDeletes = [];
-                $.ajax({
-                    url: '/Chapter/GetDetailChapter',
-                    type: 'post',
-                    async: false,
-                    data: {
-                        idChapter: $('#Id').val(),
-                    },
-                    success: function (res) {
-                        const div = document.createElement("div");
-                        div.innerHTML = res.rows.content;
-                        ImagesDeletes = Array.from(div.querySelectorAll("img"))
-                            .map(img => img.getAttribute("src"))
-                            .filter(src => src && src.includes("/uploads/chapter/"));
-                    }
-                });
+                var ImagesInEditor = Chapter.getEditorImages();
+
+                // Ảnh cũ bị xóa
+                var OldImagesDelete = Chapter.savedImages
+                    .filter(x => !ImagesInEditor.includes(x));
+
+                // Ảnh upload mới nhưng đã bị xóa khỏi editor
+                var NewImagesDelete = base.uploadImages
+                    .filter(x => !ImagesInEditor.includes(x));
+
+                // Gộp lại
+                var ImagesDeletes = [
+                    ...OldImagesDelete,
+                    ...NewImagesDelete
+                ];
+                ImagesDeletes = ImagesDeletes.map(img => img.split('/').pop());
+
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
                 formData.append("StoryId", $('#StoryId').val());
@@ -133,16 +134,14 @@
                 formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
                 formData.append("RawContent", base.convertToHTML(CKEDITOR.instances.txtRawContent.getData()));
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
-                // Lấy Img ở CKEditor để chuyển từ temp sang chapter
-                formData.append("Images", JSON.stringify(Chapter.getImagesFromEditor()));
-                // Lấy Img đã lưu để xóa nếu có
                 formData.append("deleteImage", JSON.stringify(ImagesDeletes));
                 $.ajax({
                     url: '/Chapter/CreateOrUpdate',
                     type: 'POST',
                     data: formData,
                     success: function (res) {
-                        if(res.status){
+                        if (res.status) {
+                            base.uploadImages.length = 0;
                             location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
                         } else{
                             base.notification('error', res.message)
@@ -234,7 +233,8 @@
                                                         div.innerHTML = res.rows.content;
                                                         ImagesDelet = Array.from(div.querySelectorAll("img"))
                                                             .map(img => img.getAttribute("src"))
-                                                            .filter(src => src && src.includes("/uploads/chapter/"));
+                                                            .filter(src => src && src.includes("/chapter-images/")).map(img => img.split('/').pop());
+                                                        ImagesDelet = ImagesDelet.map(img => img.split('/').pop());
                                                         $.ajax({
                                                             url: '/Chapter/Delete',
                                                             type: 'post',
@@ -270,30 +270,13 @@
                 },
             })
         },
-        deleteTempImages: function () {
-            $.ajax({
-                url: '/Chapter/DeleteTempImages',
-                type: 'POST',
-                async: false
-            });
-        },
         getEditorImages: function () {
             const html = CKEDITOR.instances.txtContent.getData();
             const div = document.createElement("div");
             div.innerHTML = html;
             return Array.from(div.querySelectorAll("img"))
                 .map(img => img.getAttribute("src"))
-                .filter(src => src && src.includes("/uploads/chapter/"));
-        },
-        getImagesFromEditor: function () {
-            const html = CKEDITOR.instances.txtContent.getData();
-
-            const div = document.createElement("div");
-            div.innerHTML = html;
-
-            return Array.from(div.querySelectorAll("img"))
-                .map(img => img.getAttribute("src"))
-                .filter(src => src && src.includes("/uploads/temp/"));
+                .filter(src => src && src.includes("/chapter-images/"));
         }
     }
     window.ImportTxt = {

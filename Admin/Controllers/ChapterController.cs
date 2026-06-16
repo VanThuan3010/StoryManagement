@@ -6,7 +6,9 @@ using StoryManagement.Model.Entity;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Admin.Controllers
 {
@@ -54,60 +56,25 @@ namespace Admin.Controllers
         }
 
         [HttpPost]
-        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo, string Images, string deleteImage)
+        public JsonResult CreateOrUpdate(Chapters chapters, int OrderTo, string deleteImage)
         {
             try
             {
                 if (chapters == null)
                     return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
-                var imageList = JsonConvert.DeserializeObject<List<string>>(Images);
-                if(imageList?.Count > 0)
-                {
-                    foreach (var img in imageList)
-                    {
-                        var fileName = Path.GetFileName(img);
-
-                        var relativePath = img.TrimStart('/');
-                        var tempPath = Path.Combine(_env.WebRootPath, relativePath);
-                        var destFolder = Path.Combine(
-                            _env.WebRootPath,
-                            "uploads",
-                            "chapter",
-                            chapters.StoryId.ToString()
-                        );
-                        //var destPath = Path.Combine(_env.WebRootPath, "uploads/chapter", chapters.StoryId.ToString(), fileName);
-
-                        if (System.IO.File.Exists(tempPath))
-                        {
-                            if (!Directory.Exists(destFolder))
-                            {
-                                Directory.CreateDirectory(destFolder);
-                            }
-                            var destPath = Path.Combine(destFolder, fileName);
-                            System.IO.File.Move(tempPath, destPath);
-                        }
-                    }
-                }
-
-                // replace đường dẫn trong content
-                chapters.Content = chapters.Content.Replace("/uploads/temp/", "/uploads/chapter/");
-
-                // xóa temp
-                var tempFolder = Path.Combine(_env.WebRootPath, "uploads/temp");
-
-                if (Directory.Exists(tempFolder))
-                {
-                    Directory.Delete(tempFolder, true);
-                }
-                Directory.CreateDirectory(tempFolder);
-                // xóa ảnh không còn so với trước đó
                 var deleteImages = string.IsNullOrEmpty(deleteImage) ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(deleteImage);
+                var rootPath = _config["UploadImage:Chapters"];
                 if (deleteImages?.Count > 0)
                 {
                     foreach (var img in deleteImages)
                     {
-                        var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
+                        var path = Path.Combine(rootPath, img);
 
+                        if (System.IO.File.Exists(path))
+                        {
+                            System.IO.File.Delete(path);
+                        }
+                        path = Path.Combine(rootPath, "Save Base 64", $"{Path.GetFileNameWithoutExtension(img)}.json");
                         if (System.IO.File.Exists(path))
                         {
                             System.IO.File.Delete(path);
@@ -200,12 +167,18 @@ namespace Admin.Controllers
                     });
                 }
                 var deleteImages = string.IsNullOrEmpty(images) ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(images);
+                var rootPath = _config["UploadImage:Chapters"];
                 if (deleteImages?.Count > 0)
                 {
                     foreach (var img in deleteImages)
                     {
-                        var path = Path.Combine(_env.WebRootPath, img.TrimStart('/'));
+                        var path = Path.Combine(rootPath, img);
 
+                        if (System.IO.File.Exists(path))
+                        {
+                            System.IO.File.Delete(path);
+                        }
+                        path = Path.Combine(rootPath, "Save Base 64", $"{Path.GetFileNameWithoutExtension(img)}.json");
                         if (System.IO.File.Exists(path))
                         {
                             System.IO.File.Delete(path);
@@ -387,30 +360,97 @@ namespace Admin.Controllers
         public async Task<IActionResult> UploadImage(IFormFile upload, int storyId)
         {
             if (upload == null || upload.Length == 0)
-                return Json(new { uploaded = 0, error = new { message = "No file" } });
+            {
+                return Json(new
+                {
+                    uploaded = 0,
+                    error = new
+                    {
+                        message = "No file"
+                    }
+                });
+            }
 
-            var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(),
-                                  "wwwroot",
-                                  "uploads",
-                                  "temp",
-                                  storyId.ToString());
-            if (!Directory.Exists(folderPath))
+            try
             {
-                Directory.CreateDirectory(folderPath);
+                var rootPath = _config["UploadImage:Chapters"];
+
+                if (string.IsNullOrWhiteSpace(rootPath))
+                {
+                    return Json(new
+                    {
+                        uploaded = 0,
+                        error = new
+                        {
+                            message = "UploadImage:Chapters not found in appsettings.json"
+                        }
+                    });
+                }
+
+                // Tên file ảnh
+                var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
+
+                var filePath = Path.Combine(rootPath, fileName);
+
+                // Lưu ảnh
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await upload.CopyToAsync(stream);
+                }
+
+                // ==========================
+                // Backup Base64
+                // ==========================
+
+                var backupFolder = Path.Combine(rootPath, "Save Base 64");
+                Directory.CreateDirectory(backupFolder);
+
+                byte[] imageBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                string base64 = Convert.ToBase64String(imageBytes);
+
+                var backupFile = Path.Combine(
+                    backupFolder,
+                    $"{Path.GetFileNameWithoutExtension(fileName)}.json");
+
+                var backupData = new
+                {
+                    FileName = fileName,
+                    StoryId = storyId,
+                    Base64 = base64,
+                    CreatedDate = DateTime.Now
+                };
+
+                await System.IO.File.WriteAllTextAsync(
+                    backupFile,
+                    JsonSerializer.Serialize(
+                        backupData,
+                        new JsonSerializerOptions
+                        {
+                            WriteIndented = true
+                        }));
+
+                // URL trả về cho CKEditor
+                var fileUrl = $"/chapter-images/{fileName}";
+
+                return Json(new
+                {
+                    uploaded = 1,
+                    fileName,
+                    url = fileUrl
+                });
             }
-            var filePath = Path.Combine(folderPath, fileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            catch (Exception ex)
             {
-                await upload.CopyToAsync(stream);
+                return Json(new
+                {
+                    uploaded = 0,
+                    error = new
+                    {
+                        message = ex.Message
+                    }
+                });
             }
-            var fileUrl = $"/uploads/temp/{storyId}/{fileName}";
-            return Json(new
-            {
-                uploaded = 1,
-                fileName = fileName,
-                url = fileUrl
-            });
         }
         [HttpPost]
         public async Task<JsonResult> UploadTxt(IFormFile file)

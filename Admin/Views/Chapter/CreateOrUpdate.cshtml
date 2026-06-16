@@ -104,6 +104,17 @@
             // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
             // filebrowserUploadMethod: 'form'
         });
+        CKEDITOR.instances.txtContent.on('fileUploadResponse', function (evt) {
+            var response = evt.data.fileLoader.xhr.responseText;
+            try {
+                var data = JSON.parse(response);
+                if (data.uploaded) {
+                    base.uploadImages.push(data.url);
+                }
+            } catch (e) {
+                console.error('Parse upload response error:', e);
+            }
+        });
         CKEDITOR.replace('txtRawContent', {
             height: '700px'
         });

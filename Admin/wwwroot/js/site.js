@@ -1,4 +1,5 @@
 ﻿var base = {
+    uploadImages: [],
     init: function () {
         $('#btnEditProfile').click(function () {
             $('#modalEditProfile').modal('show');
@@ -15,6 +16,20 @@
     //        (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
     //    );
     //},
+    deleteNotSavedImages: function () {
+        if (base.uploadImages.length === 0)
+            return;
+
+        navigator.sendBeacon(
+            '/Home/DeleteImgUploadNotSave',
+            new Blob(
+                [JSON.stringify(base.uploadImages)],
+                { type: 'application/json' }
+            )
+        );
+
+        base.uploadImages.length = 0;
+    },
     notification: function (type, message) {
         if (type == 'success') {
             Lobibox.notify('success', {

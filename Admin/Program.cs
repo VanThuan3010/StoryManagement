@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using StoryManagement.Model;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,12 +43,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-//var chapterImagePath = builder.Configuration["SaveImage:Chapter"];
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(chapterImagePath),
-//    RequestPath = "/StoryImages"
-//});
+var uploadChapter = builder.Configuration["UploadImage:Chapters"];
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadChapter),
+    RequestPath = "/chapter-images"
+});
 app.UseRouting();
 
 app.UseAuthorization();
