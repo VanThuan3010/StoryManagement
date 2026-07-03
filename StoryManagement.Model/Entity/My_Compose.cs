@@ -11,9 +11,11 @@ namespace StoryManagement.Model.Entity
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string? Description { get; set; }
         public string? Contents { get; set; }
         public int ParentId { get; set; }
         public int Level { get; set; }
+        public int SortOrder { get; set; }
         [NotMapped]
         public string? Status { get; set; }
         [NotMapped]

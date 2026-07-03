@@ -15,121 +15,75 @@ namespace Admin.Controllers
         {
             return View();
         }
-        public JsonResult GetInfor()
+        public JsonResult GetTree()
         {
-            var data = _ibase.my_ComposeRepository.GetAll(0, "Read", "", "", 0);
-            var treeData = data.Select(x => new
-            {
-                id = x.Id.ToString(),
-                parent = x.ParentId == 0 ? "#" : x.ParentId.ToString(),
-                text = x.Name,
-                type = x.Level == 1 ? "root" : "child",
-                level = x.Level
-            }).ToList();
+            var data = _ibase.my_ComposeRepository.GetAll();
 
-            return Json(treeData);
-        }
-        public JsonResult SearchParent(string keyword)
-        {
-            var data = _ibase.my_ComposeRepository.GetAll(0, "Read", "", "", 0);
-            var treeData = data.Select(x => new
-            {
-                id = x.Id.ToString(),
-                parent = x.ParentId == 0 ? "#" : x.ParentId.ToString(),
-                text = x.Name,
-                type = x.Level == 1 ? "root" : "child",
-                level = x.Level
-            }).ToList();
-
-            return Json(treeData);
+            return Json(data);
         }
         public JsonResult GetDetail(int Id)
         {
-            var data = _ibase.my_ComposeRepository.GetAll(Id, "GetData", "", "", 0);
+            var data = _ibase.my_ComposeRepository.GetDetail(Id);
             return Json(data);
         }
-        public JsonResult CreateOrUpdate(int Id, string Act, string Name, string Content, int ParentId, List<string> deletedImages)
+        [HttpPost]
+        public JsonResult Delete(int Id)
         {
-            int total = 0;
-            var data = _ibase.my_ComposeRepository.GetAll(Id, Act, Name, Content, ParentId);
-            if (deletedImages?.Count > 0 && Act == "Update")
+            try
             {
-                foreach (var img in deletedImages)
+                if (Id <= 0)
                 {
-                    var path = Path.Combine("wwwroot", img.TrimStart('/'));
-                    if (System.IO.File.Exists(path))
+                    return new JsonResult(new
                     {
-                        System.IO.File.Delete(path);
-                    }
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
                 }
-            }
-            return Json(new { rows = data, total = total });
-        }
-        [HttpPost]
-        public async Task<IActionResult> UploadImage(IFormFile upload)
-        {
-            if (upload == null || upload.Length == 0)
-                return Json(new { uploaded = 0, error = new { message = "No file" } });
-
-            var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(),
-                                  "wwwroot",
-                                  "uploads",
-                                  "compose",
-                                  "Images");
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            var filePath = Path.Combine(folderPath, fileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await upload.CopyToAsync(stream);
-            }
-            var fileUrl = $"/uploads/compose/Images/{fileName}";
-            return Json(new
-            {
-                uploaded = 1,
-                fileName = fileName,
-                url = fileUrl
-            });
-        }
-        [HttpPost]
-        public async Task<IActionResult> UploadVideo(IFormFile upload, string oldVideo)
-        {
-            if (upload == null || upload.Length == 0)
-                return Json(new { uploaded = 0, error = new { message = "No file" } });
-            if (!string.IsNullOrEmpty(oldVideo))
-            {
-                var oldPath = Path.Combine("wwwroot", oldVideo.TrimStart('/'));
-                if (System.IO.File.Exists(oldPath))
+                _ibase.my_ComposeRepository.Delete(Id);
+                return new JsonResult(new
                 {
-                    System.IO.File.Delete(oldPath);
+                    status = true,
+                    message = "Xóa thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    status = false,
+                    message = ex.Message,
+                });
+            }
+        }
+        [HttpPost]
+        public JsonResult CreateOrUpdate(My_Compose my_Compose)
+        {
+            try
+            {
+                if (my_Compose == null)
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Có lỗi xảy ra"
+                    });
                 }
+                _ibase.my_ComposeRepository.CreateOrUpdate(my_Compose);
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Thao tác thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    status = false,
+                    message = ex.Message,
+                });
             }
 
-            var fileName = Guid.NewGuid() + Path.GetExtension(upload.FileName);
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(),
-                                  "wwwroot",
-                                  "uploads",
-                                  "compose",
-                                  "Vides");
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            var filePath = Path.Combine(folderPath, fileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await upload.CopyToAsync(stream);
-            }
-            var fileUrl = $"/uploads/compose/Vides/{fileName}";
-            return Json(new
-            {
-                uploaded = 1,
-                fileName = fileName,
-                path = fileUrl
-            });
         }
     }
 }

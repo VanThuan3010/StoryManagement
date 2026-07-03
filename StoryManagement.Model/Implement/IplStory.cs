@@ -66,6 +66,26 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
+        public Story GetDetail2(int id)
+        {
+            Story List = new Story();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+
+                    p.Add("@idStory", id);
+                    List = u.GetIEnumerable<Story>("Get_StoryDetail2", p).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
         // Thêm/Sửa thông tin truyện
         public int CreateOrUpdate(Story storyModel, string tagId, string subTagId, string authorId)
         {
@@ -85,6 +105,7 @@ namespace StoryManagement.Model.Implement
                     //p.Add("@subTagId", subTagId);
                     p.Add("@authors", authorId);
                     p.Add("@source", storyModel.Source);
+                    p.Add("@readOrder", storyModel.ReadOrder);
 
                     list = u.ProcedureExecute("CreateOrUpdate_Story", p);
                 }
@@ -271,6 +292,24 @@ namespace StoryManagement.Model.Implement
                     var p = new DynamicParameters();
                     p.Add("@Id", Id);
                     List = u.GetIEnumerable<Authors>("Get_AuthorByStory", p).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public List<Story> GetReadList()
+        {
+            List<Story> List = new List<Story>();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    List = u.GetIEnumerable<Story>("Get_ReadList", p).ToList();
                 }
             }
             catch (Exception ex)

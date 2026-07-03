@@ -85,6 +85,8 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.Contents);
                 entity.Property(e => e.ParentId);
                 entity.Property(e => e.Level);
+                entity.Property(e => e.Contents);
+                entity.Property(e => e.SortOrder);
             });
             modelBuilder.Entity<Part_Chapter>(entity =>
             {
@@ -132,6 +134,7 @@ namespace MFTech.Model.Entity
                 entity.Property(e => e.IsRead);
                 entity.Property(e => e.TagsName);
                 entity.Property(e => e.Source);
+                entity.Property(e => e.ReadOrder);
             });
             modelBuilder.Entity<Story_Comic>(entity =>
             {

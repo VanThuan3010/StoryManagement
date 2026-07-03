@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Bảng xếp hạng";
+}
+
+<div class="app">
+
+    <header class="top-bar">
+
+        <div class="brand">
+            <div class="seal-mark">榜</div>
+
+            <div class="brand-text">
+                <h1>Bảng Xếp Hạng Truyện</h1>
+                <p>Top truyện nên đọc</p>
+            </div>
+        </div>
+
+        <div class="search-wrap">
+
+            <input id="searchInput"
+                   placeholder="Tìm theo tên truyện hoặc tác giả..." />
+
+        </div>
+
+    </header>
+
+    <main class="layout">
+
+        <aside class="rank-list-panel">
+
+            <ol id="rankList"
+                class="rank-list">
+            </ol>
+
+        </aside>
+
+        <section id="detailPanel"
+                 class="detail-panel">
+        </section>
+
+    </main>
+
+</div>

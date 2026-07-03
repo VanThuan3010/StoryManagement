@@ -16,6 +16,7 @@ namespace StoryManagement.Model.Entity
         public bool? IsRead { get; set; }
         public string? Source {  get; set; }
         public string? TagsName { get; set; }
+        public int ReadOrder { get; set; }
         [NotMapped]
         public string? Review {  get; set; }
         [NotMapped]
@@ -28,5 +29,9 @@ namespace StoryManagement.Model.Entity
         public string? ChapterUploaded { get; set; }
         [NotMapped]
         public string? ReadChapter { get; set; }
+        [NotMapped]
+        public string? TagList { get; set; }
+        [NotMapped]
+        public string? Pseudonym { get; set; }
     }
 }

@@ -15,6 +15,7 @@ namespace StoryManagement.Model.Interface
         int CreateOrUpdate(Story storyModel, string tagId, string subTagId, string authorId);
         int DeleteStory(int id);
         Story GetDetail(int id);
+        Story GetDetail2(int id);
         List<Story> GetStoryCanRead();
         List<Story> GetStoryNewest();
         List<Story> GetStoryLastUpdate();
@@ -23,5 +24,6 @@ namespace StoryManagement.Model.Interface
         List<Story> GetStoryByAuthor(int id);
         List<Story> GetStorySearchInAuthor(string search, string idSelected);
         List<Authors> GetAuthor(int Id);
+        List<Story> GetReadList();
     }
 }

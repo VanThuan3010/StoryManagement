@@ -10,6 +10,9 @@ namespace StoryManagement.Model.Interface
 {
     public interface IMy_Compose : IRepository<My_Compose>
     {
-        List<My_Compose> GetAll(int Id, string act, string name, string cnt, int parentId);
+        List<My_Compose> GetAll();
+        My_Compose GetDetail(int id);
+        int Delete(int id);
+        int CreateOrUpdate(My_Compose my_Compose);
     }
 }

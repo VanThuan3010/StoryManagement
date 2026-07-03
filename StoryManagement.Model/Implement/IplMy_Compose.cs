@@ -24,7 +24,7 @@ namespace StoryManagement.Model.Implement
             _configuration = configuration;
             _cnnString = _configuration.GetConnectionString("DefaultConnection");
         }
-        public List<My_Compose> GetAll(int Id, string act, string name, string cnt, int parentId)
+        public List<My_Compose> GetAll()
         {
             List<My_Compose> List = new List<My_Compose>();
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
@@ -33,13 +33,7 @@ namespace StoryManagement.Model.Implement
                 using (var u = unitOfWork.Create(false))
                 {
                     var p = new DynamicParameters();
-
-                    p.Add("@id", Id);
-                    p.Add("@act", act);
-                    p.Add("@name", name);
-                    p.Add("@cnt", cnt);
-                    p.Add("@pId", parentId);
-                    List = u.GetIEnumerable<My_Compose>("CRUD_Compose", p).ToList();
+                    List = u.GetIEnumerable<My_Compose>("sp_GetComposTree", p).ToList();
                 }
             }
             catch (Exception ex)
@@ -47,6 +41,71 @@ namespace StoryManagement.Model.Implement
                 return List;
             }
             return List;
+        }
+        public My_Compose GetDetail(int id)
+        {
+            My_Compose List = new My_Compose();
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            try
+            {
+                using (var u = unitOfWork.Create(false))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@Id", id);
+                    List = u.GetIEnumerable<My_Compose>("sp_GetComposeDetail", p).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                return List;
+            }
+            return List;
+        }
+        public int CreateOrUpdate(My_Compose my_Compose)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@Id", my_Compose.Id);
+                    p.Add("@Name", my_Compose.Name);
+                    p.Add("@Description", my_Compose.Description);
+                    p.Add("@Contents", my_Compose.Contents);
+                    p.Add("@ParentId", my_Compose.ParentId);
+
+                    list = u.ProcedureExecute("sp_CreateOrUpdateCompose", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
+        }
+        public int Delete(int id)
+        {
+            var unitOfWork = new UnitOfWorkFactory(_cnnString);
+            int list = 0;
+            try
+            {
+                using (var u = unitOfWork.Create(true))
+                {
+                    var p = new DynamicParameters();
+                    p.Add("@Id", id);
+
+                    list = u.ProcedureExecute("sp_DeleteCompose", p);
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return list;
+            }
+
         }
     }
 }

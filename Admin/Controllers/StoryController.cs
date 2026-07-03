@@ -47,7 +47,7 @@ namespace Admin.Controllers
             {
                 return new JsonResult(new
                 {
-                    status = true,
+                    status = false,
                     message = ex.Message,
                 });
             }
@@ -77,7 +77,7 @@ namespace Admin.Controllers
             {
                 return new JsonResult(new
                 {
-                    status = true,
+                    status = false,
                     message = ex.Message,
                 });
             }
@@ -135,6 +135,16 @@ namespace Admin.Controllers
         public JsonResult GetAuthorForStory(int id)
         {
             var data = _ibase.storyRespository.GetAuthor(id);
+            return Json(data);
+        }
+        public JsonResult GetReadList()
+        {
+            var data = _ibase.storyRespository.GetReadList();
+            return Json(data);
+        }
+        public JsonResult GetStoryDetail(int id)
+        {
+            var data = _ibase.storyRespository.GetDetail2(id);
             return Json(data);
         }
     }

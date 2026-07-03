@@ -10,6 +10,7 @@
                 $('#txtNumberChapter').val('');
                 $('#txtTagName').val('');
                 $("#tblAuthors tbody").empty();
+                $('#txtReadOrder').val("");
                 $('#sources').val('SacHiepVien');
                 $('#labelAction').text('Thêm mới truyện');
 
@@ -146,6 +147,14 @@
                 story.tblStory();
             });
             $('#btnSubmit').click(function () {
+                if ($('#txtName').val().trim() === '') {
+                    base.notification('error', 'Tên truyện không được để trống');
+                    return;
+                }
+                if (!/^\d+$/.test($('#txtReadOrder').val())) {
+                    base.notification('error', 'Nhập số thứ tự hợp lệ cho thứ tự đọc');
+                    return;
+                }
                 let authorsData = [];
                 $("#tblAuthors tbody tr").each(function () {
                     const authorId = $(this).find(".selected-story .story-name").data("id");
@@ -162,6 +171,7 @@
                 datas.append('Source', $('#sources').val());
                 datas.append('IsRead', 0);
                 datas.append('TagsName', $('#txtTagName').val());
+                datas.append('ReadOrder', $('#txtReadOrder').val());
                 datas.append('AuthorId', JSON.stringify(authorsData));
                 $.ajax({
                     url: '/Story/CreateOrUpdate',
@@ -414,6 +424,7 @@
                             'click .btnEdit': function (e, value, row, index) {
                                 $('#saveIdStory').val(row.id);
                                 $('#txtTagName').val(row.tagsName);
+                                $('#txtReadOrder').val(row.readOrder);
                                 //$('#txtNumberChapter').val(row.numberChapter);
                                 try {
                                     let names = JSON.parse(row.name);

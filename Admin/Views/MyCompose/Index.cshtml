@@ -1,86 +1,38 @@
 ﻿@{
     // ViewData["Title"] = "Danh sách truyện";
 }
-<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-    <div class="breadcrumb-title pe-3">Truyện tự sáng tác</div>
-    <div class="ps-3">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 p-0">
-                <li class="breadcrumb-item">
-                    <a href="/"><i class="bx bx-home-alt"></i></a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">Thông tin</li>
-            </ol>
-        </nav>
-    </div>
-    <div class="ms-auto">
-        <div class="btn-group">
-            <button type="button" class="btn btn-primary" id="btnCreate">Thêm mới</button>
+<div class="workspace">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-head">
+            <span>Cấu trúc</span>
+            <button class="btn-add-root" onclick="myCompose.addNode(null)">＋ Thêm gốc</button>
         </div>
-    </div>
-</div>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-4">
-            <input class="form-control mb-2" id="searchNode" placeholder="Search node...">
-            <div id="tree"></div>
-        </div>
-        <div class="col-8">
-            <input type="hidden" id="IdNode" />
-            <h3 id="tile"></h3>
-            <div class="mb-3">
-                <label>Tên</label>
-                <input class="form-control" id="Name">
-            </div>
-            <div class="mb-3 position-relative">
-                <label>Parent</label>
-                <input type="hidden" id="ParentId">
-                <input type="text"
-                       id="ParentSearch"
-                       class="form-control"
-                       placeholder="Nhập ít nhất 2 ký tự để tìm">
-                       placeholder="Nhập ít nhất 2 ký tự để tìm">
-                <div id="parentDropdown"
-                     class="list-group position-absolute w-100 shadow"
-                     style="z-index:1000; display:none;">
+        <div class="tree-scroll" id="treeRoot"></div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+        <div id="contentPanel">
+            <div class="content-body">
+                <div class="empty-state">
+                    <div class="icon">🌿</div>
+                    <p>Chọn một node để xem chi tiết</p>
                 </div>
             </div>
-            <div class="mb-3">
-                <label>Video tham khảo</label>
-                <video id="videoPreview" width="400" controls></video>
-                <div class="mt-2">
-                    <input type="file" id="videoFile" class="form-control" accept="video/*">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="chkOldVid">
-                        <label class="form-check-label" for="ilChkTag">Lấy Video gốc</label>
-                    </div>
-                </div>
-                <input type="hidden" name="name" value="" id="video_Upload" />
-                <input type="hidden" value="" id="Vid_Save"/>
-            </div>
-            <div class="mb-3">
-                <label>Nội dung</label>
-                <textarea id="txtContent" class="form-control"></textarea>
-            </div>
-            <div class="mt-3">
-                <button class="btn btn-success me-2" id="btnSave">
-                    💾 Lưu
-                </button>
-                <button class="btn btn-danger" id="btnDelete">
-                    🗑 Xóa
-                </button>
-            </div>
         </div>
-    </div>
+    </main>
 </div>
+
+<div class="toast-wrap" id="toastWrap"></div>
 @section Scripts {
     <script type="text/javascript">
-        CKEDITOR.replace('txtContent', {
-            height: '500px',
-            extraPlugins: 'uploadimage,image2',
-            uploadUrl: '/MyCompose/UploadImage',
-            filebrowserUploadUrl: '/MyCompose/UploadImage',
-            filebrowserUploadMethod: 'form'
-        });
+        // CKEDITOR.replace('txtContent', {
+        //     height: '500px',
+        //     extraPlugins: 'uploadimage,image2',
+        //     uploadUrl: '/MyCompose/UploadImage',
+        //     filebrowserUploadUrl: '/MyCompose/UploadImage',
+        //     filebrowserUploadMethod: 'form'
+        // });
     </script>
 }

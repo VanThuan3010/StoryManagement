@@ -15,3 +15,8 @@ Xóa:
 20/05/2026
 Xóa: Get_TagOrSubTag_ById, Get_GroupTag, CreateOrUpdate_GroupTag, Get_SearchTag, Tbl_Relationship, UpdateRelationship, Get_TagOrSubTag_ById, 
 Sửa: CreateOrUpdate_TagOrSubTag (đổi tên lại thành CreateOrUpdate_Tag), Delete_TagOrSubTag (đổi tên lại thành Delete_Tag)
+*********************************************************************
+
+Sửa: Bảng Story (thêm cột ReadOrder smallint), My_Compose, Stored Procedure: CreateOrUpdate_Story, Get_Story
+Thêm: Stored Get_StoryDetail2, Get_ReadList, ReOrderStory, sp_GetComposeDetail, sp_GetComposTree, sp_DeleteCompose, sp_CreateOrUpdateCompose
+	Function GetFirstValueJson
