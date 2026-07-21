@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Office.Interop.Excel;
 using Newtonsoft.Json;
 using StoryManagement.Model;
 using StoryManagement.Model.Entity;
@@ -25,12 +26,26 @@ namespace Admin.Controllers
         }
         public IActionResult Index(int idStory)
         {
-            var ChapterCount = 0;
             ViewBag.StoryId = idStory;
             ViewBag.getStory = _ibase.storyRespository.GetDetail(idStory);
-            ViewBag.PartChapter = _ibase.part_ChapterRespository.GetAll(idStory, ref ChapterCount);
-            ViewBag.ChapterCount = ChapterCount;
             return View();
+        }
+        public IActionResult UploadByTxt(int idStory)
+        {
+            ViewBag.StoryId = idStory;
+            return View();
+        }
+        public JsonResult GetPartChapter(int idStory)
+        {
+            try
+            {
+                var ChapterCount = 0;
+                List<Part_Chapter> result = _ibase.part_ChapterRespository.GetAll(idStory, ref ChapterCount);
+                return Json(new { status = true, data = result, chapterCount = ChapterCount });
+            } catch (Exception ex)
+            {
+                return Json(new { status = false, message = ex.Message });
+            }
         }
         public JsonResult GetChapter(int offset, int limit, int idStory, string search = "")
         {
@@ -46,12 +61,9 @@ namespace Admin.Controllers
         }
         public IActionResult CreateOrUpdate(int idStory, long idChapter)
         {
-            var ChapterCount = 0;
             ViewBag.idStory = idStory;
             ViewBag.idChapter = idChapter;
-            ViewBag.PartChapter = _ibase.part_ChapterRespository.GetAll(idStory, ref ChapterCount);
             ViewBag.chapters = _ibase.chapterRespository.GetDetail(idChapter);
-            ViewBag.ChapterCount = ChapterCount;
             return View();
         }
 
@@ -81,6 +93,28 @@ namespace Admin.Controllers
                         }
                     }
                 }
+                int NumberChapter = 0;
+                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, ref NumberChapter);
+                return new JsonResult(new
+                {
+                    status = true,
+                    message = "Thao tác thành công",
+                    numberChapter = NumberChapter,
+                    belong = chapters.Belong
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { status = false, message = "Lỗi server: " + ex.Message });
+            }
+        }
+        [HttpPost]
+        public JsonResult CreateOrUpdate2(Chapters chapters, int OrderTo)
+        {
+            try
+            {
+                if (chapters == null)
+                    return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
                 int NumberChapter = 0;
                 _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, ref NumberChapter);
                 return new JsonResult(new
@@ -458,35 +492,119 @@ namespace Admin.Controllers
             if (file == null || file.Length == 0)
                 return Json(new { status = false, message = "File không hợp lệ" });
 
-            string text;
-            using (var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
+            try
             {
-                text = await reader.ReadToEndAsync();
-            }
+                var jsonPath = Path.Combine(
+                    _env.ContentRootPath,
+                    "App_Data",
+                    "TempImport.json"
+                );
 
-            var regex = new Regex(
-                @"(?<title>Chương\s+\d+\s*:\s*.+?)\r?\n(?<content>.*?)(?=(\r?\nChương\s+\d+\s*:)|$)",
-                RegexOptions.Singleline
-            );
+                int indexChapter = 1;
+                int totalChapter = 0;
 
-            var matches = regex.Matches(text);
-            var chapters = new List<ImportChapterDto>();
+                // FileMode.Create => tự động clear file cũ
+                await using var jsonStream = new FileStream(
+                    jsonPath,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None
+                );
 
-            for (int i = 0; i < matches.Count; i++)
-            {
-                chapters.Add(new ImportChapterDto
+                await using var txtStream = file.OpenReadStream();
+
+                using var reader = new StreamReader(
+                    txtStream,
+                    Encoding.UTF8
+                );
+
+                using var jsonWriter = new Utf8JsonWriter(
+                    jsonStream,
+                    new JsonWriterOptions
+                    {
+                        Indented = false
+                    }
+                );
+
+                jsonWriter.WriteStartArray();
+
+                string? currentTitle = null;
+                var currentContent = new StringBuilder();
+
+                string? line;
+
+                while ((line = await reader.ReadLineAsync()) != null)
                 {
-                    IndexChapter = i,
-                    ChapterTitle = matches[i].Groups["title"].Value.Trim(),
-                    Content = ConvertToHtml(matches[i].Groups["content"].Value.Trim()),
-                    IsLastChapter = i == matches.Count - 1 ? 1 : 0
+                    var trimLine = line.Trim();
+
+                    if (IsChapterTitle(trimLine))
+                    {
+                        // Gặp chương mới => ghi chương trước
+                        if (!string.IsNullOrEmpty(currentTitle))
+                        {
+                            var chapter = new ImportChapterDto
+                            {
+                                IndexChapter = indexChapter,
+                                ChapterTitle = currentTitle,
+                                Content = currentContent.ToString().Trim(),
+                                IsLastChapter = 0
+                            };
+
+                            JsonSerializer.Serialize(jsonWriter, chapter);
+
+                            indexChapter++;
+                            totalChapter++;
+
+                            await jsonWriter.FlushAsync();
+
+                            currentContent.Clear();
+                        }
+
+                        currentTitle = trimLine;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(currentTitle))
+                        {
+                            currentContent.AppendLine(line);
+                        }
+                    }
+                }
+
+                // Ghi chương cuối
+                if (!string.IsNullOrEmpty(currentTitle))
+                {
+                    var chapter = new ImportChapterDto
+                    {
+                        IndexChapter = indexChapter,
+                        ChapterTitle = currentTitle,
+                        Content = currentContent.ToString().Trim(),
+                        IsLastChapter = 1
+                    };
+
+                    JsonSerializer.Serialize(jsonWriter, chapter);
+
+                    totalChapter++;
+                }
+
+                jsonWriter.WriteEndArray();
+
+                await jsonWriter.FlushAsync();
+
+                return Json(new
+                {
+                    status = true,
+                    total = totalChapter
                 });
             }
-
-            var path = Path.Combine(_env.ContentRootPath, "App_Data", "TempImport.json");
-            System.IO.File.WriteAllText(path, System.Text.Json.JsonSerializer.Serialize(chapters));
-
-            return Json(new { status = true, total = chapters.Count });
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    status = false,
+                    message = ex.Message
+                });
+            }
         }
         [HttpGet]
         public JsonResult GetImportChapter(int index)
@@ -520,6 +638,24 @@ namespace Admin.Controllers
             }
 
             return Ok();
+        }
+        private static bool IsChapterTitle(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            return Regex.IsMatch(
+                line,
+                @"^(?:
+            chương\s+\d+\s*:?.* |
+            thứ\s+\d+\s+chương\s*:?.* |
+            tự\s+\d+\s+chương\s*:?.* |
+            \d+\.\s*.* |
+            [IVXLCDM]+\.\s*.*
+        )$",
+                RegexOptions.IgnoreCase |
+                RegexOptions.IgnorePatternWhitespace
+            );
         }
     }
 }

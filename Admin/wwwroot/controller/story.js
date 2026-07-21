@@ -151,7 +151,7 @@
                     base.notification('error', 'Tên truyện không được để trống');
                     return;
                 }
-                if (!/^\d+$/.test($('#txtReadOrder').val())) {
+                if ($('#txtReadOrder').val() && !/^\d+$/.test($('#txtReadOrder').val())) {
                     base.notification('error', 'Nhập số thứ tự hợp lệ cho thứ tự đọc');
                     return;
                 }

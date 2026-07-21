@@ -1,12 +1,9 @@
 ﻿$(function () {
     window.Chapter = {
-        savedImages : [],
         init: function () {
-            if ($('#Id').val() > 0) {
-                Chapter.savedImages = Chapter.getEditorImages();
-            }
             Chapter.action();
             Chapter.tblChapter();
+            Chapter.renderPartChapter();
             $('#btnCreate').on('click', function () {
                 window.location.href = '/Chapter/CreateOrUpdate?idStory=' + $('#saveStoryId').val() + '&idChapter=0';
             });
@@ -38,7 +35,14 @@
             })
             $('#partList').change(function () {
                 $('#idPartChaptCU').val($(this).val());
-                $('#partChapterName').val($(this).text().trim());
+                if ($(this).val() == 0) {
+                    $('#partChapterName').val("");
+                    $('#example1ModalLabel').text('Thêm phần mới');
+                } else {
+                    let name = $(this).find(':selected').data('name');
+                    $('#partChapterName').val(name);
+                    $('#example1ModalLabel').text('Sửa tên phần');
+                }
             })
             $('#btnSearchChapter').click(function () {
                 $.ajax({
@@ -90,16 +94,17 @@
                     success: function (res) {
                         $('#savePart').prop('disabled', false);
                         $('#savePart').html("Lưu");
-                        $("#exampleModal").modal('hide');
                         if (res.status) {
-                            var opt = $("#Belong option[value='" + res.newId + "']");
-                            if (opt.length > 0) {
-                                opt.text(res.newName);
-                                $("#partList option[value='" + res.newId + "']").text(res.newName);
-                            } else {
-                                $("#Belong").append(new Option(res.newName +" (0)", res.newId));
-                                $("#partList").append(new Option(res.newName, res.newId));
-                            }
+                            //var opt = $("#Belong option[value='" + res.newId + "']");
+                            //if (opt.length > 0) {
+                            //    opt.text(res.newName);
+                            //    $("#partList option[value='" + res.newId + "']").text(res.newName);
+                            //} else {
+                            //    $("#Belong").append(new Option(res.newName +" (0)", res.newId));
+                            //    $("#partList").append(new Option(res.newName, res.newId));
+                            //}
+                            Chapter.renderPartChapter();
+                            $("#exampleModal").modal('hide');
                             base.notification('success', res.message);
                         } else {
                             base.notification('error', res.message);
@@ -109,39 +114,21 @@
             })
             $('#SaveChap').on('click', function(e){
                 e.preventDefault();
-                var ImagesInEditor = Chapter.getEditorImages();
-
-                // Ảnh cũ bị xóa
-                var OldImagesDelete = Chapter.savedImages
-                    .filter(x => !ImagesInEditor.includes(x));
-
-                // Ảnh upload mới nhưng đã bị xóa khỏi editor
-                var NewImagesDelete = base.uploadImages
-                    .filter(x => !ImagesInEditor.includes(x));
-
-                // Gộp lại
-                var ImagesDeletes = [
-                    ...OldImagesDelete,
-                    ...NewImagesDelete
-                ];
-                ImagesDeletes = ImagesDeletes.map(img => img.split('/').pop());
 
                 var formData = new FormData();
                 formData.append("Id", $('#Id').val());
                 formData.append("StoryId", $('#StoryId').val());
                 formData.append("Title", $('#txtTitle').val());
                 formData.append("Belong", $('#Belong').val());
-                formData.append("Content", base.convertToHTML(CKEDITOR.instances.txtContent.getData()));
-                formData.append("RawContent", base.convertToHTML(CKEDITOR.instances.txtRawContent.getData()));
+                formData.append("Content", $('#txtContent').val());
+                formData.append("RawContent", $('#txtRawContent').val());
                 formData.append("OrderTo", $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
-                formData.append("deleteImage", JSON.stringify(ImagesDeletes));
                 $.ajax({
-                    url: '/Chapter/CreateOrUpdate',
+                    url: '/Chapter/CreateOrUpdate2',
                     type: 'POST',
                     data: formData,
                     success: function (res) {
                         if (res.status) {
-                            base.uploadImages.length = 0;
                             location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
                         } else{
                             base.notification('error', res.message)
@@ -155,6 +142,167 @@
                     processData: false
                 });
             })
+            $('#uploadTxt').on('click', function (e) {
+                window.location.href = '/Chapter/UploadByTxt?idStory=' + $('#saveStoryId').val();
+            })
+            $('#btnBegin').on('click', function (e) {
+                $('#ModalImportTxt').modal('show');
+            })
+            $('#btnRead').on('click', function (e) {
+                if ($('#inputUpTxt')[0].files.length === 0) {
+                    base.notification("error", "Vui lòng Upload file text");
+                    return;
+                }
+                let file = $('#inputUpTxt')[0].files[0];
+                let fd = new FormData();
+                fd.append('file', file);
+
+                $.ajax({
+                    url: '/Chapter/UploadTxt',
+                    type: 'POST',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        if (res.status) {
+                            $('#numberChaps').text(res.total);
+                            $('#saveNumChap').val(res.total);
+                            $('#inpReadF').attr('max', res.total);
+                            $('#inpReadF').val(1);
+                            $('#btnRead').prop('disabled', 1);
+                            $('#btnSave').prop('disabled', 0);
+                        } else {
+                            base.notification("error", res.message);
+                            return;
+                        }
+                    }
+                });
+            })
+            $('#btnSave').on('click', function (e) {
+                Chapter.getChapter(true);
+                $('#inputUpTxt').val('');
+                $('#btnSave').prop('disabled', 1);
+                $('#SaveNCon').prop('disabled', 0);
+                $('#ModalImportTxt').modal('hide');
+            })
+            $('#SaveNCon').on('click', function () {
+                if (!$('#txtContent').val() && !$('#txtTitle').val()) {
+                    base.notification('error', 'Vui lòng nhập title chương hoặc nội dung chương');
+                    return;
+                }
+
+                Chapter.saveChapter()
+                    .done(function (res) {
+
+                        if (!res.status) {
+                            base.notification('error', res.message);
+                            return;
+                        }
+                        base.notification('success', 'Đã lưu chương');
+
+                        let index = Number($('#saveChapNow').val());
+
+                        if (index + 1 <= Number($('#saveNumChap').val())) {
+                            $('#saveChapNow').val(index + 1);
+                            Chapter.renderPartChapter();
+                            Chapter.getChapter(false);
+                        }
+                        else {
+                            Chapter.renderPartChapter();
+                            base.notification('success', 'Đã lưu tới chương cuối cùng');
+
+                            $('#txtTitle').val("");
+                            $('#txtContent').val("");
+                            $('#inpReadF').prop('disabled', true);
+                        }
+                    })
+                    .fail(function (xhr, status, error) {
+                        console.error(error);
+                        base.notification('error', 'Lỗi khi lưu chương');
+                    });
+            });
+        },
+        getChapter: function (isFirst = false) {
+            let index = 0;
+            if (isFirst) {
+                index = Number($('#inpReadF').val());
+                $('#saveChapNow').val(index);
+            } else {
+                index = Number($('#saveChapNow').val());
+            }
+            if (index > $('#saveNumChap').val()) {
+                base.notification('error', 'Vượt quá số chương trong file');
+                return;
+            }
+            $.get('/Chapter/GetImportChapter', { index: index - 1 }, function (res) {
+                if (!res.status) return;
+                $('#txtTitle').text(res.data.chapterTitle);
+                $('#txtContent').val(res.data.content);
+            });
+        },
+        saveChapter: function () {
+            var formData = new FormData();
+            formData.append("Id", $('#Id').val());
+            formData.append("StoryId", $('#StoryId').val());
+            formData.append("Title", $('#txtTitle').val());
+            formData.append("Belong", $('#Belong').val());
+            formData.append("Content", $('#txtContent').val());
+            formData.append("RawContent", $('#txtRawContent').val());
+            formData.append("OrderTo",
+                $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
+
+            return $.ajax({
+                url: '/Chapter/CreateOrUpdate2',
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        },
+        renderPartChapter: function () {
+
+            const hasBelong = $('#Belong').length > 0;
+            const hasPartList = $('#partList').length > 0;
+
+            if (!hasBelong && !hasPartList) {
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("idStory", $('#StoryId').val());
+
+            $.ajax({
+                url: '/Chapter/GetPartChapter',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    if (res.status) {
+                        $('#searchOrder').val(Number(res.chapterCount) + 1);
+                        let html = '';
+
+                        $.each(res.data, function (i, item) {
+                            html += `<option value="${item.id}" data-name=" ${item.name}">
+                                ${item.name} (${item.chapterCount} chương)
+                             </option>`;
+                        });
+
+                        if (hasBelong) {
+                            $('#Belong').html(html);
+                        }
+
+                        if (hasPartList) {
+                            $('#partList').find('option:not([value="0"])').remove();
+                            $('#partList').append(html);
+                        }
+
+                    } else {
+                        base.notification("error", res.message);
+                    }
+                }
+            });
         },
         tblChapter: function () {
             var objTable = $("#tblChapter");
@@ -185,7 +333,6 @@
                 pageList: [50, 100],
                 reorderableRows: true,
                 useRowAttrFunc: true,
-
                 columns: [
                     {
                         field: "title",
@@ -270,104 +417,7 @@
                 },
             })
         },
-        getEditorImages: function () {
-            const html = CKEDITOR.instances.txtContent.getData();
-            const div = document.createElement("div");
-            div.innerHTML = html;
-            return Array.from(div.querySelectorAll("img"))
-                .map(img => img.getAttribute("src"))
-                .filter(src => src && src.includes("/chapter-images/"));
-        }
     }
-    window.ImportTxt = {
-        indexChapter: 0,
-        upload: function () {
-            if ($('#txtFile')[0].files.length === 0) {
-                base.notification("error", "Vui lòng Upload file text");
-                return;
-            }
-            let file = $('#txtFile')[0].files[0];
-            let fd = new FormData();
-            fd.append('file', file);
-
-            $.ajax({
-                url: '/Chapter/UploadTxt',
-                type: 'POST',
-                data: fd,
-                processData: false,
-                contentType: false,
-                success: function (res) {
-                    if (res.status) {
-                        $('#saveIndexChapter').val(0);
-                        ImportTxt.load();
-                    }
-                }
-            });
-        },
-        load: function () {
-            let index = Number($('#saveIndexChapter').val());
-            $.get('/Chapter/GetImportChapter', { index: index }, function (res) {
-                if (!res.status) return;
-
-                $('#txtTitleChapter').text(res.data.chapterTitle);
-                CKEDITOR.instances.importEditor.setData(res.data.content);
-                $('#btnNext').prop('disabled', res.data.isLastChapter == 1);
-                $('#isLastChapter').val(res.data.isLastChapter);
-                $('#importModal').modal('show');
-            });
-        },
-        Save: function () {
-            $.post('/Chapter/CreateOrUpdate', {
-                Id: 0,
-                StoryId: $('#saveStoryId').val(),
-                Title: $('#txtTitleChapter').text(),
-                Belong: $('#BelongPart').val(),
-                Content: base.convertToHTML(CKEDITOR.instances.importEditor.getData()),
-                RawContent: null,
-                OrderTo: $('#orderChapter').val() || 1,
-                Images: JSON.stringify([]),
-                deleteImage: JSON.stringify([])
-            }, function (res) {
-                if (res.status) {
-                    base.notification('success', res.message);
-                    if ($('#isLastChapter').val() == 0) {
-                        $('#orderChapter').val(res.numberChapter + 1);
-                        $('#BelongPart').val(res.belong);
-                        ImportTxt.nextIndex();
-                    } else {
-                        $('#importModal').modal('hide');
-                        window.location.reload();
-                    }
-                } else {
-                    base.notification('error', res.message);
-                }
-            }).fail(function (xhr, status, error) {
-                console.error('Error:', status, error);
-                base.notification('error', "Có lỗi xảy ra, vui lòng thử lại.");
-            });
-        },
-        Next: function () {
-            ImportTxt.nextIndex();
-        },
-        nextIndex: function () {
-            let index = Number($('#saveIndexChapter').val());
-            $('#saveIndexChapter').val(index + 1);
-            ImportTxt.load();
-        },
-        extractChapterImagePaths: function (html) {
-            const div = document.createElement('div');
-            div.innerHTML = html || '';
-
-            const imgs = div.querySelectorAll('img');
-
-            return Array.from(imgs)
-                .map(img => img.getAttribute('src'))
-                .filter(src =>
-                    src &&
-                    src.startsWith('/uploads/chapter/')
-                );
-        }
-    };
 });
 $(document).ready(function () {
     Chapter.init();

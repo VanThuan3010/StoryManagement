@@ -1,0 +1,139 @@
+﻿
+
+@{
+    ViewData["Title"] = "Thêm chương nhanh";
+}
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="breadcrumb-title pe-3">Truyện</div>
+    <div class="ps-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 p-0">
+                <li class="breadcrumb-item">
+                    <a href="/"><i class="bx bx-home-alt"></i></a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"></li>
+            </ol>
+        </nav>
+    </div>
+    <div class="ms-auto">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" id="btnBegin">Upload</button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <form id="frmChapter" asp-action="CreateOrUpdate" enctype="multipart/form-data" method="post">
+                    <input type="text" hidden value="@ViewBag.StoryId" id="StoryId" name="StoryId" />
+                    <div class="form-group col-lg-12 mb-3">
+                        <label class="form-label required">Tiêu đề</label>
+                        <textarea class="form-control" id="txtTitle"></textarea>
+                    </div>
+                    <div class="form-group col-lg-12 mb-3">
+                        <label class="form-label">Phần truyện</label>
+                        <div class="d-flex gap-3">
+                            <select class="form-select" id="Belong" name="Belong">
+                            </select>
+                            <a id="addPart" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary">+</a>
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-12 mb-3">
+                        <label class="form-label">Vị trí đọc</label>
+                        <div class="row">
+                            <div class="col-3 mt-3">
+                                <input class="form-control" type="text" id="searchOrder" value="" />
+                            </div>
+                            <div class="col-2 mt-3">
+                                <button type="button" id="btnSearchChapter" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 row">
+                        <div class="form-group col-lg-6 mb-3">
+                            <label class="form-label">Nội dung chương</label>
+                            <textarea rows="35" class="form-control" id="txtContent" name="txtContent"></textarea>
+                        </div>
+                        <div class="form-group col-lg-6 mb-3">
+                            <label class="form-label">Nội dung chương (Raw)</label>
+                            <textarea rows="35" class="form-control" id="txtRawContent" name="txtRawContent"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-success" style="width:100px;" type="button" id="SaveNCon">Lưu & Tiếp</button>
+                        <a id="btnBack" href="/Chapter/index?idStory=@ViewBag.StoryId" class="btn w-md btn-outline-info waves-effect waves-light">Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="saveNumChap" />
+<input type="hidden" id="saveChapNow" />
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="example1ModalLabel">Thêm phần truyện</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" value="@ViewBag.idStory" id="idStoryAddPartChapt" />
+                <input type="hidden" value="0" id="idPartChaptCU" />
+                <label class="form-label">Tên</label>
+                <input type="text" id="partChapterName" class="form-control" />
+                <label class="form-label">Phần truyện</label>
+                <select class="form-select col-6" id="partList" name="partList">
+                    <option value="0"></option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savePart">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalImportTxt" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tải lên txt truyện</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label>Tải lên truyện</label>
+                <input type="file" name="name" id="inputUpTxt" accept="txt" /> <br />
+                @* <label>Tải lên Raw</label>
+                <input type="file" name="name" id="inputTxtRaw" accept="txt" /> <br /> *@
+                <div style="display: flex;">Đọc từ: <input type="number" min="1" id="inpReadF" disabled class="form-control" style="width: 70px;"/> / <span id="numberChaps"></span></div>
+                <input type="hidden" id="saveIndex" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnRead">Đọc txt</button>
+                <button type="button" class="btn btn-primary" id="btnSave" disabled>Bắt đầu lưu</button>
+                <button type="button" class="btn btn-danger" id="btnCancel">Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $('textarea').on('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+
+                let start = this.selectionStart;
+                let end = this.selectionEnd;
+
+                $(this).val(
+                    $(this).val().substring(0, start) +
+                    '    ' +
+                    $(this).val().substring(end)
+                );
+
+                this.selectionStart = this.selectionEnd = start + 1;
+            }
+        });
+    </script>
+}

@@ -4,7 +4,6 @@
     ViewData["Title"] = ViewBag.id <= 0 ? "Thêm mới chương truyện" : "Sửa nội dung chương";
     List<Part_Chapter> part_Chapters = (List<Part_Chapter>)ViewBag.PartChapter;
     Chapters chapter = (Chapters)ViewBag.chapters;
-    var ChapterCount = (int)ViewBag.ChapterCount;
 }
 
 <div class="row">
@@ -22,13 +21,6 @@
                         <label class="form-label">Phần truyện</label>
                         <div class="d-flex gap-3">
                             <select class="form-select" id="Belong" name="Belong">
-                                @if (part_Chapters.Count > 0)
-                                {
-                                    foreach (Part_Chapter item in part_Chapters)
-                                    {
-                                        <option value="@item.Id">@item.Name (@item.ChapterCount) </option>
-                                    }
-                                }
                             </select>
                             <a id="addPart" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary">+</a>
                         </div>                        
@@ -37,7 +29,7 @@
                         <label class="form-label">Vị trí đọc</label>
                         <div class="row">
                             <div class="col-3 mt-3">
-                                <input class="form-control" type="text" id="searchOrder" value="@(ViewBag.idChapter == 0 ? ChapterCount + 1 : chapter?.Orders)" />
+                                <input class="form-control" type="text" id="searchOrder" value="@chapter?.Orders" />
                             </div>
                             <div class="col-2 mt-3">
                                 <button type="button" id="btnSearchChapter" class="btn btn-primary"><i class="fas fa-search"></i></button>
@@ -47,11 +39,11 @@
                     <div class="col-lg-12 row">
                         <div class="form-group col-lg-6 mb-3">
                             <label class="form-label">Nội dung chương</label>
-                            <textarea class="form-control" id="txtContent" name="txtContent">@(chapter != null ? chapter.Content : null)</textarea>
+                            <textarea rows="35" class="form-control" id="txtContent" name="txtContent">@(chapter != null ? chapter.Content : null)</textarea>
                         </div>
                         <div class="form-group col-lg-6 mb-3">
                             <label class="form-label">Nội dung chương</label>
-                            <textarea class="form-control" id="txtRawContent" name="txtRawContent">@(chapter != null ? chapter.RawContent : null)</textarea>
+                            <textarea rows="35" class="form-control" id="txtRawContent" name="txtRawContent">@(chapter != null ? chapter.RawContent : null)</textarea>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -67,7 +59,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <h5 class="modal-title" id="example1ModalLabel">Modal title</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -78,13 +70,6 @@
                 <label class="form-label">Phần truyện</label>
                 <select class="form-select col-6" id="partList" name="partList">
                     <option value="0"></option>
-                    @if (part_Chapters.Count > 0)
-                    {
-                        foreach (Part_Chapter item in part_Chapters)
-                        {
-                            <option value="@item.Id">@item.Name </option>
-                        }
-                    }
                 </select>
             </div>
             <div class="modal-footer">
@@ -95,29 +80,29 @@
 </div>
 @section Scripts {
     <script type="text/javascript">
-        CKEDITOR.replace('txtContent', {
-            height: '700px',
-            extraPlugins: 'uploadimage,image2',
-            uploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
-            pasteFromWordRemoveFontStyles: true,
-            pasteFromWordRemoveStyles: true
-            // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
-            // filebrowserUploadMethod: 'form'
-        });
-        CKEDITOR.instances.txtContent.on('fileUploadResponse', function (evt) {
-            var response = evt.data.fileLoader.xhr.responseText;
-            try {
-                var data = JSON.parse(response);
-                if (data.uploaded) {
-                    base.uploadImages.push(data.url);
-                }
-            } catch (e) {
-                console.error('Parse upload response error:', e);
-            }
-        });
-        CKEDITOR.replace('txtRawContent', {
-            height: '700px'
-        });
+        // CKEDITOR.replace('txtContent', {
+        //     height: '700px',
+        //     extraPlugins: 'uploadimage,image2',
+        //     uploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
+        //     pasteFromWordRemoveFontStyles: true,
+        //     pasteFromWordRemoveStyles: true
+        //     // filebrowserUploadUrl: '/Chapter/UploadImage?storyId=' + $('#StoryId').val(),
+        //     // filebrowserUploadMethod: 'form'
+        // });
+        // CKEDITOR.instances.txtContent.on('fileUploadResponse', function (evt) {
+        //     var response = evt.data.fileLoader.xhr.responseText;
+        //     try {
+        //         var data = JSON.parse(response);
+        //         if (data.uploaded) {
+        //             base.uploadImages.push(data.url);
+        //         }
+        //     } catch (e) {
+        //         console.error('Parse upload response error:', e);
+        //     }
+        // });
+        // CKEDITOR.replace('txtRawContent', {
+        //     height: '700px'
+        // });
     </script>
 }
 

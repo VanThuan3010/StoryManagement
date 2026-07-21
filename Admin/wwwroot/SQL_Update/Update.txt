@@ -20,3 +20,45 @@ Sửa: CreateOrUpdate_TagOrSubTag (đổi tên lại thành CreateOrUpdate_Tag),
 Sửa: Bảng Story (thêm cột ReadOrder smallint), My_Compose, Stored Procedure: CreateOrUpdate_Story, Get_Story
 Thêm: Stored Get_StoryDetail2, Get_ReadList, ReOrderStory, sp_GetComposeDetail, sp_GetComposTree, sp_DeleteCompose, sp_CreateOrUpdateCompose
 	Function GetFirstValueJson
+*********************************************************************
+20/07/2026
+Sửa: 
+	Stored Procedure: ReOrderStory, Read_Change
+Xóa: 
+	Stored Procedure: Change_StatusRead
+------------------------------------------
+ALTER PROCEDURE [dbo].[ReOrderStory]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    ;WITH CTE AS
+    (
+        SELECT
+            Id,
+            NewReadOrder = ROW_NUMBER() OVER (ORDER BY ReadOrder, Id)
+        FROM Story
+        WHERE ReadOrder IS NOT NULL
+          AND ReadOrder <> 0
+    )
+    UPDATE S
+    SET ReadOrder = CTE.NewReadOrder
+    FROM Story S
+    INNER JOIN CTE
+        ON S.Id = CTE.Id;
+END
+------------------------------------------
+ALTER PROCEDURE [dbo].[Read_Change]
+	@id int,
+	@idChapter bigint
+as
+begin
+	declare @read bit = (select IsRead from Story where Id = @id)
+	Update Story 
+	set IsRead = case when @read = 1 then 0 
+					when @read = 0 or @read is null then 1 end,
+		ReadTo = case when @read = 1 then null
+					when @read = 0 or @read is null then @idChapter end,
+		ReadOrder = case when @read = 0 then null else ReadOrder end
+	where Id =@id
+end
