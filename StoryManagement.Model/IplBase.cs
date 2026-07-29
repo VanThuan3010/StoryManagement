@@ -16,6 +16,7 @@ namespace StoryManagement.Model
         private StoryContext _dbContext;
 
         private IAuthors _authorRespository;
+        private IChapterPatch _chapterPatchRespository;
         private IChapters _chapterRespository;
         private IComic _comicRespository;
         private IComic_Episode _comicEpisodeRespository;
@@ -44,6 +45,13 @@ namespace StoryManagement.Model
             get
             {
                 return _authorRespository ?? (_authorRespository = new IplAuthor(_dbContext, _Configuration));
+            }
+        }
+        public IChapterPatch chapterPatchRespository
+        {
+            get
+            {
+                return _chapterPatchRespository ?? (_chapterPatchRespository = new IplChapterPatch(_dbContext, _Configuration));
             }
         }
         public IChapters chapterRespository

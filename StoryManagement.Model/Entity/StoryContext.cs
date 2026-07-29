@@ -17,6 +17,7 @@ namespace MFTech.Model.Entity
         {
         }
         public virtual DbSet<Authors> Authors { get; set; } = null!;
+        public virtual DbSet<ChapterPatch> ChapterPatches { get; set; } = null!;
         public virtual DbSet<Chapters> Chapters { get; set; } = null!;
         public virtual DbSet<Comic> Comics { get; set; } = null!;
         public virtual DbSet<Comic_Episode> Comic_Episodes { get; set; } = null!;
@@ -40,6 +41,14 @@ namespace MFTech.Model.Entity
 
                 entity.Property(e => e.Pseudonym).HasMaxLength(4000);
                 entity.Property(e => e.Style);
+            });
+            modelBuilder.Entity<ChapterPatch>(entity =>
+            {
+                entity.ToTable("ChapterPatch");
+
+                entity.Property(e => e.VerName).HasMaxLength(150);
+                entity.Property(e => e.Title).HasMaxLength(1000);
+                entity.Property(e => e.Patch);
             });
             modelBuilder.Entity<Chapters>(entity =>
             {

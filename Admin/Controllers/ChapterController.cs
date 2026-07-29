@@ -35,6 +35,12 @@ namespace Admin.Controllers
             ViewBag.StoryId = idStory;
             return View();
         }
+        public IActionResult VersionPatch(long idChapter)
+        {
+            ViewBag.chapters = _ibase.chapterRespository.GetDetail(idChapter);
+            ViewBag.chapterPatch = _ibase.chapterPatchRespository.GetAll(idChapter);
+            return View();
+        }
         public JsonResult GetPartChapter(int idStory)
         {
             try

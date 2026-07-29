@@ -12,6 +12,7 @@ namespace StoryManagement.Model
     public interface IBase
     {
         IAuthors authorRespository { get; }
+        IChapterPatch chapterPatchRespository { get; }
         IChapters chapterRespository { get; }
         IComic comicRespository { get; }
         IComic_Episode comicEpisodeRespository { get; }

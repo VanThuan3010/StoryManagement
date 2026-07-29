@@ -1,0 +1,78 @@
+﻿@using StoryManagement.Model.Entity
+@{
+    ViewData["Title"] = "Bản dịch khác";
+    Chapters chapter = (Chapters)ViewBag.chapters;
+    List<ChapterPatch> patches = (List<ChapterPatch>)ViewBag.chapterPatch;
+}
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="breadcrumb-title pe-3">Truyện</div>
+    <div class="ps-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 p-0">
+                <li class="breadcrumb-item">
+                    <a href="/"><i class="bx bx-home-alt"></i></a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"></li>
+            </ol>
+        </nav>
+    </div>
+    <div class="ms-auto">
+        <div class="btn-group">
+            <select id="slPatch" class="form-control me-1" style="width: 200px;">
+                @{
+                    foreach(ChapterPatch patch in patches)
+                    {
+                        <option value="@patch.Id">@patch.VerName</option>
+                    }
+                }
+            </select>
+            <button type="button" class="btn btn-success me-1" id="btnGetPatch">Lấy thông tin</button>
+            <button type="button" class="btn btn-danger me-1" id="btnDelPatch">Xóa</button>
+            <button type="button" class="btn btn-primary" id="btnCreatePatch">Thêm mới</button>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="name" value="@chapter.Id" id="saveChapterId" />
+<input type="hidden" name="name" value="0" id="savePatchId" />
+@* <div class="form-control mb-1">
+    <label class="form-label">Tên bản dịch</label>
+    <input type="text" class="form-control" id="txtVerName" />
+</div>
+<br /> *@
+<div style="display:flex">
+    <textarea id="editor1" style="width:49%;height:500px;resize:vertical;">@chapter.Content</textarea>
+
+    <div style="width:2%"></div>
+
+    <textarea id="editor2" style="width:49%;height:500px;resize:vertical;"></textarea>
+</div>
+
+<div style="display:flex;justify-content:center;margin-top:10px; margin-bottom: 10px;">
+    <button class="btn btn-success me-2" id="btnSavePatch">Save</button>
+    <button class="btn btn-primary" id="btnCompare">Compare</button>
+</div>
+<div id="diffEditor" style="height:700px;margin-top:20px">
+</div>
+@section Scripts{
+    <script src="/lib/jsdiff/8.0.2/diff802.min.js"></script>
+    <script src="/lib/monaco-editor/0.52.2/vs/loader.js"></script>
+    <script>
+        require.config({
+                paths: {
+                    vs: '/lib/monaco-editor/0.52.2/vs'
+                }
+            });
+
+        require(['vs/editor/editor.main'], function () {
+            monaco.editor.setTheme("vs-dark");
+
+            diffEditor = monaco.editor.createDiffEditor(
+                document.getElementById('diffEditor'),
+                {
+                    automaticLayout: true,
+                    renderSideBySide: true
+                }
+            );
+        });
+    </script>
+}

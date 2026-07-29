@@ -68,7 +68,7 @@ function renderDetail(s) {
     try {
         let chapters = JSON.parse(s.numberChapter);
         chapters.forEach(function (c) {
-            chapterHtml += `<div class="chapter-item">${c.name}</div>`;
+            chapterHtml += `<div class="chapter-item">${c}</div>`;
         });
     } catch (e) {
         chapterHtml = `<div class="chapter-item">Không có thông tin</div>`;

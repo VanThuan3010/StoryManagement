@@ -62,3 +62,88 @@ begin
 		ReadOrder = case when @read = 0 then null else ReadOrder end
 	where Id =@id
 end
+*********************************************************************
+27/07/2026
+create  PROCEDURE [dbo].[CreateOrUpdate_ChapterPatch]
+	@Id int,
+	@chapterId bigint,
+	@verName nvarchar(150),
+	@title nvarchar(1000),
+	@patch nvarchar(max)
+as
+begin
+	if @Id <= 0
+	begin
+		if @verName = '' or @verName is null
+		begin
+			declare @numPatch tinyint = (select count(Id) from ChapterPatch where ChapterId = @chapterId)
+			set @verName = 'Version ' + CAST(@numPatch + 1 AS NVARCHAR(10))
+		end
+		insert into ChapterPatch
+		values (@chapterId, @verName, @title, @patch)
+	end
+	else
+		update ChapterPatch
+		set Title = @title, Patch = @patch
+		where Id = @Id
+end
+------------------------------------------
+create PROCEDURE [dbo].[Delete_ChapterPatch]
+	@id int
+as
+begin
+    DECLARE @ChapterId BIGINT;
+
+    SELECT @ChapterId = ChapterId
+    FROM ChapterPatch
+    WHERE Id = @Id;
+
+	delete ChapterPatch where Id = @id
+
+    declare @data table (
+		Id int,
+        Orders int
+	);
+
+    insert into @data
+    select Id, ROW_NUMBER() OVER (
+            ORDER BY CAST(REPLACE(VerName, 'Version ', '') AS INT)
+        )
+    from ChapterPatch
+    where ChapterId = @ChapterId
+
+    update ChapterPatch
+    set VerName = 'Version ' + CAST(d.Orders AS NVARCHAR(10))
+    from ChapterPatch join @data d on ChapterPatch.Id = d.Id
+end
+------------------------------------------
+create PROCEDURE [dbo].[Get_ChapterPatchDetail]
+	@id int
+as
+begin
+	select top 1  *
+	from ChapterPatch
+	where Id = @id
+end
+------------------------------------------
+create PROCEDURE [dbo].[Get_ChapterPatch]
+	@idChapter bigint
+as
+begin
+	select Id, VerName
+	from ChapterPatch
+	where ChapterId = @idChapter
+end
+------------------------------------------
+CREATE TABLE [dbo].[ChapterPatch](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ChapterId] [bigint] NULL,
+	[VerName] [nvarchar](150) NULL,
+	[Title] [nvarchar](1000) NULL,
+	[Patch] [nvarchar](max) NULL,
+ CONSTRAINT [PK_ChapterPatch] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO

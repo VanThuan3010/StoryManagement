@@ -26,6 +26,7 @@
     <link href="~/css/@(controller).css?v=@DateTime.UtcNow.ToString()" rel="stylesheet" />
     @* JsTree *@
     <link href="~/lib/jstree/style.min.css" rel="stylesheet" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">

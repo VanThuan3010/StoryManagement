@@ -16,6 +16,14 @@
                 base.deleteNotSavedImages();
                 window.location.href = '/Chapter/index?idStory=' + $('#StoryId').val();
             });
+            if ($('#slPatch').length <= 0 || ($('#slPatch').length > 0 && $('#slPatch option').length <= 0)) {
+                if ($('#btnGetPatch').length > 0) {
+                    $('#btnGetPatch').prop('disabled', true);
+                }
+                if ($('#btnDelPatch').length > 0) {
+                    $('#btnDelPatch').prop('disabled', true);
+                }
+            }
         },
 
         action: function () {
@@ -221,6 +229,148 @@
                         base.notification('error', 'Lỗi khi lưu chương');
                     });
             });
+            $('#btnCompare').on('click', function () {
+                const oldText = $('#editor1').val();
+                const newText = $('#editor2').val();
+                if (newText.trim() === '') {
+                    base.notification('error', 'Vui lòng nhập nội dung chương mới để so sánh');
+                    $('#editor2').focus();
+                    return;
+                }
+
+                const originalModel =
+                    monaco.editor.createModel(
+                        oldText,
+                        'plaintext'
+                    );
+
+                const modifiedModel =
+                    monaco.editor.createModel(
+                        newText,
+                        'plaintext'
+                    );
+
+                diffEditor.setModel({
+                    original: originalModel,
+                    modified: modifiedModel
+                });
+
+                const patch = Diff.createPatch(
+                    '',
+                    oldText,
+                    newText
+                );
+                // const content = Diff.applyPatch(originalContent, patch);
+                // const parsed = Diff.parsePatch(patch);
+
+                // const reversed = Diff.reversePatch(parsed);
+
+                // const undo = Diff.applyPatch(
+                //     B,
+                //     Diff.formatPatch(reversed)
+                // );
+
+                //console.log(patch);
+            });
+            $('#btnSavePatch').on('click', function () {
+                const oldText = $('#editor1').val();
+                const newText = $('#editor2').val();
+                if (newText.trim() === '') {
+                    base.notification('error', 'Vui lòng nhập nội dung chương mới để so sánh');
+                    $('#editor2').focus();
+                    return;
+                }
+                if (oldText === newText) {
+                    base.notification('info', 'Hai nội dung không có thay đổi');
+                    return;
+                }
+                const originalModel =
+                    monaco.editor.createModel(
+                        oldText,
+                        'plaintext'
+                    );
+
+                const modifiedModel =
+                    monaco.editor.createModel(
+                        newText,
+                        'plaintext'
+                    );
+
+                diffEditor.setModel({
+                    original: originalModel,
+                    modified: modifiedModel
+                });
+
+                const patch = Diff.createPatch(
+                    '',
+                    oldText,
+                    newText
+                );
+                //if ($('#txtPseudonym').val().trim() === '') {
+                //    base.notification('error', "Hãy nhập bút danh");
+                //    return;
+                //}
+                var datas = new FormData();
+                datas.append('Id', $('#savePatchId').val());
+                datas.append('ChapterId', $('#saveChapterId').val());
+                datas.append('VerName', "");
+                datas.append('Title', "");
+                datas.append('Patch', patch);
+                $.ajax({
+                    url: '/ChapterPatch/CreateOrUpdate',
+                    type: 'post',
+                    processData: false,
+                    contentType: false,
+                    data: datas,
+                    beforeSend: function () {
+                        $('#btnSavePatch').prop('disabled', true);
+                    },
+                    success: function (res) {
+                        $('#btnSavePatch').prop('disabled', false);
+                        if (res.status) {
+                            base.notification('success', res.message);
+                            window.location.reload();
+                        } else {
+                            base.notification('error', res.message);
+                        }
+                    }
+                })
+            });
+            $('#btnCreatePatch').on('click', function () {
+                $('#editor2').val("");
+                $('#savePatchId').val(0);
+            });
+            $('#btnGetPatch').on('click', function () {
+                $.ajax({
+                    url: "/ChapterPatch/GetDetail",
+                    data: {
+                        id: $('#slPatch').val()
+                    },
+                    success: function (res) {
+                        $('#editor2').val(Diff.applyPatch($('#editor1').val(), res.patch));
+                        $('#savePatchId').val($('#slPatch').val());
+                    },
+                    error: function () {
+                        base.notification('error', 'Lỗi khi lấy bản vá');
+                    }
+                });
+            });
+            $('#btnDelPatch').on('click', function () {
+                $.ajax({
+                    url: "/ChapterPatch/Delete",
+                    method: 'DELETE',
+                    data: {
+                        id: $('#slPatch').val()
+                    },
+                    success: function (res) {
+                        base.notification('success', 'Xóa thành công');
+                        location.reload();
+                    },
+                    error: function () {
+                        base.notification('error', 'Lỗi khi lấy bản vá');
+                    }
+                });
+            });
         },
         getChapter: function (isFirst = false) {
             let index = 0;
@@ -354,6 +504,7 @@
                         formatter: function (value, row, index) {
                             var action = "<div style='width: 200px;'>";
                             action += '<a href="/Chapter/CreateOrUpdate?idStory=' + row.storyId + '&idChapter=' + row.chapterId + '" class="btn btn-primary btn-sm btnEdit"><i class="fas fa-pen"></i></a>';
+                            action += '<a href="/Chapter/VersionPatch?idChapter=' + row.chapterId + '" class="btn btn-primary btn-sm ms-1"><i class="fas fa-code-branch"></i></a>';
                             action += '<a href="javascript:void(0)" class="btn btn-danger btn-sm btnDelete ms-1"><i class="fas fa-times"></i></a>';
                             action += '</div>';
                             return action;
