@@ -55,7 +55,8 @@ namespace MFTech.Model.Entity
                 entity.ToTable("Chapters");
 
                 entity.Property(e => e.StoryId);
-                entity.Property(e => e.Title);
+                entity.Property(e => e.Title).HasMaxLength(1000);
+                entity.Property(e => e.TitleRaw).HasMaxLength(1000);
                 entity.Property(e => e.RawContent);
                 entity.Property(e => e.Content);
                 entity.Property(e => e.Belong);

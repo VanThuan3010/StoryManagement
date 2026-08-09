@@ -24,6 +24,16 @@
                     $('#btnDelPatch').prop('disabled', true);
                 }
             }
+            if ($("#flexSwitchCheckDefault").length > 0) {
+                $("#flexSwitchCheckDefault").on("change", function () {
+                    const label = $('label[for="flexSwitchCheckDefault"]');
+                    if ($(this).prop("checked")) {
+                        label.text("Hoán vị");
+                    } else {
+                        label.text("Chèn");
+                    }
+                });
+            }
         },
 
         action: function () {
@@ -157,13 +167,13 @@
                 $('#ModalImportTxt').modal('show');
             })
             $('#btnRead').on('click', function (e) {
-                if ($('#inputUpTxt')[0].files.length === 0) {
+                if ($('#inputUpTxt')[0].files.length === 0 && $('#inputTxtRaw')[0].files.length === 0) {
                     base.notification("error", "Vui lòng Upload file text");
                     return;
                 }
-                let file = $('#inputUpTxt')[0].files[0];
                 let fd = new FormData();
-                fd.append('file', file);
+                fd.append('file', $('#inputUpTxt')[0].files[0]);
+                fd.append('fileRaw', $('#inputTxtRaw')[0].files[0]);
 
                 $.ajax({
                     url: '/Chapter/UploadTxt',
@@ -194,7 +204,7 @@
                 $('#ModalImportTxt').modal('hide');
             })
             $('#SaveNCon').on('click', function () {
-                if (!$('#txtContent').val() && !$('#txtTitle').val()) {
+                if (!$('#txtContent').val() && !$('#txtTitle').val() && !$('#txtRawContent').val() && !$('#txtTitleRaw').val()) {
                     base.notification('error', 'Vui lòng nhập title chương hoặc nội dung chương');
                     return;
                 }
@@ -221,6 +231,9 @@
 
                             $('#txtTitle').val("");
                             $('#txtContent').val("");
+                            $('#txtTitleRaw').val("");
+                            $('#txtRawContent').val("");
+
                             $('#inpReadF').prop('disabled', true);
                         }
                     })
@@ -381,13 +394,22 @@
                 index = Number($('#saveChapNow').val());
             }
             if (index > $('#saveNumChap').val()) {
-                base.notification('error', 'Vượt quá số chương trong file');
+                base.notification('error', 'Vượt quá số chương trong cả 2 file');
                 return;
             }
             $.get('/Chapter/GetImportChapter', { index: index - 1 }, function (res) {
-                if (!res.status) return;
-                $('#txtTitle').text(res.data.chapterTitle);
-                $('#txtContent').val(res.data.content);
+                if (!res.status) {
+                    base.notification('error', res.message);
+                    return;
+                }
+                const data = res.data;
+                const dataRaw = res.dataRaw;
+
+                $('#txtTitle').text(data?.chapterTitle ?? '');
+                $('#txtContent').val(data?.content ?? '');
+
+                $('#txtTitleRaw').text(dataRaw?.chapterTitle ?? '');
+                $('#txtRawContent').val(dataRaw?.content ?? '');
             });
         },
         saveChapter: function () {
@@ -395,9 +417,11 @@
             formData.append("Id", $('#Id').val());
             formData.append("StoryId", $('#StoryId').val());
             formData.append("Title", $('#txtTitle').val());
+            formData.append("TitleRaw", $('#txtTitleRaw').val());
             formData.append("Belong", $('#Belong').val());
             formData.append("Content", $('#txtContent').val());
             formData.append("RawContent", $('#txtRawContent').val());
+            formData.append("InsertOrExchange", $('#flexSwitchCheckDefault').is(':checked'));
             formData.append("OrderTo",
                 $('#searchOrder').val() == '' ? 1 : $('#searchOrder').val());
 
@@ -489,6 +513,26 @@
                         title: "Tên",
                         align: 'left',
                         valign: 'left',
+                        width: 600,
+                        formatter: function (value, row, index) {
+                            try {
+                                if (row.title && row.titleRaw) {
+                                    return row.title + "<br>" + row.titleRaw;
+                                } else {
+                                    let valueToParse = "";
+                                    if (row.title) {
+                                        valueToParse = row.title;
+                                    }
+                                    if (row.titleRaw) {
+                                        valueToParse = row.titleRaw;
+                                    }
+                                    return valueToParse;
+                                }
+                                return value;
+                            } catch {
+                                return value;
+                            }
+                        }
                     },
                     {
                         field: "part_Name",

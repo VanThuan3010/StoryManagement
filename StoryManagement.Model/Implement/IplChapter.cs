@@ -70,7 +70,7 @@ namespace StoryManagement.Model.Implement
             }
             return List;
         }
-        public int CreateOrUpdate(Chapters chapters, int OrderTo, ref int Total)
+        public int CreateOrUpdate(Chapters chapters, int OrderTo, bool InsertOrExchange, ref int Total)
         {
             var unitOfWork = new UnitOfWorkFactory(_cnnString);
             int list = 0;
@@ -82,10 +82,12 @@ namespace StoryManagement.Model.Implement
                     p.Add("@Id", chapters.Id);
                     p.Add("@idStory", chapters.StoryId);
                     p.Add("@title", chapters.Title);
+                    p.Add("@titleRaw", chapters.TitleRaw);
                     p.Add("@content", chapters.Content);
                     p.Add("@raw", chapters.RawContent);
                     p.Add("@belong", chapters.Belong);
                     p.Add("@order", OrderTo);
+                    p.Add("@exchange", InsertOrExchange);
                     p.Add("@numberChapter", Total, DbType.Int32, ParameterDirection.Output);
                     list = u.ProcedureExecute("CreateOrUpdate_Chapter", p);
                     Total = p.Get<int>("@numberChapter");

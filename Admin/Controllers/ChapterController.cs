@@ -100,7 +100,7 @@ namespace Admin.Controllers
                     }
                 }
                 int NumberChapter = 0;
-                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, ref NumberChapter);
+                //_ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, ref NumberChapter);
                 return new JsonResult(new
                 {
                     status = true,
@@ -115,14 +115,22 @@ namespace Admin.Controllers
             }
         }
         [HttpPost]
-        public JsonResult CreateOrUpdate2(Chapters chapters, int OrderTo)
+        public JsonResult CreateOrUpdate2(Chapters chapters, int OrderTo, bool InsertOrExchange)
         {
             try
             {
                 if (chapters == null)
                     return new JsonResult(new { status = false, message = "Có lỗi xảy ra" });
                 int NumberChapter = 0;
-                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, ref NumberChapter);
+                _ibase.chapterRespository.CreateOrUpdate(chapters, OrderTo, InsertOrExchange, ref NumberChapter);
+                if(NumberChapter == 0)
+                {
+                    return new JsonResult(new
+                    {
+                        status = false,
+                        message = "Thao tác thất bại, hãy kiểm tra lại"
+                    });
+                }
                 return new JsonResult(new
                 {
                     status = true,
@@ -493,114 +501,44 @@ namespace Admin.Controllers
             }
         }
         [HttpPost]
-        public async Task<JsonResult> UploadTxt(IFormFile file)
+        public async Task<JsonResult> UploadTxt(IFormFile? file, IFormFile? fileRaw)
         {
-            if (file == null || file.Length == 0)
-                return Json(new { status = false, message = "File không hợp lệ" });
+            if ((file == null || file.Length == 0) &&
+                (fileRaw == null || fileRaw.Length == 0))
+            {
+                return Json(new
+                {
+                    status = false,
+                    message = "Ít nhất phải chọn một file."
+                });
+            }
 
             try
             {
-                var jsonPath = Path.Combine(
+                var normalPath = Path.Combine(
                     _env.ContentRootPath,
                     "App_Data",
-                    "TempImport.json"
-                );
+                    "TempImport.json");
 
-                int indexChapter = 1;
-                int totalChapter = 0;
+                var rawPath = Path.Combine(
+                    _env.ContentRootPath,
+                    "App_Data",
+                    "TempImportRaw.json");
 
-                // FileMode.Create => tự động clear file cũ
-                await using var jsonStream = new FileStream(
-                    jsonPath,
-                    FileMode.Create,
-                    FileAccess.Write,
-                    FileShare.None
-                );
+                int totalNormal = await SaveImportJson(
+                    file,
+                    normalPath,
+                    IsChapterTitle);
 
-                await using var txtStream = file.OpenReadStream();
-
-                using var reader = new StreamReader(
-                    txtStream,
-                    Encoding.UTF8
-                );
-
-                using var jsonWriter = new Utf8JsonWriter(
-                    jsonStream,
-                    new JsonWriterOptions
-                    {
-                        Indented = false
-                    }
-                );
-
-                jsonWriter.WriteStartArray();
-
-                string? currentTitle = null;
-                var currentContent = new StringBuilder();
-
-                string? line;
-
-                while ((line = await reader.ReadLineAsync()) != null)
-                {
-                    var trimLine = line.Trim();
-
-                    if (IsChapterTitle(trimLine))
-                    {
-                        // Gặp chương mới => ghi chương trước
-                        if (!string.IsNullOrEmpty(currentTitle))
-                        {
-                            var chapter = new ImportChapterDto
-                            {
-                                IndexChapter = indexChapter,
-                                ChapterTitle = currentTitle,
-                                Content = currentContent.ToString().Trim(),
-                                IsLastChapter = 0
-                            };
-
-                            JsonSerializer.Serialize(jsonWriter, chapter);
-
-                            indexChapter++;
-                            totalChapter++;
-
-                            await jsonWriter.FlushAsync();
-
-                            currentContent.Clear();
-                        }
-
-                        currentTitle = trimLine;
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(currentTitle))
-                        {
-                            currentContent.AppendLine(line);
-                        }
-                    }
-                }
-
-                // Ghi chương cuối
-                if (!string.IsNullOrEmpty(currentTitle))
-                {
-                    var chapter = new ImportChapterDto
-                    {
-                        IndexChapter = indexChapter,
-                        ChapterTitle = currentTitle,
-                        Content = currentContent.ToString().Trim(),
-                        IsLastChapter = 1
-                    };
-
-                    JsonSerializer.Serialize(jsonWriter, chapter);
-
-                    totalChapter++;
-                }
-
-                jsonWriter.WriteEndArray();
-
-                await jsonWriter.FlushAsync();
+                int totalRaw = await SaveImportJson(
+                    fileRaw,
+                    rawPath,
+                    IsRawChapterTitle);
 
                 return Json(new
                 {
                     status = true,
-                    total = totalChapter
+                    total = Math.Max(totalNormal, totalRaw)
                 });
             }
             catch (Exception ex)
@@ -612,20 +550,142 @@ namespace Admin.Controllers
                 });
             }
         }
+        private async Task<int> SaveImportJson(IFormFile? file, string jsonPath, Func<string, bool> isChapterTitle)
+        {
+            await using var jsonStream = new FileStream(
+                jsonPath,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None);
+
+            await using var jsonWriter = new Utf8JsonWriter(
+                jsonStream,
+                new JsonWriterOptions
+                {
+                    Indented = false
+                });
+
+            jsonWriter.WriteStartArray();
+
+            // Không có file -> tạo file []
+            if (file == null || file.Length == 0)
+            {
+                jsonWriter.WriteEndArray();
+                await jsonWriter.FlushAsync();
+                return 0;
+            }
+
+            await using var txtStream = file.OpenReadStream();
+
+            using var reader = new StreamReader(
+                txtStream,
+                Encoding.UTF8);
+
+            int indexChapter = 1;
+            int totalChapter = 0;
+
+            string? currentTitle = null;
+            var currentContent = new StringBuilder();
+
+            string? line;
+
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                var trimLine = line.Trim();
+
+                if (isChapterTitle(trimLine))
+                {
+                    if (!string.IsNullOrEmpty(currentTitle))
+                    {
+                        var chapter = new ImportChapterDto
+                        {
+                            IndexChapter = indexChapter,
+                            ChapterTitle = currentTitle,
+                            Content = currentContent.ToString().Trim(),
+                            IsLastChapter = 0
+                        };
+
+                        JsonSerializer.Serialize(jsonWriter, chapter);
+
+                        indexChapter++;
+                        totalChapter++;
+
+                        currentContent.Clear();
+                    }
+
+                    currentTitle = trimLine;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(currentTitle))
+                    {
+                        currentContent.AppendLine(line);
+                    }
+                }
+            }
+
+            // ghi chương cuối
+            if (!string.IsNullOrEmpty(currentTitle))
+            {
+                var chapter = new ImportChapterDto
+                {
+                    IndexChapter = indexChapter,
+                    ChapterTitle = currentTitle,
+                    Content = currentContent.ToString().Trim(),
+                    IsLastChapter = 1
+                };
+
+                JsonSerializer.Serialize(jsonWriter, chapter);
+
+                totalChapter++;
+            }
+
+            jsonWriter.WriteEndArray();
+
+            await jsonWriter.FlushAsync();
+
+            return totalChapter;
+        }
         [HttpGet]
         public JsonResult GetImportChapter(int index)
         {
+            if(index < 0){
+                return Json(new
+                {
+                    status = false,
+                    message = "Vị trí lấy không hợp lệ"
+                });
+            }
             var path = Path.Combine(_env.ContentRootPath, "App_Data", "TempImport.json");
-            if (!System.IO.File.Exists(path))
-                return Json(new { status = false });
+            var pathRaw = Path.Combine(_env.ContentRootPath, "App_Data", "TempImportRaw.json");
 
             var chapters = System.Text.Json.JsonSerializer
                 .Deserialize<List<ImportChapterDto>>(System.IO.File.ReadAllText(path));
 
-            if (index < 0 || index >= chapters.Count)
-                return Json(new { status = false });
+            var chapterRaw = System.Text.Json.JsonSerializer
+                .Deserialize<List<ImportChapterDto>>(System.IO.File.ReadAllText(pathRaw));
 
-            return Json(new { status = true, data = chapters[index] });
+            var normalCount = chapters?.Count ?? 0;
+            var rawCount = chapterRaw?.Count ?? 0;
+            
+            if (index >= normalCount && index >= rawCount)
+            {
+                return Json(new
+                {
+                    status = false,
+                    message = "Không file nào lấy được dữ liệu"
+                });
+            }
+            var data = index < normalCount ? chapters[index] : null;
+
+            var dataRaw = index < rawCount ? chapterRaw[index] : null;
+
+            return Json(new
+            {
+                status = true,
+                data,
+                dataRaw
+            });
         }
         [HttpPost]
         public IActionResult DeleteTempImages()
@@ -661,6 +721,16 @@ namespace Admin.Controllers
         )$",
                 RegexOptions.IgnoreCase |
                 RegexOptions.IgnorePatternWhitespace
+            );
+        }
+        private static bool IsRawChapterTitle(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            return Regex.IsMatch(
+                line.Trim(),
+                @"^第\d+章(?:\s+.*)?$"
             );
         }
     }
